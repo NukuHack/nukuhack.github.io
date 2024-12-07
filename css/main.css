@@ -68,6 +68,7 @@ a {
 .navbar_link {
     display: inline-block;
     text-align: center;
+    cursor: pointer;
 }
 
 .navbar_toggle {
@@ -108,6 +109,12 @@ a {
     margin: 5px 0;
 }
 
+.navbar_item{
+    cursor: pointer;
+    float: left;
+    width: auto;
+}
+
 .navbar_items.show {
     display: flex;
 }
@@ -138,6 +145,7 @@ a {
 
 /*Footer*/
 footer {
+    cursor: default;
     position: fixed;
     bottom: 0;
     left: 0;
