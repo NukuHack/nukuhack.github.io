@@ -17,7 +17,10 @@
     overflow: hidden;
 }
 .code:hover{
-    background-color: #333333;
+    background-color: #888888;
+}
+.code_lang,.code_desc,.code_title{
+    cursor: default;
 }
 .code_help{
 
@@ -32,6 +35,15 @@
     border-radius: 30px;
     resize: none;
 }
+.code_code:focus{
+    outline: none;
+}
+.code_code:invalid{
+
+}
+
+
+
 .code_readonly{
     margin-right: 5px;
 }

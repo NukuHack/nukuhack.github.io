@@ -35,9 +35,9 @@
     padding-bottom: 13px;
     font-size: 120%;
     width: 100%;
-    background-color: grey;
+    background-color: #444444;
     border-radius: 50px;
 }
 .link:hover{
-    background-color: darkslategray;
+    background-color: #888888;
 }

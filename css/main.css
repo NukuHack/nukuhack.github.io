@@ -1,7 +1,7 @@
 /*First the basics*/
 body {
     min-height: 100%;
-    color: lightgray;
+    color: snow;
     background-color: slategray;
     margin: 0;
     display: flex;
@@ -34,16 +34,13 @@ a {
 
 
 
-
-
-
 .navbar {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background-color: #333; /* Navbar background */
+    background-color: #333333; /* Navbar background */
     padding: 10px 20px;
-    color: #cccccc;
+    color: snow;
     position: fixed;
     top: 0;
     width: 100%;
@@ -61,7 +58,7 @@ a {
 }
 
 .navbar_link, .navbar_item {
-    color: white;
+    color: snow;
     text-decoration: none;
     font-size: 1.4rem;
     margin: 0 10px;

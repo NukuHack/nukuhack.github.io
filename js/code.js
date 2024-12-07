@@ -42,11 +42,11 @@ function DisplayData() {
             let CodeHelp = "";
             CodeHelp += `<div class="code" id="code_${id}">`;
 
-            CodeHelp += `<div class="lang" id="lang_${id}">`;
+            CodeHelp += `<div class="code_lang" id="lang_${id}">`;
             CodeHelp += `Language: ${lang_to_Lang[lang]}`;
             CodeHelp += `</div>`;
 
-            CodeHelp += `<div class="desc" id="desc_${id}">`;
+            CodeHelp += `<div class="code_desc" id="desc_${id}">`;
             CodeHelp += `Description: ${desc}`;
             CodeHelp += `</div>`;
 
@@ -56,7 +56,7 @@ function DisplayData() {
             CodeHelp += `<input type="button" class="code_readonly" onclick="ChangeTextareReadonly(${id})" value="Change from readonly">`;
             CodeHelp += `<input type="button" class="code_reset" onclick="CodeReset(${id})" value="Reset the code">`;
             CodeHelp += `<br>`;
-            CodeHelp += `<textarea rows="${len + 2}" cols="${wid + (lang == "c#" ? 8 : 4)}" readonly class="code_code" id="code_code_${id}">`;
+            CodeHelp += `<textarea rows="${len + 2}" cols="${wid + (lang == "c#" ? 8 : 4)}" onfocus="ClearRed(${id})" readonly class="code_code" id="code_code_${id}">`;
             CodeHelp += `${code}`;
             CodeHelp += `</textarea>`;
 
@@ -105,6 +105,11 @@ function CodeReset(id) {
     //toReset.innerText=toReset.innerHTML;
     console.log(Data[id].code);
     ChangeTextareReadonly(id,"XD");
+}
+
+function ClearRed(id) {
+    let toClear = document.getElementById(`code_code_${id}`);
+    toClear.classList.remove('invalid');
 }
 
 
