@@ -1,0 +1,121 @@
+
+/*First the basics*/
+body {
+    min-height: 100%;
+    color: aqua;
+    background-color:chocolate;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+}
+a {
+    text-decoration: none;
+    color: black;
+}
+
+
+
+
+
+/*Footer*/
+footer {
+    margin-top: auto;
+    background-color: #f1f1f1; /* Adjust to your preferred color */
+    padding: 10px 20px;
+    text-align: center;
+    border-top: 1px solid #ccc; /* Optional styling */
+}
+
+.footer_in {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.footer_in_in {
+    text-align: center;
+}
+
+footer h5, footer h6 {
+    margin: 5px 0;
+}
+
+
+
+
+
+/* Navbar*/
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #333; /* Adjust to your preferred color */
+    padding: 10px 20px;
+    color: white;
+}
+
+.navbar_link {
+    color: white;
+    text-decoration: none;
+    font-size: 1.2rem;
+}
+
+.navbar_link:hover {
+    text-decoration: underline;
+}
+
+.navbar_toggler {
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+}
+
+.navbar_toggle_icon {
+    display: inline-block;
+    width: 20px;
+    height: 2px;
+    background-color: white;
+    position: relative;
+}
+
+.navbar_toggle_icon::before, .navbar_toggle_icon::after {
+    content: '';
+    position: absolute;
+    width: 20px;
+    height: 2px;
+    background-color: white;
+    left: 0;
+}
+
+.navbar_toggle_icon::before {
+    top: -6px;
+}
+
+.navbar_toggle_icon::after {
+    top: 6px;
+}
+
+.navbar_collapse {
+    display: none;
+}
+
+.navbar_ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+}
+
+.navbar_li {
+    margin: 0 10px;
+}
+
+.navbar_item {
+    color: white;
+    text-decoration: none;
+}
+
+.navbar_item:hover {
+    text-decoration: underline;
+}
