@@ -20,6 +20,9 @@ function LoadBasicConetent() {
                         <li class="navbar_li">
                             <p class="navbar_item" onclick="ChangePage('code')">Actual Code</p>
                         </li>
+                        <li class="navbar_li">
+                            <p class="navbar_item" onclick="ChangePage('extra')">Extra Things</p>
+                        </li>
                     </ul>
                 </div>
             </div>
