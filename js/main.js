@@ -2,7 +2,7 @@
 
 const body = document.querySelector("body");
 
-function LoadNavbar() {
+function LoadBasicConetent() {
 
 
     let navContent = `
@@ -52,12 +52,21 @@ function LoadNavbar() {
     body.insertAdjacentHTML("beforeend",footerContent);
 }
 
-LoadNavbar();
+
+
+
+LoadBasicConetent();
+
+
+
 
 
 const toggle = document.getElementById("navbarToggle");
 const items = document.getElementById("navbarDropdown");
 items.style.display = "none";
+
+
+
 
 
 // for the header
@@ -71,6 +80,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
     });
 });
+
+
+
 
 
 
