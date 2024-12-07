@@ -1,0 +1,40 @@
+
+
+.list{
+    align-self: center;
+    width: 70%;
+    align-items: center;
+    padding-right: 20px;
+    padding-left: 20px;
+}
+.list_item{
+    padding-top: 1px;
+    padding-bottom: 13px;
+    list-style: none;
+    margin: 5px;
+    width: max(200px,90%);
+    background: #333333;
+    border-radius: 50px;
+    overflow: hidden;
+}
+.list_item:hover{
+    background: #444444;
+    color: snow;
+}
+.list_title{
+    cursor: default;
+
+}
+.list_content{
+    cursor: default;
+    font-size: 140%;
+    width: 100%;
+    background-color: grey;
+    color: black;
+    padding: 3px;
+    margin: 2px;
+}
+.list_extra{
+    cursor: default;
+    font-size: 80%;
+}

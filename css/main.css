@@ -1,11 +1,14 @@
 /*First the basics*/
 body {
     min-height: 100%;
-    color: aqua;
-    background-color: chocolate;
+    color: lightgray;
+    background-color: slategray;
     margin: 0;
     display: flex;
     flex-direction: column;
+    text-align: center;
+    justify-content: center;
+    overflow: hidden;
 }
 
 a {
@@ -43,7 +46,6 @@ a {
     color: #cccccc;
     position: fixed;
     top: 0;
-    left: 0;
     width: 100%;
     z-index: 1000; /* Ensure it stays above content */
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Optional: Shadow for visibility */
@@ -51,7 +53,7 @@ a {
 
 .navbar_in {
     position: relative;
-    left: 20%;
+    left: 24%;
     width: 50%; /* Align near the center */
     display: flex;
     align-items: center; /* Ensure vertical alignment */
@@ -88,7 +90,7 @@ a {
 
 .navbar_items {
     display: none;
-    width: 200px;
+    width: 250px;
     flex-direction: column; /* Stack items vertically in dropdown */
     background-color: #444;
     position: absolute;
@@ -121,8 +123,8 @@ a {
 
 
 #navbarHelp{
-    margin-bottom: 5%;
-
+    margin-bottom: 50px;
+    visibility: hidden;
 }
 
 
@@ -147,13 +149,14 @@ a {
 footer {
     cursor: default;
     position: fixed;
+    color: snow;
     bottom: 0;
     left: 0;
     width: 100%;
-    background-color: #f1f1f1; /* Adjust to your preferred color */
+    background-color: #888888; /* Adjust to your preferred color */
     padding: 10px 20px;
     text-align: center;
-    border-top: 1px solid #ccc; /* Optional styling */
+    border-top: 1px solid #111; /* Optional styling */
     z-index: 1000; /* Ensure it stays on top of other content */
 }
 
@@ -176,7 +179,8 @@ footer h5, footer h6 {
 }
 
 #footerHelp {
-    margin-top: 5%;
+    margin-top: 50px;
+    visibility: hidden;
 }
 
 

@@ -1,2 +1,48 @@
 
+.codes{
+    margin: 10px;
+    width: 96%;
+    height: 96%;
+    display: grid;
+    justify-items: center;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 50%));
+}
+.code{
+    width: 98%;
+    background-color: #444444;
+    border: 2px solid black;
+    border-radius: min(100px,30%);
+    margin: 2px;
+    padding: 2px;
+    overflow: hidden;
+}
+.code:hover{
+    background-color: #333333;
+}
+.code_help{
 
+    margin: 4px;
+}
+.code_code{
+    font-size: 50%;
+    margin: 4px;
+    cursor: default;
+    background-color: lightskyblue;
+    border: 1px solid #cccccc;
+    border-radius: 30px;
+    resize: none;
+}
+.code_readonly{
+    margin-right: 5px;
+}
+
+
+/*Buttons*/
+.code_copy,.code_readonly,.code_reset{
+    color: black;
+    background-color: snow;
+    cursor: pointer;
+}
+.code_copy:hover,.code_readonly:hover,.code_reset:hover{
+    background-color: grey;
+}

@@ -1,20 +1,36 @@
 {
   "data": [
-    {
-      "id": 0,
-      "desc": "for now this is just a dummy"
-    },
-    {
-      "id": 1,
-      "desc": "for now this is just a dummy"
-    },
-    {
-      "id": 2,
-      "desc": "for now this is just a dummy"
-    },
-    {
-      "id": 3,
-      "desc": "for now this is just a dummy"
-    }
+  {
+    "id": 0,
+    "lang": "js",
+    "desc": "Fetch an external json",
+    "code": "   function fetchData() {\n     fetch('./json/data.json')\n       .then((res) => {\n         if (!res.ok) {\n           throw new Error\n           (`HTTP error status: ${res.status}`);\n         }\n         return res.json();\n       })\n       .then((amabatukam) => {\n         Data = amabatukam.data;\n         //console.log(Data);\n       })\n       .catch((error) =>{\n           console.error('Json load error:', error)\n       });\n  }"
+
+
+  },
+  {
+    "id": 1,
+    "lang": "c#",
+    "desc": "Read an external file",
+    "code": "\tprivate string[,] Data;\n\tprivate int len;\n\tprivate int wid;\n\t\n\tprivate void Read_file() {\n\t  string filePlace = \"hid.csv\"; // the file to read\n\t  string cut = \";\"; // the character used inside splitting\n\n\t  string[] adat = File.ReadAllLines(filePlace);\n\t  len = adat.Length; // this is where we make the length\n\t  wid = adat[0].Split(cut).Length; // this is the width\n\t  Data = new string[len, wid]; // leng times wid to make a matrix\n\t  StreamReader fireReader = new StreamReader(filePlace);\n\t  int n = 0;\n\t  while (!fireReader.EndOfStream) {\n\t    string[]   line = fireReader.ReadLine().Split(cut);\n\t    for (int i = 0; i < wid; i++)\n\t      Data[n, i] =   line[i];\n\t    n++;\n\t  }\n\t  fireReader.Close();\n\t}"
+  },
+  {
+    "id": 2,
+    "lang": "none",
+    "desc": "for now this is just a dummy",
+    "code": "none"
+  },
+  {
+    "id": 3,
+    "lang": "none",
+    "desc": "none",
+    "code": "none"
+  },
+  {
+    "id": 4,
+    "lang": "none",
+    "desc": "none",
+    "code": "none"
+  }
   ]
 }
