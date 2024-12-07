@@ -1,13 +1,13 @@
-
 /*First the basics*/
 body {
     min-height: 100%;
     color: aqua;
-    background-color:chocolate;
+    background-color: chocolate;
     margin: 0;
     display: flex;
     flex-direction: column;
 }
+
 a {
     text-decoration: none;
     color: black;
@@ -17,22 +17,149 @@ a {
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #333; /* Navbar background */
+    padding: 10px 20px;
+    color: #cccccc;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000; /* Ensure it stays above content */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Optional: Shadow for visibility */
+}
+
+.navbar_in {
+    position: relative;
+    left: 20%;
+    width: 50%; /* Align near the center */
+    display: flex;
+    align-items: center; /* Ensure vertical alignment */
+    justify-content: center;
+}
+
+.navbar_link, .navbar_item {
+    color: white;
+    text-decoration: none;
+    font-size: 1.4rem;
+    margin: 0 10px;
+}
+
+.navbar_link {
+    display: inline-block;
+    text-align: center;
+}
+
+.navbar_toggle {
+    display: flex; /* Align items horizontally */
+    background: none;
+    border: none;
+    cursor: pointer;
+    justify-content: center;
+    align-items: center; /* Center the image inside */
+    padding: 5px;
+    margin-left: 10px; /* Optional spacing between link and toggle */
+}
+
+.navbar_link:hover, .navbar_item:hover {
+    text-decoration: underline;
+}
+
+.navbar_items {
+    display: none;
+    width: max(40%,200px);
+    flex-direction: column; /* Stack items vertically in dropdown */
+    background-color: #444;
+    position: absolute;
+    top: 100%;
+    left: 70%; /* Align near the center */
+    padding: 10px;
+    border-radius: 5px;
+    transform: translateX(-50%); /* Center adjustment for better aesthetics */
+}
+
+.navbar_ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.navbar_li {
+    margin: 5px 0;
+}
+
+.navbar_items.show {
+    display: flex;
+}
+
+
+#navbarHelp{
+    margin-bottom: 5%;
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 /*Footer*/
 footer {
-    margin-top: auto;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
     background-color: #f1f1f1; /* Adjust to your preferred color */
     padding: 10px 20px;
     text-align: center;
     border-top: 1px solid #ccc; /* Optional styling */
+    z-index: 1000; /* Ensure it stays on top of other content */
 }
 
 .footer_in {
+    position: relative;
+    left: 20%;
+    width: 50%;
     display: flex;
     justify-content: center;
     align-items: center;
 }
 
 .footer_in_in {
+    width: 50%;
     text-align: center;
 }
 
@@ -40,82 +167,9 @@ footer h5, footer h6 {
     margin: 5px 0;
 }
 
-
-
-
-
-/* Navbar*/
-.navbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background-color: #333; /* Adjust to your preferred color */
-    padding: 10px 20px;
-    color: white;
+#footerHelp {
+    margin-top: 5%;
 }
 
-.navbar_link {
-    color: white;
-    text-decoration: none;
-    font-size: 1.2rem;
-}
 
-.navbar_link:hover {
-    text-decoration: underline;
-}
 
-.navbar_toggler {
-    background: none;
-    border: none;
-    color: white;
-    cursor: pointer;
-}
-
-.navbar_toggle_icon {
-    display: inline-block;
-    width: 20px;
-    height: 2px;
-    background-color: white;
-    position: relative;
-}
-
-.navbar_toggle_icon::before, .navbar_toggle_icon::after {
-    content: '';
-    position: absolute;
-    width: 20px;
-    height: 2px;
-    background-color: white;
-    left: 0;
-}
-
-.navbar_toggle_icon::before {
-    top: -6px;
-}
-
-.navbar_toggle_icon::after {
-    top: 6px;
-}
-
-.navbar_collapse {
-    display: none;
-}
-
-.navbar_ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    display: flex;
-}
-
-.navbar_li {
-    margin: 0 10px;
-}
-
-.navbar_item {
-    color: white;
-    text-decoration: none;
-}
-
-.navbar_item:hover {
-    text-decoration: underline;
-}
