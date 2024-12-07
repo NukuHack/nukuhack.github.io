@@ -6,29 +6,29 @@ function LoadNavbar() {
 
 
     let navContent = `
-<nav class="navbar" id="navbar">
-    <div class="navbar_in">
-        <a class="navbar_link" href="#">Current Webpage</a>
-        <button type="button" class="navbar_toggle" id="navbarToggle">
-            <img src="./assets/menu_bars.png" alt="Menu" />
-        </button>
-        <div class="navbar_items" id="navbarDropdown">
-            <ul class="navbar_ul">
-                <li class="navbar_li">
-                    <a class="navbar_item" href="./index.html">Main Webpage</a>
-                </li>
-                <li class="navbar_li">
-                    <a class="navbar_item" href="./code.html">Actual Code</a>
-                </li>
-            </ul>
-        </div>
-    </div>
-</nav>
+        <nav class="navbar" id="navbar">
+            <div class="navbar_in">
+                <p class="navbar_link" onclick="ChangePage()">Current Webpage</p>
+                <button type="button" class="navbar_toggle" id="navbarToggle">
+                    <img src="./assets/menu_bars.png" alt="Menu" />
+                </button>
+                <div class="navbar_items" id="navbarDropdown">
+                    <ul class="navbar_ul">
+                        <li class="navbar_li">
+                            <p class="navbar_item" onclick="ChangePage('index')">Main Webpage</p>
+                        </li>
+                        <li class="navbar_li">
+                            <p class="navbar_item" onclick="ChangePage('code')">Actual Code</p>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
 
     
-    <div id="navbarHelp">
-        .
-    </div>
+        <div id="navbarHelp">
+            .
+        </div>
     `;
 
 
@@ -59,6 +59,7 @@ const toggle = document.getElementById("navbarToggle");
 const items = document.getElementById("navbarDropdown");
 items.style.display = "none";
 
+
 // for the header
 document.addEventListener("DOMContentLoaded", function () {
 
@@ -70,3 +71,25 @@ document.addEventListener("DOMContentLoaded", function () {
 
     });
 });
+
+
+
+let url = window.location.href;
+url = url.slice(url.lastIndexOf("/") + 1);
+// only needed if you use it with an editor like webstorm (like me)
+if (url.indexOf("?") != -1) url = url.slice(0, url.indexOf("?"));
+
+console.log("current page url: ",url);
+
+
+function ChangePage(url){
+    let urlHelp = window.location.href;
+    if(url)
+        window.location.href=`${url}.html`;
+    else
+        if(urlHelp.indexOf('#')==-1)
+            window.location.href+='#';
+        else
+            window.location.href=window.location.href;
+}
+
