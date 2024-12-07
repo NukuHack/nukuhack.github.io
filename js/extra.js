@@ -5,7 +5,7 @@ const listHelper = [
         {
             "id":0,
             "title":"Last Update :",
-            "content":"This page has been updated : 2024.12.07 22:40",
+            "content":"This page has been updated : 2024.12.07 23:20",
             "extra":"But it is still maintained currently",
         },
     {
