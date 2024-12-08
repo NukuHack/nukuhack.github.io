@@ -15,9 +15,9 @@
 
 .code {
     width: 98%;
-    background-color: #444444;
+    background-color: #222222;
     border: 2px solid black;
-    border-radius: min(100px, 30%);
+    border-radius: 50px;
     margin: 2px;
     padding: 2px;
     overflow: hidden;
@@ -28,7 +28,7 @@
 }
 
 .code:hover {
-    background-color: #888888;
+    background-color: #444444;
 }
 
 .code_lang, .code_desc, .code_title {

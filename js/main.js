@@ -2,6 +2,12 @@
 
 const body = document.querySelector("body");
 
+body.insertAdjacentHTML('afterbegin',`
+    <div id="modal" class="modal" style="display: none;">
+        
+    </div>
+`);
+
 function LoadBasicConetent() {
 
 

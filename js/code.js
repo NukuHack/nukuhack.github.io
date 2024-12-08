@@ -1,5 +1,11 @@
+
+
 const CodeOutput = document.getElementById('codes');
+const Modal = document.getElementById('modal');
 let Data; // the main data storage ... yeah
+
+
+
 const lang_to_Lang = {
     "c#": "C# aka C sharp",
     "js": "Js aka JavaScript",
@@ -71,14 +77,32 @@ function DisplayData() {
     })
 }
 
-
 function CopyCode(id) {
-    let toCopy = document.getElementById(`code_code_${id}`).value;
-    if (toCopy != "")
-        navigator.clipboard.writeText(toCopy);
-    else
-        alert("Nothing to copy")
+    // Check if the Clipboard API is available
+    if (navigator.clipboard) {
+        // Get the text to copy
+        let textToCopy = document.getElementById(`code_code_${id}`).value;
+        if (!textToCopy) {
+            modalOpen('Copy Error','Failed to copy:',"text to copy is null")
+        }
+        else{
+            // Write the text to the clipboard
+            navigator.clipboard.writeText(textToCopy)
+                .then(() => {
+                    // Display a message if the text was copied successfully
+                    modalOpen('Copy Success','Code copied to clipboard!')
+                })
+                .catch((error) => {
+                    // Display an error message if there is an issue copying the text
+                    modalOpen('Copy Error','Failed to copy:', error)
+                });
+        }
+    } else {
+        // If the Clipboard API is not available, display an error message
+        modalOpen('Browser Error','Your browser does not support the Clipboard API.')
+    }
 }
+
 
 function ChangeTextareReadonly(id,helper) {
     let toChange = document.getElementById(`code_code_${id}`);
@@ -103,14 +127,9 @@ function CodeReset(id) {
     let toReset = document.getElementById(`code_code_${id}`);
     toReset.value = `${Data[id].code}`;
     //toReset.innerText=toReset.innerHTML;
-    console.log(Data[id].code);
     ChangeTextareReadonly(id,"XD");
 }
 
-function ClearRed(id) {
-    let toClear = document.getElementById(`code_code_${id}`);
-    toClear.classList.remove('invalid');
-}
 
 
 const CountB_in_A = ((sourceString, searchString) => {
@@ -152,3 +171,23 @@ const LongestSubstring = ((sourceString, searchString) => {
 
 
 
+
+
+function modalOpen(title,text,error) {
+    let modalHelp = `
+        <div class="modal-content">
+            <h4 class="modal_title">${title}</h4>
+            <p class="modal_text">${text}</p>
+            ${!error?"":`<p class="modal-error">${error}</p>`}
+            <div class="modal-footer">
+                <button onClick="modalClose()" class="modal-button">Ok</button>
+            </div>
+        </div>
+    `
+    Modal.innerHTML = modalHelp;
+    document.getElementById('modal').style.display = "block";
+}
+
+function modalClose() {
+    document.getElementById('modal').style.display = "none";
+}

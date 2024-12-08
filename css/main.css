@@ -181,3 +181,94 @@ footer h5, footer h6 {
 
 
 
+
+
+
+
+
+
+
+
+/*my custom "popup box" I also use it for errors and stuff*/
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    color: #222222;
+    z-index: 1; /* Sit on top */
+    padding-top: 100px; /* Location of the box */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgb(0,0,0); /* Fallback color */
+    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+
+/* Modal Content */
+.modal-content {
+    background-color: grey;
+    margin: auto;
+    padding: 20px;
+    border: 2px solid black;
+    border-radius: 25px;
+    width: 80%;
+    max-width: 500px;
+}
+
+/* The Close Button */
+.modal-button{
+    margin: 0 10px;
+}
+.modal-error{
+    color: red;
+    background-color: black;
+}
+
+/* Add Animation */
+.modal-content, .modal-footer {
+    -webkit-animation-name: zoom;
+    -webkit-animation-duration: 0.6s;
+    animation-name: zoom;
+    animation-duration: 0.6s;
+}
+
+@-webkit-keyframes zoom {
+    from {-webkit-transform:scale(0)}
+    to {-webkit-transform:scale(1)}
+}
+
+@keyframes zoom {
+    from {transform:scale(0)}
+    to {transform:scale(1)}
+}
+
+.modal {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-align-items: center;
+    -ms-align-items: center;
+    align-items: center;
+    -webkit-justify-content: center;
+    -ms-justify-content: center;
+    justify-content: center;
+}
+
+.modal-button {
+    background-color: lightgray;
+    color: black;
+    font-size: 120%;
+    border: none;
+    cursor: pointer;
+    padding: 10px;
+    margin: 0;
+    width: 50px;
+    border-radius: 5px;
+}
+
+.modal-button:hover {
+    opacity: 0.8;
+}
+
+
