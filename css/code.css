@@ -1,32 +1,45 @@
-
-.codes{
+.codes {
     margin: 10px;
     width: 96%;
     height: 96%;
     display: grid;
-    justify-items: center;
-    grid-template-columns: repeat(auto-fill, minmax(100px, 50%));
+    place-items: center; /* Centers all grid items both horizontally and vertically */
+    align-items: stretch;
+    grid-template-columns: repeat(auto-fill, minmax(450px, min(900px,100%)));
+    justify-content: center;
+    @media (min-width: 900px) {
+        grid-template-columns: repeat(auto-fill, 50%);
+    }
 }
-.code{
+
+
+.code {
     width: 98%;
     background-color: #444444;
     border: 2px solid black;
-    border-radius: min(100px,30%);
+    border-radius: min(100px, 30%);
     margin: 2px;
     padding: 2px;
     overflow: hidden;
+    display: flex; /* Flexbox for centering content inside */
+    justify-content: center; /* Centers content horizontally */
+    align-items: center; /* Centers content vertically */
+    flex-direction: column; /* Keeps content stacked vertically */
 }
-.code:hover{
+
+.code:hover {
     background-color: #888888;
 }
-.code_lang,.code_desc,.code_title{
+
+.code_lang, .code_desc, .code_title {
     cursor: default;
 }
-.code_help{
 
+.code_help {
     margin: 4px;
 }
-.code_code{
+
+.code_code {
     font-size: 50%;
     margin: 4px;
     cursor: default;
@@ -35,26 +48,24 @@
     border-radius: 30px;
     resize: none;
 }
-.code_code:focus{
+
+.code_code:focus {
     outline: none;
 }
-.code_code:invalid{
 
-}
+.code_code:invalid {}
 
-
-
-.code_readonly{
+.code_readonly {
     margin-right: 5px;
 }
 
-
 /*Buttons*/
-.code_copy,.code_readonly,.code_reset{
+.code_copy, .code_readonly, .code_reset {
     color: black;
     background-color: snow;
     cursor: pointer;
 }
-.code_copy:hover,.code_readonly:hover,.code_reset:hover{
+
+.code_copy:hover, .code_readonly:hover, .code_reset:hover {
     background-color: grey;
 }
