@@ -85,7 +85,9 @@ a {
 }
 
 .navbar_items {
-    display: none;
+    transition: opacity 0.3s ease;
+    opacity: 0;
+    visibility: hidden;
     width: 250px;
     flex-direction: column; /* Stack items vertically in dropdown */
     background-color: #444;
@@ -203,6 +205,9 @@ footer h5, footer h6 {
     overflow: auto; /* Enable scroll if needed */
     background-color: rgb(0,0,0); /* Fallback color */
     background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+    align-items: center;
+    justify-content: center;
+    cursor: default;
 }
 
 /* Modal Content */
@@ -212,30 +217,19 @@ footer h5, footer h6 {
     padding: 20px;
     border: 2px solid black;
     border-radius: 25px;
-    width: 80%;
-    max-width: 500px;
+    width: min(70%, 500px);
 }
 
-/* The Close Button */
-.modal-button{
-    margin: 0 10px;
-}
 .modal-error{
     color: red;
+    text-shadow: 0.5px 0.5px 1px darkred;
     background-color: black;
 }
 
 /* Add Animation */
 .modal-content, .modal-footer {
-    -webkit-animation-name: zoom;
-    -webkit-animation-duration: 0.6s;
-    animation-name: zoom;
-    animation-duration: 0.6s;
-}
-
-@-webkit-keyframes zoom {
-    from {-webkit-transform:scale(0)}
-    to {-webkit-transform:scale(1)}
+    animation: zoom 0.6s;
+    cursor: default;
 }
 
 @keyframes zoom {
@@ -243,18 +237,7 @@ footer h5, footer h6 {
     to {transform:scale(1)}
 }
 
-.modal {
-    display: -webkit-box;
-    display: -ms-flexbox;
-    display: flex;
-    -webkit-align-items: center;
-    -ms-align-items: center;
-    align-items: center;
-    -webkit-justify-content: center;
-    -ms-justify-content: center;
-    justify-content: center;
-}
-
+/* The Close Button */
 .modal-button {
     background-color: lightgray;
     color: black;
@@ -262,13 +245,15 @@ footer h5, footer h6 {
     border: none;
     cursor: pointer;
     padding: 10px;
-    margin: 0;
+    margin: 0 10px;
     width: 50px;
     border-radius: 5px;
 }
 
 .modal-button:hover {
-    opacity: 0.8;
+    transition: background-color 0.5s ease;
+    background-color: #222222;
+    color: #888888;
 }
 
 

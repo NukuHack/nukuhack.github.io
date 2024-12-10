@@ -23,7 +23,18 @@
 <br/>
 <br/>
 <br/>
-For now
+
+<input type="button" id="animCube" class="animate_button" onclick="Animate('cube')" value="Animate the Cube">
+
+<div class="cube" id="cube" onclick="Animate('cube')">
+    <div class="front"></div>
+    <div class="back"></div>
+    <div class="left"></div>
+    <div class="right"></div>
+    <div class="top"></div>
+    <div class="bottom"></div>
+</div>
+
 <br/>
 <br/>
 <br/>
@@ -33,41 +44,21 @@ For now
 <br/>
 <br/>
 <br/>
+<label for="select_animation" id="select_anim_label">Select the polygon you want to animate:</label>
+<select id="select_animation" oninput="Animate()">
+    <option value="Default">
+        Nothing
+    </option>
+</select>
+
+<div class="polygon circle" id="circle" onclick="Animate('circle')"></div>
+<div class="polygon triangle" id="triangle" onclick="Animate('triangle')"></div>
+<div class="polygon square" id="square" onclick="Animate('square')"></div>
+<div class="polygon octagon" id="octagon" onclick="Animate('octagon')"></div>
+<div class="polygon pentagon" id="pentagon" onclick="Animate('pentagon')"></div>
+
 <br/>
 <br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-Here are some placeholders ...
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-To fill out the page
 <br/>
 <br/>
 <br/>
@@ -89,7 +80,7 @@ To fill out the page
 <br/>
 <br/>
 
-<script src="./js/main.js"></script>
-<script src="./js/index.js"></script>
+    <script src="./js/main.js"></script>
+    <script src="./js/index.js"></script>
 </body>
 </html>

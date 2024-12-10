@@ -6,9 +6,10 @@ let Data; // the main data storage ... yeah
 
 
 
-const lang_to_Lang = {
-    "c#": "C# aka C sharp",
-    "js": "Js aka JavaScript",
+const lang_help = {
+    "js": ["Js aka JavaScript",8],
+    "css": ["",6],
+    "c#": ["",4],
 }
 
 // just the json fetch
@@ -49,7 +50,7 @@ function DisplayData() {
             CodeHelp += `<div class="code" id="code_${id}">`;
 
             CodeHelp += `<div class="code_lang" id="lang_${id}">`;
-            CodeHelp += `Language: ${lang_to_Lang[lang]}`;
+            CodeHelp += `Language: ${lang_help[lang][0]||lang.toUpperCase()}`;
             CodeHelp += `</div>`;
 
             CodeHelp += `<div class="code_desc" id="desc_${id}">`;
@@ -59,13 +60,13 @@ function DisplayData() {
             CodeHelp += `<div class="code_help">`;
 
             CodeHelp += `<p class="code_title">`;
-            CodeHelp += `<input type="button" class="code_reasize" id="code_resize_${id}"
+            CodeHelp += `<input type="button" class="code_resize" id="code_resize_${id}"
                 value="The code itself: " readonly onClick="CodeResizer(${id})">`;
             CodeHelp += `</p>`;
             CodeHelp += `<input type="button" class="code_readonly" onclick="ChangeTextareaReadonly(${id})" value="Change from readonly">`;
-            CodeHelp += `<input type="button" class="code_reset" onclick="CodeReset(${id})" value="Reset the code">`;
+            CodeHelp += `<input type="button" class="code_reset" id="code_reset_${id}" onclick="CodeReset(${id})" value="Reset the code">`;
             CodeHelp += `<br>`;
-            CodeHelp += `<textarea rows="${len + 2}" cols="${wid + (lang == "c#" ? 8 : 4)}" readonly class="code_code" id="code_code_${id}">`;
+            CodeHelp += `<textarea rows="${len + 2}" cols="${wid + (lang_help[lang][1]||4)}" readonly class="code_code" id="code_code_${id}">`;
             CodeHelp += `${code}`;
             CodeHelp += `</textarea>`;
 
@@ -102,7 +103,7 @@ function CopyCode(id) {
         }
     } else {
         // If the Clipboard API is not available, display an error message
-        modalOpen('Browser Error','Your browser does not support the Clipboard API.')
+        modalOpen('Browser Error','Failed to copy:','Your browser does not support the Clipboard API.')
     }
 }
 
@@ -124,16 +125,26 @@ function ChangeTextareaReadonly(id,helper) {
 
 function CodeReset(id) {
     let toReset = document.getElementById(`code_code_${id}`);
+    let resetButton = document.getElementById(`code_reset_${id}`);
     toReset.value = `${Data[id].code}`;
     //toReset.innerText=toReset.innerHTML;
+
+    let originalValues = [resetButton.value,resetButton.onclick]; // Store the original value
+    resetButton.value = "Resetting code..."; // Change the button value
+    resetButton.onclick = null;
+
+    setTimeout(() => {
+        resetButton.value = originalValues[0]; // Reset the value after 1 second
+        resetButton.onclick = originalValues[1];
+    }, 1000);
 }
 
 function CodeResizer(id) {
     let toResize = document.getElementById(`code_code_${id}`);
-    if (toResize.style.fontSize==='100%')
+    if (toResize.style.fontSize==='120%')
         RemoveCss(toResize,'font-size');
     else
-        toResize.style.fontSize = `100%`;
+        toResize.style.fontSize = `120%`;
 }
 
 
@@ -176,32 +187,4 @@ const LongestSubstring = ((sourceString, searchString) => {
 });
 
 
-
-
-function RemoveCss(item,type){
-    let CssT = item.style.cssText;
-    let TypePlace = CssT.indexOf(`${type}`);
-    // counting the length between the start and the start of the type
-    let TypeStart = CssT.slice(0,TypePlace).length;
-    item.style.cssText=CssT.replace(CssT.slice(TypePlace,TypeStart+CssT.slice(TypePlace).indexOf(';')),'');
-}
-
-function modalOpen(title,text,error) {
-    let modalHelp = `
-        <div class="modal-content">
-            <h4 class="modal_title">${title}</h4>
-            <p class="modal_text">${text}</p>
-            ${!error?"":`<p class="modal-error">${error}</p>`}
-            <div class="modal-footer">
-                <button onClick="modalClose()" class="modal-button">Ok</button>
-            </div>
-        </div>
-    `
-    Modal.innerHTML = modalHelp;
-    document.getElementById('modal').style.display = "block";
-}
-
-function modalClose() {
-    document.getElementById('modal').style.display = "none";
-}
 

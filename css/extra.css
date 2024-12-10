@@ -19,9 +19,11 @@
 }
 
 .list_item:hover {
+    transition: background-color 0.5s ease;
     background-color: #888888;
 
     .list_content {
+        transition: background-color 0.5s ease;
         background-color: lightgray;
         color: black;
     }

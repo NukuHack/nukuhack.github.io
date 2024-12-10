@@ -19,9 +19,11 @@
 }
 
 .link:hover {
+    transition: background-color 0.5s ease;
     background-color: #888888;
 
     .link_content {
+        transition: background-color 0.5s ease;
         background-color: lightgray;
         color: black;
     }
@@ -41,10 +43,6 @@
     padding: 3px;
     margin-top: 2px;
     margin-bottom: 2px;
-}
-
-.link_link {
-
 }
 
 .link_link:hover {

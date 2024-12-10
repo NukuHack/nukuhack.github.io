@@ -5,8 +5,9 @@
     display: grid;
     place-items: center; /* Centers all grid items both horizontally and vertically */
     align-items: stretch;
-    grid-template-columns: repeat(auto-fill, minmax(450px, min(900px,100%)));
+    grid-template-columns: repeat(auto-fill, 100%);
     justify-content: center;
+
     @media (min-width: 900px) {
         grid-template-columns: repeat(auto-fill, 50%);
     }
@@ -28,6 +29,7 @@
 }
 
 .code:hover {
+    transition: background-color 0.5s ease;
     background-color: #444444;
 }
 
@@ -53,19 +55,22 @@
     outline: none;
 }
 
-.code_code:invalid {}
-
 .code_readonly {
     margin-right: 5px;
 }
 
 /*Buttons*/
-.code_copy, .code_readonly, .code_reset {
+.code_copy, .code_readonly, .code_reset, .code_resize {
+    border-radius: 5px;
+    border: 1px solid #cccccc;
+    font-size: 90%;
     color: black;
     background-color: snow;
     cursor: pointer;
 }
 
-.code_copy:hover, .code_readonly:hover, .code_reset:hover {
+.code_copy:hover, .code_readonly:hover, .code_reset:hover, .code_resize:hover {
+    border-color: black;
+    transition: background-color 0.3s ease;
     background-color: grey;
 }

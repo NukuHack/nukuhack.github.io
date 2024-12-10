@@ -16,9 +16,9 @@
   },
   {
     "id": 2,
-    "lang": "none",
-    "desc": "for now this is just a dummy",
-    "code": "none"
+    "lang": "css",
+    "desc": "A basic animation (a bouncing ball)",
+    "code": "  .ball {\n\twidth: 50px;\n\theight: 50px;\n\tbackground-color: red;\n\tborder-radius: 50%;\n\tposition: fixed;\n\ttop: 0;\n\tleft: 50%;\n\ttransform: translateX(-50%);\n\tanimation: bounce 2s infinite;\n  }\n\n  @keyframes bounce {\n\t0%, 100% { top: 100px; }\n\t50% { top: 500px; }\n  }"
   },
   {
     "id": 3,
