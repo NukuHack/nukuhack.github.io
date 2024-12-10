@@ -58,11 +58,14 @@ function DisplayData() {
 
             CodeHelp += `<div class="code_help">`;
 
-            CodeHelp += `<p class="code_title">The code itself: </p>`;
-            CodeHelp += `<input type="button" class="code_readonly" onclick="ChangeTextareReadonly(${id})" value="Change from readonly">`;
+            CodeHelp += `<p class="code_title">`;
+            CodeHelp += `<input type="button" class="code_reasize" id="code_resize_${id}"
+                value="The code itself: " readonly onClick="CodeResizer(${id})">`;
+            CodeHelp += `</p>`;
+            CodeHelp += `<input type="button" class="code_readonly" onclick="ChangeTextareaReadonly(${id})" value="Change from readonly">`;
             CodeHelp += `<input type="button" class="code_reset" onclick="CodeReset(${id})" value="Reset the code">`;
             CodeHelp += `<br>`;
-            CodeHelp += `<textarea rows="${len + 2}" cols="${wid + (lang == "c#" ? 8 : 4)}" onfocus="ClearRed(${id})" readonly class="code_code" id="code_code_${id}">`;
+            CodeHelp += `<textarea rows="${len + 2}" cols="${wid + (lang == "c#" ? 8 : 4)}" readonly class="code_code" id="code_code_${id}">`;
             CodeHelp += `${code}`;
             CodeHelp += `</textarea>`;
 
@@ -104,21 +107,17 @@ function CopyCode(id) {
 }
 
 
-function ChangeTextareReadonly(id,helper) {
+function ChangeTextareaReadonly(id,helper) {
     let toChange = document.getElementById(`code_code_${id}`);
-    if (!helper) {
-        if (toChange.readOnly == true) {
+    if (!helper&&toChange.readOnly === true) {
             toChange.readOnly = false;
             toChange.style.backgroundColor = "dodgerblue";
             toChange.style.cursor = "text";
-        } else {
-            toChange.readOnly = true;
-            toChange.style.cssText = "";
-        }
     }
     else{
         toChange.readOnly = true;
-        toChange.style.cssText = "";
+        RemoveCss(toChange,'background-color');
+        RemoveCss(toChange,'cursor');
     }
 
 }
@@ -127,7 +126,14 @@ function CodeReset(id) {
     let toReset = document.getElementById(`code_code_${id}`);
     toReset.value = `${Data[id].code}`;
     //toReset.innerText=toReset.innerHTML;
-    ChangeTextareReadonly(id,"XD");
+}
+
+function CodeResizer(id) {
+    let toResize = document.getElementById(`code_code_${id}`);
+    if (toResize.style.fontSize==='100%')
+        RemoveCss(toResize,'font-size');
+    else
+        toResize.style.fontSize = `100%`;
 }
 
 
@@ -172,6 +178,13 @@ const LongestSubstring = ((sourceString, searchString) => {
 
 
 
+function RemoveCss(item,type){
+    let CssT = item.style.cssText;
+    let TypePlace = CssT.indexOf(`${type}`);
+    // counting the length between the start and the start of the type
+    let TypeStart = CssT.slice(0,TypePlace).length;
+    item.style.cssText=CssT.replace(CssT.slice(TypePlace,TypeStart+CssT.slice(TypePlace).indexOf(';')),'');
+}
 
 function modalOpen(title,text,error) {
     let modalHelp = `
@@ -191,3 +204,4 @@ function modalOpen(title,text,error) {
 function modalClose() {
     document.getElementById('modal').style.display = "none";
 }
+
