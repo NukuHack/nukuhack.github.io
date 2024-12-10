@@ -74,11 +74,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
     document.getElementById("navbarToggle").addEventListener("click", function () {
         console.log(NavItems.style.opacity)
-        if (NavItems.style.opacity !== "100"){
+        if (NavItems.style.opacity !== "100") {
             NavItems.style.visibility = "visible";
             NavItems.style.opacity = "100";
-        }
-        else
+        } else
             NavItems.style.cssText = "";
 
     });

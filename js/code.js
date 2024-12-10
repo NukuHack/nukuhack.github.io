@@ -1,15 +1,12 @@
-
-
 const CodeOutput = document.getElementById('codes');
 const Modal = document.getElementById('modal');
 let Data; // the main data storage ... yeah
 
 
-
 const lang_help = {
-    "js": ["Js aka JavaScript",8],
-    "css": ["",6],
-    "c#": ["",4],
+    "js": ["Js aka JavaScript", 8],
+    "css": ["", 6],
+    "c#": ["", 4],
 }
 
 // just the json fetch
@@ -50,7 +47,7 @@ function DisplayData() {
             CodeHelp += `<div class="code" id="code_${id}">`;
 
             CodeHelp += `<div class="code_lang" id="lang_${id}">`;
-            CodeHelp += `Language: ${lang_help[lang][0]||lang.toUpperCase()}`;
+            CodeHelp += `Language: ${lang_help[lang][0] || lang.toUpperCase()}`;
             CodeHelp += `</div>`;
 
             CodeHelp += `<div class="code_desc" id="desc_${id}">`;
@@ -66,7 +63,7 @@ function DisplayData() {
             CodeHelp += `<input type="button" class="code_readonly" onclick="ChangeTextareaReadonly(${id})" value="Change from readonly">`;
             CodeHelp += `<input type="button" class="code_reset" id="code_reset_${id}" onclick="CodeReset(${id})" value="Reset the code">`;
             CodeHelp += `<br>`;
-            CodeHelp += `<textarea rows="${len + 2}" cols="${wid + (lang_help[lang][1]||4)}" readonly class="code_code" id="code_code_${id}">`;
+            CodeHelp += `<textarea rows="${len + 2}" cols="${wid + (lang_help[lang][1] || 4)}" readonly class="code_code" id="code_code_${id}">`;
             CodeHelp += `${code}`;
             CodeHelp += `</textarea>`;
 
@@ -87,38 +84,36 @@ function CopyCode(id) {
         // Get the text to copy
         let textToCopy = document.getElementById(`code_code_${id}`).value;
         if (!textToCopy) {
-            modalOpen('Copy Error','Failed to copy:',"text to copy is null")
-        }
-        else{
+            modalOpen('Copy Error', 'Failed to copy:', "text to copy is null")
+        } else {
             // Write the text to the clipboard
             navigator.clipboard.writeText(textToCopy)
                 .then(() => {
                     // Display a message if the text was copied successfully
-                    modalOpen('Copy Success','Code copied to clipboard!')
+                    modalOpen('Copy Success', 'Code copied to clipboard!')
                 })
                 .catch((error) => {
                     // Display an error message if there is an issue copying the text
-                    modalOpen('Copy Error','Failed to copy:', error)
+                    modalOpen('Copy Error', 'Failed to copy:', error)
                 });
         }
     } else {
         // If the Clipboard API is not available, display an error message
-        modalOpen('Browser Error','Failed to copy:','Your browser does not support the Clipboard API.')
+        modalOpen('Browser Error', 'Failed to copy:', 'Your browser does not support the Clipboard API.')
     }
 }
 
 
-function ChangeTextareaReadonly(id,helper) {
+function ChangeTextareaReadonly(id, helper) {
     let toChange = document.getElementById(`code_code_${id}`);
-    if (!helper&&toChange.readOnly === true) {
-            toChange.readOnly = false;
-            toChange.style.backgroundColor = "dodgerblue";
-            toChange.style.cursor = "text";
-    }
-    else{
+    if (!helper && toChange.readOnly === true) {
+        toChange.readOnly = false;
+        toChange.style.backgroundColor = "dodgerblue";
+        toChange.style.cursor = "text";
+    } else {
         toChange.readOnly = true;
-        RemoveCss(toChange,'background-color');
-        RemoveCss(toChange,'cursor');
+        RemoveCss(toChange, 'background-color');
+        RemoveCss(toChange, 'cursor');
     }
 
 }
@@ -129,7 +124,7 @@ function CodeReset(id) {
     toReset.value = `${Data[id].code}`;
     //toReset.innerText=toReset.innerHTML;
 
-    let originalValues = [resetButton.value,resetButton.onclick]; // Store the original value
+    let originalValues = [resetButton.value, resetButton.onclick]; // Store the original value
     resetButton.value = "Resetting code..."; // Change the button value
     resetButton.onclick = null;
 
@@ -141,12 +136,11 @@ function CodeReset(id) {
 
 function CodeResizer(id) {
     let toResize = document.getElementById(`code_code_${id}`);
-    if (toResize.style.fontSize==='120%')
-        RemoveCss(toResize,'font-size');
+    if (toResize.style.fontSize === '120%')
+        RemoveCss(toResize, 'font-size');
     else
         toResize.style.fontSize = `120%`;
 }
-
 
 
 const CountB_in_A = ((sourceString, searchString) => {

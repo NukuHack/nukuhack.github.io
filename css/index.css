@@ -45,14 +45,7 @@
     width: 50px;
     height: 50px;
     clip-path: polygon(
-            30% 0%, /* Top-left corner */
-            70% 0%, /* Top-right corner */
-            100% 30%, /* Right-top corner */
-            100% 70%, /* Right-bottom corner */
-            70% 100%, /* Bottom-right corner */
-            30% 100%, /* Bottom-left corner */
-            0% 70%, /* Left-bottom corner */
-            0% 30% /* Left-top corner */
+            30% 0%, /* Top-left corner */ 70% 0%, /* Top-right corner */ 100% 30%, /* Right-top corner */ 100% 70%, /* Right-bottom corner */ 70% 100%, /* Bottom-right corner */ 30% 100%, /* Bottom-left corner */ 0% 70%, /* Left-bottom corner */ 0% 30% /* Left-top corner */
     );
     background-color: red;
     top: 55%;
@@ -67,7 +60,6 @@
     top: 20%;
     left: 20%;
 }
-
 
 
 .cube {
@@ -128,20 +120,21 @@
 }
 
 
-
-
 .cube.animate {
     animation: rotateCube 5s infinite linear;
 }
 
 @keyframes rotateCube {
-    0% { transform: rotateX(-20deg) rotateY(20deg); }
-    50% { transform: rotateX(30deg) rotateY(-30deg); }
-    100% { transform: rotateX(-20deg) rotateY(20deg); }
+    0% {
+        transform: rotateX(-20deg) rotateY(20deg);
+    }
+    50% {
+        transform: rotateX(30deg) rotateY(-30deg);
+    }
+    100% {
+        transform: rotateX(-20deg) rotateY(20deg);
+    }
 }
-
-
-
 
 
 .animate_button {
@@ -173,9 +166,10 @@
     cursor: pointer;
     margin: 10px;
 }
-#select_anim_label{
-    top: 66%;
-    left: 13%;
+
+#select_anim_label {
+    top: 68%;
+    left: 15%;
     position: absolute;
 }
 

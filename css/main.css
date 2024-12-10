@@ -16,23 +16,6 @@ a {
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 .navbar {
     display: flex;
     justify-content: space-between;
@@ -109,7 +92,7 @@ a {
     margin: 5px 0;
 }
 
-.navbar_item{
+.navbar_item {
     cursor: pointer;
     float: left;
     width: auto;
@@ -120,27 +103,10 @@ a {
 }
 
 
-#navbarHelp{
+#navbarHelp {
     margin-bottom: 50px;
     visibility: hidden;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 /*Footer*/
@@ -182,15 +148,6 @@ footer h5, footer h6 {
 }
 
 
-
-
-
-
-
-
-
-
-
 /*my custom "popup box" I also use it for errors and stuff*/
 .modal {
     display: none; /* Hidden by default */
@@ -203,8 +160,8 @@ footer h5, footer h6 {
     width: 100%; /* Full width */
     height: 100%; /* Full height */
     overflow: auto; /* Enable scroll if needed */
-    background-color: rgb(0,0,0); /* Fallback color */
-    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+    background-color: rgb(0, 0, 0); /* Fallback color */
+    background-color: rgba(0, 0, 0, 0.4); /* Black w/ opacity */
     align-items: center;
     justify-content: center;
     cursor: default;
@@ -220,7 +177,7 @@ footer h5, footer h6 {
     width: min(70%, 500px);
 }
 
-.modal-error{
+.modal-error {
     color: red;
     text-shadow: 0.5px 0.5px 1px darkred;
     background-color: black;
@@ -233,8 +190,12 @@ footer h5, footer h6 {
 }
 
 @keyframes zoom {
-    from {transform:scale(0)}
-    to {transform:scale(1)}
+    from {
+        transform: scale(0)
+    }
+    to {
+        transform: scale(1)
+    }
 }
 
 /* The Close Button */
