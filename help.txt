@@ -1,3 +1,5 @@
 https://prismjs.com/#examples
 
-https://vizsga.danielcsohany.testhosting.hu/
+http://vizsga.danielcsohany.testhosting.hu/
+
+http://www.informatikaismeretek.nhely.hu/
