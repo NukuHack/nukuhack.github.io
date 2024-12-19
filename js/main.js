@@ -6,8 +6,12 @@ body.insertAdjacentHTML('afterbegin', `
     </div>
 `);
 
-function LoadBasicConetent() {
+let url = window.location.href;
+url = url.slice(url.lastIndexOf("/") + 1);
+// only needed if you use it with an editor like webstorm (like me)
+if (url.indexOf("?") != -1) url = url.slice(0, url.indexOf("?"));
 
+function LoadBasicConetent() {
 
     let navContent = `
         <nav class="navbar" id="navbar">
@@ -83,11 +87,6 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 
-
-let url = window.location.href;
-url = url.slice(url.lastIndexOf("/") + 1);
-// only needed if you use it with an editor like webstorm (like me)
-if (url.indexOf("?") != -1) url = url.slice(0, url.indexOf("?"));
 
 console.log("current page url: ", url);
 
