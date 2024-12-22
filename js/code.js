@@ -4,9 +4,9 @@ let Data; // the main data storage ... yeah
 
 
 const lang_help = {
-    "js": ["Js aka JavaScript", 8],
-    "css": ["", 6],
-    "c#": ["", 4],
+    "js": "Javascript",
+    "css": "",
+    "c#": "",
 }
 
 // just the json fetch
@@ -35,19 +35,17 @@ console.log("I love bread");
 
 function DisplayData() {
     Data.forEach(({id, lang, desc, code}, index) => {
-        if (code == "none") {
-            //nothing happened
+        if (code === "none") {
+            // nothing happened
         } else {
             let len = CountB_in_A(code, "\n");
-            //console.log(leng)
             let wid = LongestSubstring(code, "\n");
-            //console.log(wid)
 
             let CodeHelp = "";
             CodeHelp += `<div class="code" id="code_${id}">`;
 
             CodeHelp += `<div class="code_lang" id="lang_${id}">`;
-            CodeHelp += `Language: ${lang_help[lang][0] || lang.toUpperCase()}`;
+            CodeHelp += `Language: ${lang_help[lang] || lang.toUpperCase()}`;
             CodeHelp += `</div>`;
 
             CodeHelp += `<div class="code_desc" id="desc_${id}">`;
@@ -57,15 +55,19 @@ function DisplayData() {
             CodeHelp += `<div class="code_help">`;
 
             CodeHelp += `<p class="code_title">`;
-            CodeHelp += `<input type="button" class="code_resize" id="code_resize_${id}"
+            CodeHelp += `<input type="button" class="code_resize" id="code_resize_${id}" 
                 value="The code itself: " readonly onClick="CodeResizer(${id})">`;
             CodeHelp += `</p>`;
             CodeHelp += `<input type="button" class="code_readonly" onclick="ChangeTextareaReadonly(${id})" value="Change from readonly">`;
             CodeHelp += `<input type="button" class="code_reset" id="code_reset_${id}" onclick="CodeReset(${id})" value="Reset the code">`;
             CodeHelp += `<br>`;
+
+            // Add the HTML structure for code display
             CodeHelp += `<textarea rows="${len + 2}" cols="${wid + (lang_help[lang][1] || 4)}" readonly class="code_code" id="code_code_${id}">`;
+            //<pre class="line-numbers"><code class="language-javascript">
             CodeHelp += `${code}`;
             CodeHelp += `</textarea>`;
+            //</code></pre>
 
             CodeHelp += `</div>`;
 
@@ -75,8 +77,9 @@ function DisplayData() {
 
             CodeOutput.insertAdjacentHTML('beforeend', CodeHelp);
         }
-    })
+    });
 }
+
 
 function CopyCode(id) {
     // Check if the Clipboard API is available

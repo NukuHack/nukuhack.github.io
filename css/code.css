@@ -1,76 +1,78 @@
-.codes {
-    margin: 10px;
-    width: 96%;
-    height: 96%;
-    display: grid;
-    place-items: center; /* Centers all grid items both horizontally and vertically */
-    align-items: stretch;
-    grid-template-columns: repeat(auto-fill, 100%);
-    justify-content: center;
 
-    @media (min-width: 900px) {
-        grid-template-columns: repeat(auto-fill, 50%);
+.codes {
+    margin: 10px; /* Adds spacing and centers the container */
+    width: 96%;
+    display: grid;
+    grid-gap:30px;
+    place-items: center; /* Centers all grid items */
+    align-items: stretch;
+    justify-content: center;
+    grid-template-columns: repeat(auto-fill, minmax(500px,90%));
+
+    @media (min-width: 1000px) {
+        grid-template-columns: repeat(auto-fill, minmax(30%,45%));
     }
 }
 
-
 .code {
-    width: 98%;
-    background-color: #222222;
-    border: 2px solid black;
-    border-radius: 50px;
-    margin: 2px;
-    padding: 2px;
+    min-width: 500px;
+    max-width: 700px;
+    width: 100%;
+    height: 100%;
+    background-color: #2c2c2c;
+    border: 2px solid #444444; /* Subtle border */
+    border-radius: 20px;
     overflow: hidden;
-    display: flex; /* Flexbox for centering content inside */
-    justify-content: center; /* Centers content horizontally */
-    align-items: center; /* Centers content vertically */
-    flex-direction: column; /* Keeps content stacked vertically */
+    padding: 5px 10px; /*up-down left-right*/
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Adds subtle shadow for depth */
+    transition: transform 0.3s ease, background-color 0.3s ease; /* Adds smooth hover effect */
 }
 
 .code:hover {
-    transition: background-color 0.5s ease;
-    background-color: #444444;
-}
-
-.code_lang, .code_desc, .code_title {
-    cursor: default;
-}
-
-.code_help {
-    margin: 4px;
-}
-
-.code_code {
-    font-size: 50%;
-    margin: 4px;
-    cursor: default;
-    background-color: lightskyblue;
-    border: 1px solid #cccccc;
-    border-radius: 30px;
-    resize: none;
+    background-color: #3a3a3a; /* Slightly lighter on hover */
+    transform: translateY(-5px); /* Subtle lift effect */
 }
 
 .code_code:focus {
     outline: none;
 }
 
-.code_readonly {
-    margin-right: 5px;
+.code_lang,.code_desc,.code_title{
+    color: #ffffff;
+    margin-bottom: 4px;
+    font-weight: bold;
 }
 
-/*Buttons*/
+.code_code{
+    font-size: 80% !important;
+    line-height: 1 !important;
+    margin: 10px 4px !important;
+    border-radius: 8px !important;
+    padding: 12px !important; /* Adds padding inside the code box */
+    overflow: auto !important; /* Allows scrolling for large content */
+    resize: none;
+}
+
 .code_copy, .code_readonly, .code_reset, .code_resize {
-    border-radius: 5px;
+    border-radius: 4px;
     border: 1px solid #cccccc;
-    font-size: 90%;
-    color: black;
-    background-color: snow;
+    font-size: 80%;
+    color: #222222;
+    background-color: #ffffff;
+    padding: 6px 12px; /* Adds padding for better click targets */
     cursor: pointer;
+    margin: 1px;
+    transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 .code_copy:hover, .code_readonly:hover, .code_reset:hover, .code_resize:hover {
-    border-color: black;
-    transition: background-color 0.3s ease;
-    background-color: grey;
+    background-color: #444444;
+    color: #ffffff;
+}
+
+.code_readonly {
+    margin-right: 5px;
 }
