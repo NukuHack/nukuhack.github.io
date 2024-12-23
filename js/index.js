@@ -4,7 +4,6 @@ const Polygons = [
     'square',
     "triangle",
     "circle",
-    'square',
     "octagon",
     `pentagon`
 ]
