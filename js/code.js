@@ -2,12 +2,12 @@ const CodeOutput = document.getElementById('codes');
 const Modal = document.getElementById('modal');
 let Data; // the main data storage ... yeah
 
-
-const lang_help = {
-    "js": "Javascript",
-    "css": "",
-    "c#": "",
-}
+const langHelp = {
+    "csharp":"C#",
+    "javascript":"JavaScript",
+    "python":"Python",
+    "css":"CSS",
+};
 
 // just the json fetch
 function fetchData() {
@@ -31,7 +31,7 @@ function fetchData() {
 
 fetchData();
 
-console.log("I love bread");
+//console.log("I love bread");
 
 function DisplayData() {
     Data.forEach(({id, lang, desc, code}, index) => {
@@ -45,29 +45,25 @@ function DisplayData() {
             CodeHelp += `<div class="code" id="code_${id}">`;
 
             CodeHelp += `<div class="code_lang" id="lang_${id}">`;
-            CodeHelp += `Language: ${lang_help[lang] || lang.toUpperCase()}`;
+            CodeHelp += `Language: ${langHelp[lang]||lang.slice(0,1).toUpperCase()+lang.slice(1)}`;
             CodeHelp += `</div>`;
 
             CodeHelp += `<div class="code_desc" id="desc_${id}">`;
             CodeHelp += `Description: ${desc}`;
             CodeHelp += `</div>`;
 
-            CodeHelp += `<div class="code_help">`;
-
-            CodeHelp += `<p class="code_title">`;
             CodeHelp += `<input type="button" class="code_resize" id="code_resize_${id}" 
                 value="The code itself: " readonly onClick="CodeResizer(${id})">`;
-            CodeHelp += `</p>`;
-            CodeHelp += `<input type="button" class="code_readonly" onclick="ChangeTextareaReadonly(${id})" value="Change from readonly">`;
+            CodeHelp += `<p class="code_buttons">`;
+            CodeHelp += `<input type="button" class="code_readonly" id="code_readonly_${id}" onclick="ChangeReadonly(${id})" value="Change from readonly">`;
             CodeHelp += `<input type="button" class="code_reset" id="code_reset_${id}" onclick="CodeReset(${id})" value="Reset the code">`;
-            CodeHelp += `<br>`;
+            CodeHelp += `</p>`;
+
+            CodeHelp += `<div class="code_help" id="code_help_${id}">`;
 
             // Add the HTML structure for code display
-            CodeHelp += `<textarea rows="${len + 2}" cols="${wid + (lang_help[lang][1] || 4)}" readonly class="code_code" id="code_code_${id}">`;
-            //<pre class="line-numbers"><code class="language-javascript">
-            CodeHelp += `${code}`;
-            CodeHelp += `</textarea>`;
-            //</code></pre>
+            CodeHelp +=
+    `<pre class="line-numbers code_out" id="code_out_${id}" style="height: ${len*20+len/2}px"><code class="language-${lang} code_code" id="code_code_${id}">${code}</code></pre>`;
 
             CodeHelp += `</div>`;
 
@@ -78,6 +74,8 @@ function DisplayData() {
             CodeOutput.insertAdjacentHTML('beforeend', CodeHelp);
         }
     });
+    Prism.highlightAll();
+
 }
 
 
@@ -85,7 +83,7 @@ function CopyCode(id) {
     // Check if the Clipboard API is available
     if (navigator.clipboard) {
         // Get the text to copy
-        let textToCopy = document.getElementById(`code_code_${id}`).value;
+        let textToCopy = document.getElementById(`code_code_${id}`).innerText;
         if (!textToCopy) {
             modalOpen('Copy Error', 'Failed to copy:', "text to copy is null")
         } else {
@@ -107,16 +105,20 @@ function CopyCode(id) {
 }
 
 
-function ChangeTextareaReadonly(id, helper) {
+function ChangeReadonly(id, helper) {
+    let readonlyButton = document.getElementById(`code_readonly_${id}`);
     let toChange = document.getElementById(`code_code_${id}`);
-    if (!helper && toChange.readOnly === true) {
-        toChange.readOnly = false;
-        toChange.style.backgroundColor = "dodgerblue";
-        toChange.style.cursor = "text";
+    let helpChange = document.getElementById(`code_help_${id}`);
+    if (!helper && toChange.contentEditable !== "true") {
+        toChange.contentEditable = "true";
+        readonlyButton.value = "Change to Readonly";
+        //toChange.style.backgroundColor = "dodgerblue";
+        helpChange.style.cursor = "text";
     } else {
-        toChange.readOnly = true;
-        RemoveCss(toChange, 'background-color');
-        RemoveCss(toChange, 'cursor');
+        toChange.contentEditable = "false";
+        readonlyButton.value = "Change from Readonly";
+        //RemoveCss(toChange, 'background-color');
+        RemoveCss(helpChange, 'cursor');
     }
 
 }
@@ -124,25 +126,37 @@ function ChangeTextareaReadonly(id, helper) {
 function CodeReset(id) {
     let toReset = document.getElementById(`code_code_${id}`);
     let resetButton = document.getElementById(`code_reset_${id}`);
-    toReset.value = `${Data[id].code}`;
+    toReset.textContent = `${Data[id].code}`;
     //toReset.innerText=toReset.innerHTML;
 
     let originalValues = [resetButton.value, resetButton.onclick]; // Store the original value
-    resetButton.value = "Resetting code..."; // Change the button value
+    resetButton.value = "Resetting code."; // Change the button value
     resetButton.onclick = null;
+
+    setTimeout(() => {
+        resetButton.value = "Resetting code.."
+    }, 180);
+    setTimeout(() => {
+        resetButton.value = "Resetting code..."
+    }, 350);
 
     setTimeout(() => {
         resetButton.value = originalValues[0]; // Reset the value after 1 second
         resetButton.onclick = originalValues[1];
-    }, 1000);
+        Prism.highlightElement(toReset);
+    }, 500);
 }
 
 function CodeResizer(id) {
-    let toResize = document.getElementById(`code_code_${id}`);
+    /*
+    let toResize = document.getElementById(`code_out_${id}`);
     if (toResize.style.fontSize === '120%')
         RemoveCss(toResize, 'font-size');
     else
-        toResize.style.fontSize = `120%`;
+        toResize.style.setProperty("font-size", `120%`, "important");
+
+     */
+    console.log("Currently Disabled!");
 }
 
 
