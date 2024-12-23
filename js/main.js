@@ -1,17 +1,22 @@
 const body = document.querySelector("body");
 
 body.insertAdjacentHTML('afterbegin', `
-    <div id="modal" class="modal" style="display: none;">
+    <div id="modal" class="modal">
         
     </div>
 `);
 
+
+/*
 let url = window.location.href;
 url = url.slice(url.lastIndexOf("/") + 1);
 // only needed if you use it with an editor like webstorm (like me)
 if (url.indexOf("?") != -1) url = url.slice(0, url.indexOf("?"));
 
-function LoadBasicConetent() {
+console.log("current page url: ", url);
+console.log("basic url: ", window.location.href);
+*/
+function LoadBasicContent() {
 
     let navContent = `
         <nav class="navbar" id="navbar">
@@ -36,6 +41,14 @@ function LoadBasicConetent() {
                         </li>
                     </ul>
                 </div>
+            </div>
+            <div class="slider-container">
+                <label class="slider">
+                    <input type="checkbox" id="darkModeToggle" onchange="toggleDarkMode()">
+                        <span class="slider-track">
+                        <span class="slider-thumb"></span>
+                    </span>
+                </label>
             </div>
         </nav>
 
@@ -67,17 +80,17 @@ function LoadBasicConetent() {
 }
 
 
-LoadBasicConetent();
-
+LoadBasicContent();
 
 const NavItems = document.getElementById("navbarDropdown");
+const NavToggle = document.getElementById("navbarToggle");
 
 
 // for the header
 document.addEventListener("DOMContentLoaded", function () {
 
-    document.getElementById("navbarToggle").addEventListener("click", function () {
-        console.log(NavItems.style.opacity)
+    NavToggle.addEventListener("click", function () {
+        //console.log(NavItems.style.opacity);
         if (NavItems.style.opacity !== "100") {
             NavItems.style.visibility = "visible";
             NavItems.style.opacity = "100";
@@ -86,10 +99,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
     });
 });
+document.addEventListener('click', function (event) {
 
-
-console.log("current page url: ", url);
-
+    if (!NavToggle.contains(event.target) && !NavItems.contains(event.target))
+        NavItems.style.cssText = "";
+});
 
 function ChangePage(url) {
     let urlHelp = window.location.href;
@@ -99,6 +113,8 @@ function ChangePage(url) {
         window.location.href += '#';
     else
         window.location.href = window.location.href;
+    // here the url can only be set after the last /
+    // so I don't actually need to check for anything
 }
 
 
@@ -128,3 +144,36 @@ function modalOpen(title, text, error) {
 function modalClose() {
     document.getElementById('modal').style.display = "none";
 }
+
+function DarkModeLoad() {
+    let prefersDark = localStorage.getItem("prefersDark") ||
+        (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+
+    prefersDark === "true" ? prefersDark = true : prefersDark = false
+
+    localStorage.setItem("prefersDark", prefersDark);
+
+    if (!prefersDark) {
+        DarkReader.disable();
+        document.getElementById("darkModeToggle").checked = false;
+    } else {
+        DarkReader.enable();
+        document.getElementById("darkModeToggle").checked = true;
+    }
+}
+
+// Set initial Dark Mode state
+DarkModeLoad();
+
+// Dark Mode Toggle Function
+function toggleDarkMode() {
+    if (DarkReader.isEnabled()) {
+        DarkReader.disable();
+        localStorage.setItem("prefersDark", false);
+    } else {
+        DarkReader.enable();
+        localStorage.setItem("prefersDark", true);
+    }
+}
+
+
