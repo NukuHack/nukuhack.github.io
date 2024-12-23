@@ -1,36 +1,34 @@
 {
   "data": [
-  {
-    "id": 0,
-    "lang": "js",
-    "desc": "Fetch an external json",
-    "code": "   function fetchData() {\n     fetch('./json/data.json')\n       .then((res) => {\n         if (!res.ok) {\n           throw new Error\n           (`HTTP error status: ${res.status}`);\n         }\n         return res.json();\n       })\n       .then((amabatukam) => {\n         Data = amabatukam.data;\n         //console.log(Data);\n       })\n       .catch((error) =>{\n           console.error('Json load error:', error)\n       });\n  }"
-
-
-  },
-  {
-    "id": 1,
-    "lang": "c#",
-    "desc": "Read an external file",
-    "code": "\tprivate string[,] Data;\n\tprivate int len;\n\tprivate int wid;\n\t\n\tprivate void Read_file() {\n\t  string filePlace = \"hid.csv\"; // the file to read\n\t  string cut = \";\"; // the character used inside splitting\n\n\t  string[] adat = File.ReadAllLines(filePlace);\n\t  len = adat.Length; // this is where we make the length\n\t  wid = adat[0].Split(cut).Length; // this is the width\n\t  Data = new string[len, wid]; // leng times wid to make a matrix\n\t  StreamReader fireReader = new StreamReader(filePlace);\n\t  int n = 0;\n\t  while (!fireReader.EndOfStream) {\n\t    string[]   line = fireReader.ReadLine().Split(cut);\n\t    for (int i = 0; i < wid; i++)\n\t      Data[n, i] =   line[i];\n\t    n++;\n\t  }\n\t  fireReader.Close();\n\t}"
-  },
-  {
-    "id": 2,
-    "lang": "css",
-    "desc": "A basic animation (a bouncing ball)",
-    "code": "  .ball {\n\twidth: 50px;\n\theight: 50px;\n\tbackground-color: red;\n\tborder-radius: 50%;\n\tposition: fixed;\n\ttop: 0;\n\tleft: 50%;\n\ttransform: translateX(-50%);\n\tanimation: bounce 2s infinite;\n  }\n\n  @keyframes bounce {\n\t0%, 100% { top: 100px; }\n\t50% { top: 500px; }\n  }"
-  },
-  {
-    "id": 3,
-    "lang": "none",
-    "desc": "none",
-    "code": "none"
-  },
-  {
-    "id": 4,
-    "lang": "none",
-    "desc": "none",
-    "code": "none"
-  }
+    {
+      "id": 0,
+      "lang": "javascript",
+      "desc": "Fetch an external json",
+      "code": "function fetchData() {\n  fetch('./json/data.json')\n  .then((res) => {\n\tif (!res.ok) {\n\tthrow new Error\n\t  (`HTTP error status: ${res.status}`);\n\t}\n  return res.json();\n  })\n  .then((hElpEr) => {\n\tData = hElpEr.data;\n\t//console.log(Data);\n  })\n  .catch((error) =>{\n\tconsole.error('Json load error:', error)\n  });\n}"
+    },
+    {
+      "id": 1,
+      "lang": "csharp",
+      "desc": "Read an external file",
+      "code": "private string[,] Data;\nprivate int len;\nprivate int wid;\n\nprivate void Read_file() {\n  string filePlace = \"hid.csv\"; // the file to read\n  string cut = \";\"; // the char used in splitting\n\n  string[] adat = File.ReadAllLines(filePlace);\n  len = adat.Length; // the length\n  wid = adat[0].Split(cut).Length; // the width\n  Data = new string[len, wid]; // len*wid=matrix\n  StreamReader fireReader = new StreamReader(filePlace);\n  int n = 0;\n  while (!fireReader.EndOfStream) {\n    string[]line = fireReader.ReadLine().Split(cut);\n    for (int i = 0; i < wid; i++)\n      Data[n, i] =line[i];\n      n++;\n  }\n  fireReader.Close();\n}"
+    },
+    {
+      "id": 2,
+      "lang": "css",
+      "desc": "A basic animation (a bouncing ball)",
+      "code": ".ball {\n  width: 50px;\n  height: 50px;\n  background-color: red;\n  border-radius: 50%;\n  position: fixed;\n  top: 0;\n  left: 50%;\n  transform: translateX(-50%);\n  animation: bounce 2s infinite;\n}\n\n@keyframes bounce {\n  0%, 100% { top: 100px; }\n  50% { top: 500px; }\n}"
+    },
+    {
+      "id": 3,
+      "lang": "none",
+      "desc": "none",
+      "code": "none"
+    },
+    {
+      "id": 4,
+      "lang": "none",
+      "desc": "none",
+      "code": "none"
+    }
   ]
 }
