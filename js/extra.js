@@ -1,6 +1,6 @@
 const list = document.getElementById("list");
 
-const listHelper = [
+const extraHelper = [
     {
         "id": 0,
         "title": "Last Update :",
@@ -15,7 +15,7 @@ const listHelper = [
     },
 ]
 
-listHelper.forEach(({id, title, content, extra}, index) => {
+extraHelper.forEach(({id, title, content, extra}, index) => {
     let list_item = "";
     list_item += `
         <div class="list_item">
