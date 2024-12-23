@@ -1,4 +1,4 @@
-const links = document.getElementById("links");
+const list = document.getElementById("list");
 
 const linkHelper = [
     {
@@ -27,17 +27,17 @@ const linkHelper = [
 linkHelper.forEach(({id, title, content, link="#",extra}, index) => {
     let link_single = "";
     link_single += `
-        <div class="link">
-            <p class="link_title">
+        <div class="list_item">
+            <p class="list_title">
                 ${title}
             </p>
-            <div class="link_content">
-                <a class="link_link" href="${link}" target="_blank">${content}</a>
+            <div class="list_content">
+                <a class="link" href="${link}" target="_blank">${content}</a>
             </div>
-            <div class="link_extra">
+            <div class="list_extra">
                 ${extra}
             </div>
         </div>
     `;
-    links.insertAdjacentHTML("beforeend", link_single);
+    list.insertAdjacentHTML("beforeend", link_single);
 });
