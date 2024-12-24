@@ -4,7 +4,7 @@ const extraHelper = [
     {
         "id": 0,
         "title": "Last Update :",
-        "content": "This page has been updated : 2024.12.24 21:10",
+        "content": "This page has been updated : 2024.12.24 23:00",
         "extra": "But it is still maintained currently",
     },
     {
