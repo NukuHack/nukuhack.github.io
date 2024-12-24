@@ -11,19 +11,17 @@
     <link rel="stylesheet" type="text/css" href="./css/code.css">
 </head>
 <body>
+
+    <div class="dropdown">
+        <button class="dropdown-button" id="dropdown_language_button" onclick="toggleDropdown('dropdown_language')">Select Language</button>
+        <div class="dropdown-content" id="dropdown_language" onclick="toggleDropdown('dropdown_language')">
+            <button class="dropdown-item" onClick="selectStuff('all')">All</button>
+        </div>
+    </div>
+
     <div class="codes" id="codes">
 
     </div>
-
-    <!--
-    <pre class="line-numbers"><code class="language-javascript">// This is a simple example of displaying code in a webpage
-function helloWorld() {
-      console.log("Hello, World!");
-};
-helloWorld();</code></pre>
--->
-
-
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-csharp.min.js"></script>

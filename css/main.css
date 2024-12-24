@@ -72,7 +72,14 @@ a {
 
 
 
-/* Main container */
+
+
+
+
+
+
+
+/* Dark mode toggler */
 .slider-container {
     margin-left: 10%;
     display: flex;
