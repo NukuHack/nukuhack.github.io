@@ -41,14 +41,12 @@ function LoadBasicContent() {
                         </li>
                     </ul>
                 </div>
-            </div>
-            <div class="slider-container">
-                <label class="slider">
-                    <input type="checkbox" id="darkModeToggle" onchange="toggleDarkMode()">
-                        <span class="slider-track">
-                        <span class="slider-thumb"></span>
-                    </span>
-                </label>
+                <div class="slider-container">
+                    <label class="switch">
+                        <input type="checkbox" id="darkModeToggle" onchange="toggleDarkMode()">
+                        <span class="slider"></span>
+                    </label>
+                </div>
             </div>
         </nav>
 
