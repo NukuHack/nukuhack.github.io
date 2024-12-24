@@ -5,9 +5,10 @@ body {
     background-color: slategray;
     margin: 0;
     display: flex;
+    justify-content: center;
+    align-items: center;
     flex-direction: column;
     text-align: center;
-    justify-content: center;
     cursor: default;
 }
 
@@ -15,6 +16,8 @@ a {
     text-decoration: none;
     color: black;
 }
+
+
 
 
 .navbar {
@@ -68,9 +71,49 @@ a {
     text-decoration: underline;
 }
 
+.navbar_items {
+    transition: opacity 0.5s ease, transform 0.5s ease;
+    opacity: 0;
+    visibility: hidden;
+    width: 250px;
+    flex-direction: column; /* Stack items vertically in dropdown */
+    background-color: #444;
+    position: absolute;
+    top: 100%;
+    left: 40%;
+    padding: 10px;
+    border-radius: 5px;
+    transform: translateY(-20px); /* Start position for animation */
+}
+
+.navbar_items.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0); /* Animate to visible position */
+}
+
+.navbar_ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.navbar_li {
+    margin: 5px 0;
+}
+
+.navbar_item {
+    cursor: pointer;
+    float: left;
+    width: auto;
+}
 
 
 
+#navbarHelp {
+    margin-bottom: 50px;
+    visibility: hidden;
+}
 
 
 
@@ -109,6 +152,7 @@ a {
     left: 0;
     right: 0;
     bottom: 0;
+    overflow: hidden;
     background-color: #ccc;
     transition: background-color 0.4s;
     border-radius: 34px;
@@ -129,56 +173,22 @@ a {
 }
 
 /* Checked state */
-input:checked + .slider {
+#darkModeToggle:checked + .slider {
     background-color: #4CAF50;
 }
 
-input:checked + .slider:before {
+#darkModeToggle:checked + .slider:before {
     transform: translateX(26px);
 }
 
 
 
-.navbar_items {
-    transition: opacity 0.3s ease;
-    opacity: 0;
-    visibility: hidden;
-    width: 250px;
-    flex-direction: column; /* Stack items vertically in dropdown */
-    background-color: #444;
-    position: absolute;
-    top: 100%;
-    left: 55%;
-    padding: 10px;
-    border-radius: 5px;
-    transform: translateX(-50%); /* Center adjustment for better aesthetics */
-}
-
-.navbar_ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
-.navbar_li {
-    margin: 5px 0;
-}
-
-.navbar_item {
-    cursor: pointer;
-    float: left;
-    width: auto;
-}
-
-.navbar_items.show {
-    display: flex;
-}
 
 
-#navbarHelp {
-    margin-bottom: 50px;
-    visibility: hidden;
-}
+
+
+
+
 
 
 /*Footer*/

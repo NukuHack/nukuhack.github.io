@@ -34,13 +34,11 @@ fetchData();
 
 //console.log("I love bread");
 
-function DisplayData() {
-    Data.forEach(({id, lang, desc, code}, index) => {
-        if (code === "none") {
-            // nothing happened
-        } else {
-            let len = CountB_in_A(code, "\n");
-            let wid = LongestSubstring(code, "\n");
+function DisplayData(Selected) {
+    // Helper function to generate HTML for the code block
+    const generateCodeHTML = ({id, lang, desc, code}) => {
+        let len = CountB_in_A(code, "\n");
+        let wid = LongestSubstring(code, "\n");
 
         let CodeHelp = "";
         CodeHelp += `<div class="code" id="code_${id}">`;
@@ -72,10 +70,21 @@ function DisplayData() {
 
         CodeHelp += `</div>`;
 
-            CodeOutput.insertAdjacentHTML('beforeend', CodeHelp);
+        return CodeHelp;
+    };
+
+    // Determine if we need to display all data or just the selected ones
+    let dataToDisplay = Selected ? Data.filter(({id}) => Selected.includes(id)) : Data;
+    //console.log(dataToDisplay);
+
+    // Iterate over the data to generate the HTML
+    dataToDisplay.forEach(({id, lang, desc, code}) => {
+        if (code !== "none") {
+            let codeHTML = generateCodeHTML({id, lang, desc, code});
+            CodeOutput.insertAdjacentHTML('beforeend', codeHTML);
+            Prism.highlightElement(document.getElementById(`code_code_${id}`));
         }
     });
-    Prism.highlightAll();
 
 }
 
@@ -128,7 +137,7 @@ function CopyCode(id) {
         }
     } else {
         // If the Clipboard API is not available, display an error message
-        modalOpen('Browser Error', 'Failed to copy:', 'Your browser does not support the Clipboard API.')
+        modalOpen('Browser Error', 'Failed to copy:', 'Your browser does not support the Clipboard API.\nOr the webhosting server.')
     }
 }
 
@@ -155,24 +164,21 @@ function CodeReset(id) {
     let toReset = document.getElementById(`code_code_${id}`);
     let resetButton = document.getElementById(`code_reset_${id}`);
     toReset.textContent = `${Data[id].code}`;
-    //toReset.innerText=toReset.innerHTML;
-
-    let originalValues = [resetButton.value, resetButton.onclick]; // Store the original value
-    resetButton.value = "Resetting code."; // Change the button value
-    resetButton.onclick = null;
 
     setTimeout(() => {
-        resetButton.value = "Resetting code.."
+        resetButton.value = "Resetting code..";
     }, 180);
     setTimeout(() => {
-        resetButton.value = "Resetting code..."
+        resetButton.value = "Resetting code...";
     }, 350);
-
-    setTimeout(() => {
-        resetButton.value = originalValues[0]; // Reset the value after 1 second
-        resetButton.onclick = originalValues[1];
+    setTimeout((ogValue, ogOnclick) => {
+        resetButton.value = ogValue; // Reset everything after half second
+        resetButton.onclick = ogOnclick;
         Prism.highlightElement(toReset);
-    }, 500);
+    }, 500, resetButton.value, resetButton.onclick);
+
+    resetButton.value = "Resetting code."; // Change the button value
+    resetButton.onclick = null;
 }
 
 function CodeSelf(id) {

@@ -4,14 +4,20 @@ const extraHelper = [
     {
         "id": 0,
         "title": "Last Update :",
-        "content": "This page has been updated : 2024.12.23 23:20",
+        "content": "This page has been updated : 2024.12.24 21:10",
         "extra": "But it is still maintained currently",
     },
     {
         "id": 1,
-        "title": "idk :",
+        "title": "Christmas",
+        "content": "Have a Very Merry Christmas",
+        "extra": "have a good one - 2024.12.24",
+    },
+    {
+        "id": 2,
+        "title": "idk",
         "content": "idk idk",
-        "extra": "yeah",
+        "extra": "idk",
     },
 ]
 

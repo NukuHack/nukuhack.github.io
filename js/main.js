@@ -1,11 +1,5 @@
 const body = document.querySelector("body");
 
-body.insertAdjacentHTML('afterbegin', `
-    <div id="modal" class="modal">
-        
-    </div>
-`);
-
 
 /*
 let url = window.location.href;
@@ -19,28 +13,29 @@ console.log("basic url: ", window.location.href);
 function LoadBasicContent() {
 
     let navContent = `
-        <nav class="navbar" id="navbar">
+
+          <nav class="navbar" id="navbar">
             <div class="navbar_in">
-                <p class="navbar_link" onclick="ChangePage()">Current Webpage</p>
-                <button type="button" class="navbar_toggle" id="navbarToggle">
-                    <img src="./assets/menu_bars.png" alt="Menu" />
-                </button>
-                <div class="navbar_items" id="navbarDropdown">
-                    <ul class="navbar_ul">
-                        <li class="navbar_li">
-                            <p class="navbar_item" onclick="ChangePage('index')">Main Webpage</p>
-                        </li>
-                        <li class="navbar_li">
-                            <p class="navbar_item" onclick="ChangePage('code')">Actual Code</p>
-                        </li>
-                        <li class="navbar_li">
-                            <p class="navbar_item" onclick="ChangePage('extra')">Extra Things</p>
-                        </li>
-                        <li class="navbar_li">
-                            <p class="navbar_item" onclick="ChangePage('links')">Links & Connection</p>
-                        </li>
-                    </ul>
-                </div>
+              <p class="navbar_link" onclick="ChangePage()">Current Webpage</p>
+              <button type="button" class="navbar_toggle" id="navbarToggle" onclick="toggleNavbar()">
+                <img src="./assets/menu_bars.png" alt="Menu" />
+              </button>
+              <div class="navbar_items" id="navbarDropdown">
+                <ul class="navbar_ul">
+                  <li class="navbar_li">
+                    <p class="navbar_item" onclick="ChangePage('index')">Main Webpage</p>
+                  </li>
+                  <li class="navbar_li">
+                    <p class="navbar_item" onclick="ChangePage('code')">Actual Code</p>
+                  </li>
+                  <li class="navbar_li">
+                    <p class="navbar_item" onclick="ChangePage('extra')">Extra Things</p>
+                  </li>
+                  <li class="navbar_li">
+                    <p class="navbar_item" onclick="ChangePage('links')">Links & Connection</p>
+                  </li>
+                </ul>
+              </div>
                 <div class="slider-container">
                     <label class="switch">
                         <input type="checkbox" id="darkModeToggle" onchange="toggleDarkMode()">
@@ -48,12 +43,18 @@ function LoadBasicContent() {
                     </label>
                 </div>
             </div>
-        </nav>
+          </nav>
 
-    
         <div id="navbarHelp">
             .
         </div>
+    `;
+
+
+    let modalContent = `
+    <div id="modal" class="modal" onClick="modalClose()">
+        
+    </div>
     `;
 
 
@@ -67,13 +68,14 @@ function LoadBasicContent() {
         <div class="footer_in">
             <div class="footer_in_in">
                 <h5>Stupid webpage</h5>
-                <h6>Made by NukuHack</h6>
+                <h6>Made by NukuHack ©2024</h6>
             </div>
         </div>
     </footer>
     `;
 
     body.insertAdjacentHTML("afterbegin", navContent);
+    body.insertAdjacentHTML("beforeend", modalContent);
     body.insertAdjacentHTML("beforeend", footerContent);
 }
 
@@ -83,24 +85,17 @@ LoadBasicContent();
 const NavItems = document.getElementById("navbarDropdown");
 const NavToggle = document.getElementById("navbarToggle");
 
-
-// for the header
-document.addEventListener("DOMContentLoaded", function () {
-
-    NavToggle.addEventListener("click", function () {
-        //console.log(NavItems.style.opacity);
-        if (NavItems.style.opacity !== "100") {
-            NavItems.style.visibility = "visible";
-            NavItems.style.opacity = "100";
-        } else
-            NavItems.style.cssText = "";
-
-    });
-});
+function toggleNavbar() {
+    if (NavItems.classList.contains('show'))
+        NavItems.classList.remove('show');
+    else
+        NavItems.classList.add('show');
+}
+// this closes the navbar if it is not clicked but open
 document.addEventListener('click', function (event) {
-
     if (!NavToggle.contains(event.target) && !NavItems.contains(event.target))
-        NavItems.style.cssText = "";
+        if (NavItems.classList.contains('show'))
+            toggleNavbar();
 });
 
 function ChangePage(url) {
@@ -126,7 +121,7 @@ function RemoveCss(item, type) {
 
 function modalOpen(title, text, error) {
     let modalHelp = `
-        <div class="modal-content">
+        <div class="modal-content" id="modal_content">
             <h4 class="modal_title">${title}</h4>
             <p class="modal_text">${text}</p>
             ${!error ? "" : `<p class="modal-error">${error}</p>`}
@@ -134,10 +129,25 @@ function modalOpen(title, text, error) {
                 <button onClick="modalClose()" class="modal-button">Ok</button>
             </div>
         </div>
-    `
+    `;
     Modal.innerHTML = modalHelp;
+
+
+    let modalContent = document.getElementById("modal_content");
+    let modal = document.getElementById('modal');
+
+    modalContent.addEventListener('click', function (e) {
+        e.stopPropagation();
+    });
+
+    modal.addEventListener('click', function (e) {
+        if (e.target !== modal)
+            modalClose();
+    });
+
     document.getElementById('modal').style.display = "block";
 }
+
 
 function modalClose() {
     document.getElementById('modal').style.display = "none";
