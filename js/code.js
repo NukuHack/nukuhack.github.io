@@ -9,6 +9,47 @@ const langHelp = {
     "css": "CSS",
 };
 
+
+// Helper function to generate HTML for the code block
+const generateCodeHTML = ({id, lang, desc, code}) => {
+    let len = CountB_in_A(code, "\n");
+    let wid = LongestSubstring(code, "\n");
+
+    let CodeHelp = "";
+    CodeHelp += `<div class="code" id="code_${id}">`;
+
+    CodeHelp += `<div class="code_lang" id="lang_${id}">`;
+    CodeHelp += `Language: ${langHelp[lang] || lang.slice(0, 1).toUpperCase() + lang.slice(1)}`;
+    CodeHelp += `</div>`;
+
+    CodeHelp += `<div class="code_desc" id="desc_${id}">`;
+    CodeHelp += `Description: ${desc}`;
+    CodeHelp += `</div>`;
+
+    CodeHelp += `<input type="button" class="code_resize" id="code_resize_${id}" 
+        value="The code itself: " readonly onClick="CodeOpen(${id})">`;
+    CodeHelp += `<p class="code_buttons">`;
+    CodeHelp += `<input type="button" class="code_readonly" id="code_readonly_${id}" onclick="ChangeReadonly(${id})" value="Change from readonly">`;
+    CodeHelp += `<input type="button" class="code_reset" id="code_reset_${id}" onclick="CodeReset(${id})" value="Reset the code">`;
+    CodeHelp += `</p>`;
+
+    CodeHelp += `<div class="code_help" id="code_help_${id}">`;
+
+    // Add the HTML structure for code display
+    CodeHelp +=
+        `<pre class="line-numbers code_out" id="code_out_${id}" style="height: ${len * 20 + len / 2}px"><code class="language-${lang} code_code" id="code_code_${id}">${code}</code></pre>`;
+
+    CodeHelp += `</div>`;
+
+    CodeHelp += `<button onclick="CopyCode(${id})" class="code_copy">Copy Code</button>`;
+
+    CodeHelp += `</div>`;
+
+    return CodeHelp;
+};
+
+
+
 // just the json fetch
 function fetchData() {
     fetch('./json/data.json')
@@ -32,51 +73,13 @@ function fetchData() {
 fetchData();
 
 function Start_Everything() {
-    DisplayData();
+    DisplayAllData();
     DropDownLanguage();
 }
 
 //console.log("I love bread");
 
-function DisplayData(Selected) {
-    // Helper function to generate HTML for the code block
-    const generateCodeHTML = ({id, lang, desc, code}) => {
-        let len = CountB_in_A(code, "\n");
-        let wid = LongestSubstring(code, "\n");
-
-        let CodeHelp = "";
-        CodeHelp += `<div class="code" id="code_${id}">`;
-
-        CodeHelp += `<div class="code_lang" id="lang_${id}">`;
-        CodeHelp += `Language: ${langHelp[lang] || lang.slice(0, 1).toUpperCase() + lang.slice(1)}`;
-        CodeHelp += `</div>`;
-
-        CodeHelp += `<div class="code_desc" id="desc_${id}">`;
-        CodeHelp += `Description: ${desc}`;
-        CodeHelp += `</div>`;
-
-        CodeHelp += `<input type="button" class="code_resize" id="code_resize_${id}" 
-        value="The code itself: " readonly onClick="CodeSelf(${id})">`;
-        CodeHelp += `<p class="code_buttons">`;
-        CodeHelp += `<input type="button" class="code_readonly" id="code_readonly_${id}" onclick="ChangeReadonly(${id})" value="Change from readonly">`;
-        CodeHelp += `<input type="button" class="code_reset" id="code_reset_${id}" onclick="CodeReset(${id})" value="Reset the code">`;
-        CodeHelp += `</p>`;
-
-        CodeHelp += `<div class="code_help" id="code_help_${id}">`;
-
-        // Add the HTML structure for code display
-        CodeHelp +=
-            `<pre class="line-numbers code_out" id="code_out_${id}" style="height: ${len * 20 + len / 2}px"><code class="language-${lang} code_code" id="code_code_${id}">${code}</code></pre>`;
-
-        CodeHelp += `</div>`;
-
-        CodeHelp += `<button onclick="CopyCode(${id})" class="code_copy">Copy Code</button>`;
-
-        CodeHelp += `</div>`;
-
-        return CodeHelp;
-    };
-
+function DisplayAllData(Selected) {
     Data.forEach(({ id, lang, desc, code }) => {
         if ((!Selected||Selected?.includes(id)) && code !== "none") {
             let codeHTML = generateCodeHTML({ id, lang, desc, code });
@@ -86,6 +89,21 @@ function DisplayData(Selected) {
     });
 
 }
+
+function DataById(id) {
+    // Find the specific data by the id
+    const dataItem = Data.find(item => item.id === id);
+
+    // If the item exists and its code is not "none"
+    if (dataItem && dataItem.code !== "none") {
+        // Generate the HTML for this piece of data
+        let codeHTML = generateCodeHTML(dataItem);
+        return codeHTML;
+    } else {
+        return null;
+    }
+}
+
 
 function DropDownLanguage() {
     let dropdown_language = document.getElementById('dropdown_language');
@@ -111,9 +129,9 @@ function selectStuff(language) {
         let dataToDisplay = Data.filter(({lang}) => lang === language);
         let Selected = dataToDisplay.map(({id}) => id);
         //console.log(Selected);
-        DisplayData(Selected);
+        DisplayAllData(Selected);
     } else
-        DisplayData();
+        DisplayAllData();
 }
 
 
@@ -129,16 +147,16 @@ function CopyCode(id) {
             navigator.clipboard.writeText(textToCopy)
                 .then(() => {
                     // Display a message if the text was copied successfully
-                    modalOpen('Copy Success', 'Code copied to clipboard!')
+                    modalOpen('Copy Success', 'Code copied to clipboard!');
                 })
                 .catch((error) => {
                     // Display an error message if there is an issue copying the text
-                    modalOpen('Copy Error', 'Failed to copy:', error)
+                    modalOpen('Copy Error', 'Failed to copy:', error);
                 });
         }
     } else {
         // If the Clipboard API is not available, display an error message
-        modalOpen('Browser Error', 'Failed to copy:', 'Your browser does not support the Clipboard API.\nOr the webhosting server.')
+        modalOpen('Browser Error', 'Failed to copy:', 'Your browser does not support the Clipboard API.\nOr the web hosting server.');
     }
 }
 
@@ -183,15 +201,16 @@ function CodeReset(id) {
     resetButton.onclick = null;
 }
 
-function CodeSelf(id) {
-    /*
-    let toResize = document.getElementById(`code_out_${id}`);
-    if (toResize.style.fontSize === '120%')
-        RemoveCss(toResize, 'font-size');
+function CodeOpen(id) {
+    let codeToDisplay = DataById(id);
+    if (codeToDisplay){
+        body.innerHTML = "<br/>"+codeToDisplay;
+        Prism.highlightElement(document.getElementById(`code_code_${id}`));
+    }
     else
-        toResize.style.setProperty("font-size", `120%`, "important");
+        modalOpen('Display Error', `No data found for id: ${id} or there is no code for it`);
 
-     */
+
     console.log("Currently Disabled!");
 }
 
@@ -211,7 +230,7 @@ function toggleDropdown(id) {
     let dropdownContent = document.getElementById(`${id}`);
     let dropdownButton = document.getElementById(`${id}_button`);
     // Check if the dropdown is already open
-    const isOpen = dropdownContent.classList.contains('show');
+    let isOpen = dropdownContent.classList.contains('show');
 
     if (isOpen) {
         closeDropdown(dropdownContent);
@@ -230,6 +249,18 @@ function toggleDropdown(id) {
                 document.removeEventListener('click', handleOutsideClick);
             }
         }
+    }
+}
+
+function hideHtmlElement(id,time){
+    if(time)
+    setTimeout(()=>{
+        let element = document.getElementById(id);
+        element.style.cssText+="display: none !important;";
+    },time)
+    else{
+        let element = document.getElementById(id);
+        element.style.cssText+="display: none !important;";
     }
 }
 
