@@ -25,7 +25,8 @@ a {
     justify-content: space-between;
     align-items: center;
     background-color: #333333; /* Navbar background */
-    padding: 10px 20px;
+    padding: 10px;
+    left: 0;
     color: snow;
     position: fixed;
     top: 0;
@@ -36,11 +37,24 @@ a {
 
 .navbar_in {
     position: relative;
-    left: 15%;
+    transition: margin-left 0.5s ease;
+    margin-left: 5%;
     width: 80%; /* Align near the center */
     display: flex;
     align-items: center; /* Ensure vertical alignment */
     justify-content: center;
+    @media (min-width: 800px) {
+        transition: margin-left 0.5s ease;
+        margin-left: 10%;
+    }
+    @media (min-width: 1000px) {
+        transition: margin-left 0.5s ease;
+        margin-left: 15%;
+    }
+    @media (min-width: 1300px) {
+        transition: margin-left 0.5s ease;
+        margin-left: 17%;
+    }
 }
 
 .navbar_link, .navbar_item {

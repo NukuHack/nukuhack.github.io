@@ -19,7 +19,7 @@
     height: 0;
     border-left: 20px solid transparent;
     border-right: 20px solid transparent;
-    border-bottom: 50px solid blue; /* Color of the triangle */
+    border-bottom: 50px solid dodgerblue; /* Color of the triangle */
     top: 25%;
     right: 23%;
 }
@@ -83,7 +83,7 @@
 /* Front */
 .cube .front { transform: translateZ(60px); background: white/*#cccccc*/; }
 /* Back */
-.cube .back { transform: translateZ(-60px) rotateY(180deg); background: white/*#6c63ff*/; }
+.cube .back { transform: rotateY(180deg) translateZ(-60px); background: white/*#6c63ff*/; }
 /* Left */
 .cube .left { transform: rotateY(-90deg) translateX(-60px); transform-origin: left center; background: white/*#28c76f*/; }
 /* Right */
@@ -127,11 +127,10 @@
 
 
 .animate_button {
-    top: 24%;
-    left: 40%;
+    top: 40%;
     position: absolute;
     align-self: center;
-    width: 10%;
+    width: auto;
     border-radius: 5px;
     border: 1px solid #cccccc;
     font-size: 90%;
@@ -146,7 +145,7 @@
     left: 15%;
     position: absolute;
     align-self: center;
-    width: min(10%, 100px);
+    width: max(100px,10%);
     border-radius: 5px;
     border: 1px solid #cccccc;
     font-size: 90%;

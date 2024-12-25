@@ -22,8 +22,7 @@ function fetchData() {
         .then((amabatukam) => {
             Data = amabatukam.data;
             //console.log(Data);
-            DisplayData();
-            DropDownStuff();
+            Start_Everything();
         })
         .catch((error) => {
             console.error('Json load error:', error)
@@ -31,6 +30,11 @@ function fetchData() {
 }
 
 fetchData();
+
+function Start_Everything() {
+    DisplayData();
+    DropDownLanguage();
+}
 
 //console.log("I love bread");
 
@@ -73,14 +77,9 @@ function DisplayData(Selected) {
         return CodeHelp;
     };
 
-    // Determine if we need to display all data or just the selected ones
-    let dataToDisplay = Selected ? Data.filter(({id}) => Selected.includes(id)) : Data;
-    //console.log(dataToDisplay);
-
-    // Iterate over the data to generate the HTML
-    dataToDisplay.forEach(({id, lang, desc, code}) => {
-        if (code !== "none") {
-            let codeHTML = generateCodeHTML({id, lang, desc, code});
+    Data.forEach(({ id, lang, desc, code }) => {
+        if ((!Selected||Selected?.includes(id)) && code !== "none") {
+            let codeHTML = generateCodeHTML({ id, lang, desc, code });
             CodeOutput.insertAdjacentHTML('beforeend', codeHTML);
             Prism.highlightElement(document.getElementById(`code_code_${id}`));
         }
@@ -88,30 +87,32 @@ function DisplayData(Selected) {
 
 }
 
-function DropDownStuff() {
+function DropDownLanguage() {
     let dropdown_language = document.getElementById('dropdown_language');
 
+    let dropdown_language_options = Data.map(({lang, code}) => {
+        return code !== "none" ? lang : null;
+    }).filter(lang => lang !== null);
+    //console.log(dropdown_language_options);
+
     // Iterate over the data to generate the HTML
-    Data.forEach(({id, lang, desc, code}) => {
-        if (code !== "none") {
-            let dropdownHelp =
-                `<button class="dropdown-item" onClick="selectStuff('${lang}')">${langHelp[lang] || lang.slice(0, 1).toUpperCase() + lang.slice(1)}</button>`;
-            dropdown_language.insertAdjacentHTML("beforeend", dropdownHelp);
-        }
+    dropdown_language_options.forEach((lang) => {
+        let dropdownHelp =
+            `<button class="dropdown-item" onClick="selectStuff('${lang}')">${langHelp[lang]}</button>`;
+        dropdown_language.insertAdjacentHTML("beforeend", dropdownHelp);
     });
 }
 
 
 function selectStuff(language) {
     //console.log(language)
-    CodeOutput.innerHTML="";
-    if( language !== "all" ) {
+    CodeOutput.innerHTML = "";
+    if (language !== "all") {
         let dataToDisplay = Data.filter(({lang}) => lang === language);
         let Selected = dataToDisplay.map(({id}) => id);
         //console.log(Selected);
         DisplayData(Selected);
-    }
-    else
+    } else
         DisplayData();
 }
 
@@ -164,6 +165,8 @@ function CodeReset(id) {
     let toReset = document.getElementById(`code_code_${id}`);
     let resetButton = document.getElementById(`code_reset_${id}`);
     toReset.textContent = `${Data[id].code}`;
+    // if text is changed prism highlight will break, so I send it to rescan the new content
+    Prism.highlightElement(toReset);
 
     setTimeout(() => {
         resetButton.value = "Resetting code..";
@@ -174,7 +177,6 @@ function CodeReset(id) {
     setTimeout((ogValue, ogOnclick) => {
         resetButton.value = ogValue; // Reset everything after half second
         resetButton.onclick = ogOnclick;
-        Prism.highlightElement(toReset);
     }, 500, resetButton.value, resetButton.onclick);
 
     resetButton.value = "Resetting code."; // Change the button value

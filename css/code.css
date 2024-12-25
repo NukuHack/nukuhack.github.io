@@ -120,7 +120,7 @@
 
 .dropdown {
     position: relative;
-    display: inline-block;
+    align-self: stretch;
 }
 
 .dropdown-button {
@@ -134,6 +134,11 @@
     transition: background-color 0.3s;
 }
 
+#dropdown_language_button{
+    position: relative;
+    right: 25%;
+}
+
 .dropdown-button:hover {
     background-color: #3a3a3a;
 }
@@ -142,7 +147,7 @@
     text-shadow: #222222 2px 1px 2px;
     position: absolute;
     top: 100%;
-    left: 0;
+    left: 20%;
     background-color: grey;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     border-radius: 7px;

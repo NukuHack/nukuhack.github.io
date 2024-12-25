@@ -29,14 +29,11 @@
     }
 }
 
-.list_title {
-}
-
 .list_content {
     font-size: 140%;
     width: 100%;
-    background-color: grey;
     color: white;
+    background-color: grey;
     padding: 3px;
     margin-top: 2px;
     margin-bottom: 2px;

@@ -1,4 +1,32 @@
 
-.link:hover {
+.list_item:hover {
+    transition: background-color 0.5s ease;
+    background-color: #888888;
+
+    .list_content {
+        transition: background-color,color 0.5s ease;
+        background-color: lightgray;
+        color: black;
+    }
+    .link_content {
+        transition: color 0.5s ease;
+        color: black;
+    }
+}
+
+.list_content {
+    font-size: 140%;
+    width: 100%;
+    color: white;
+    background-color: grey;
+    padding: 3px;
+    margin-top: 2px;
+    margin-bottom: 2px;
+}
+
+.link_content {
+    color: white;
+}
+.link_content:hover {
     text-decoration: underline;
 }
