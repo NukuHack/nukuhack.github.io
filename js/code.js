@@ -294,7 +294,7 @@ function openDropdown(dropdownContent, dropdownButton) {
     }, 10)
     // TODO : make the click go "down" to the next layer
     function handleOutsideDropdownClick(event) {
-        if (!dropdownContent.contains(event.target)) {
+        if (!dropdownContent.contains(event.target)&&!dropdownButton.contains(event.target)) {
             closeDropdown(dropdownContent);
             document.removeEventListener('click', handleOutsideDropdownClick);
         }
