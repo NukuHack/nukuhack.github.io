@@ -12,14 +12,18 @@
 </head>
 <body>
 
-    <div class="dropdown">
+    <div class="dropdown" id="dropdowns">
         <button class="dropdown-button" id="dropdown_language_button" onclick="toggleDropdown('dropdown_language')">Select Language</button>
         <div class="dropdown-content" id="dropdown_language" onclick="toggleDropdown('dropdown_language')">
             <button class="dropdown-item" onClick="selectStuff('all')">All</button>
         </div>
     </div>
-    <div id="codes_helper" onclick="modalOpen('Css stuff','The codes in phone version are not displayed you have to go to a single code to view it'); hideHtmlElement('codes_helper',5000)">
-        The codes in phone version are not displayed you have to go to a single code to view it
+    <div id="codes_helper" onclick="modalOpen('Css stuff','The codes in phone version are not displayed, you have to go open the page about the code to view it.'); hideHtmlElement('codes_helper')">
+        The codes in phone version are not displayed.<br>
+        More about it here.
+    </div>
+    <div id="code_page">
+
     </div>
 
     <div class="codes" id="codes">

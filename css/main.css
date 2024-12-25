@@ -31,7 +31,7 @@ a {
     position: fixed;
     top: 0;
     width: 100%;
-    z-index: 1000; /* Ensure it stays above content */
+    z-index: 100; /* Ensure it stays above content */
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Optional: Shadow for visibility */
 }
 
@@ -207,7 +207,6 @@ a {
 
 /*Footer*/
 footer {
-    cursor: default;
     position: fixed;
     color: snow;
     bottom: 0;
@@ -217,7 +216,7 @@ footer {
     padding: 10px 20px;
     text-align: center;
     border-top: 1px solid #111; /* Optional styling */
-    z-index: 1000; /* Ensure it stays on top of other content */
+    z-index: 101; /* Ensure it stays on top of other content */
 }
 
 .footer_in {
@@ -248,7 +247,7 @@ footer h5, footer h6 {
     display: none;
     position: fixed;
     color: #222222;
-    z-index: 1;
+    z-index: 102;
     padding-top: 100px;
     left: 0;
     top: 0;
@@ -259,7 +258,6 @@ footer h5, footer h6 {
     background-color: rgba(0, 0, 0, 0.4); /* Black w/ opacity */
     align-items: center;
     justify-content: center;
-    cursor: default;
 }
 
 /* Modal Content */
@@ -281,7 +279,6 @@ footer h5, footer h6 {
 /* Add Animation */
 .modal-content, .modal-footer {
     animation: zoom 0.6s;
-    cursor: default;
 }
 
 @keyframes zoom {

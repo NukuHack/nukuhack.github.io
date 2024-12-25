@@ -1,5 +1,8 @@
 const CodeOutput = document.getElementById('codes');
 const Modal = document.getElementById('modal');
+const Page = document.getElementById('code_page');
+const Dropdowns = document.getElementById('dropdowns');
+const True = false;
 let Data; // the main data storage ... yeah
 
 const langHelp = {
@@ -8,46 +11,6 @@ const langHelp = {
     "python": "Python",
     "css": "CSS",
 };
-
-
-// Helper function to generate HTML for the code block
-const generateCodeHTML = ({id, lang, desc, code}) => {
-    let len = CountB_in_A(code, "\n");
-    let wid = LongestSubstring(code, "\n");
-
-    let CodeHelp = "";
-    CodeHelp += `<div class="code" id="code_${id}">`;
-
-    CodeHelp += `<div class="code_lang" id="lang_${id}">`;
-    CodeHelp += `Language: ${langHelp[lang] || lang.slice(0, 1).toUpperCase() + lang.slice(1)}`;
-    CodeHelp += `</div>`;
-
-    CodeHelp += `<div class="code_desc" id="desc_${id}">`;
-    CodeHelp += `Description: ${desc}`;
-    CodeHelp += `</div>`;
-
-    CodeHelp += `<input type="button" class="code_resize" id="code_resize_${id}" 
-        value="The code itself: " readonly onClick="CodeOpen(${id})">`;
-    CodeHelp += `<p class="code_buttons">`;
-    CodeHelp += `<input type="button" class="code_readonly" id="code_readonly_${id}" onclick="ChangeReadonly(${id})" value="Change from readonly">`;
-    CodeHelp += `<input type="button" class="code_reset" id="code_reset_${id}" onclick="CodeReset(${id})" value="Reset the code">`;
-    CodeHelp += `</p>`;
-
-    CodeHelp += `<div class="code_help" id="code_help_${id}">`;
-
-    // Add the HTML structure for code display
-    CodeHelp +=
-        `<pre class="line-numbers code_out" id="code_out_${id}" style="height: ${len * 20 + len / 2}px"><code class="language-${lang} code_code" id="code_code_${id}">${code}</code></pre>`;
-
-    CodeHelp += `</div>`;
-
-    CodeHelp += `<button onclick="CopyCode(${id})" class="code_copy">Copy Code</button>`;
-
-    CodeHelp += `</div>`;
-
-    return CodeHelp;
-};
-
 
 
 // just the json fetch
@@ -79,7 +42,85 @@ function Start_Everything() {
 
 //console.log("I love bread");
 
+const generateCodeHTML = ({id, lang, desc, code},help) => {
+    if(!help){
+        let len = CountB_in_A(code, "\n");
+        let wid = LongestSubstring(code, "\n");
+
+        let CodeHelp = "";
+        CodeHelp += `<div class="code" id="code_${id}">`;
+
+        CodeHelp += `<div class="code_lang" id="lang_${id}">`;
+        CodeHelp += `Language: ${langHelp[lang] || lang.slice(0, 1).toUpperCase() + lang.slice(1)}`;
+        CodeHelp += `</div>`;
+
+        CodeHelp += `<div class="code_desc" id="desc_${id}">`;
+        CodeHelp += `Description: ${desc}`;
+        CodeHelp += `</div>`;
+
+        CodeHelp += `<input type="button" class="code_resize" id="code_resize_${id}" 
+            value="More about the code!" onClick="CodePageOpen(${id})">`;
+        CodeHelp += `<p class="code_buttons">`;
+        CodeHelp += `<input type="button" class="code_readonly" id="code_readonly_${id}" onclick="ChangeReadonly(${id})" value="Change from readonly">`;
+        CodeHelp += `<input type="button" class="code_reset" id="code_reset_${id}" onclick="CodeReset(${id})" value="Reset the code">`;
+        CodeHelp += `</p>`;
+
+        CodeHelp += `<div class="code_help" id="code_help_${id}">`;
+
+        // Add the HTML structure for code display
+        CodeHelp +=
+            `<pre class="line-numbers code_out" id="code_out_${id}" style="height: ${len * 20 + len / 2}px"><code class="language-${lang} code_code" id="code_code_${id}">${code}</code></pre>`;
+
+        CodeHelp += `</div>`;
+
+        CodeHelp += `<button onclick="CopyCode(${id})" class="code_copy">Copy Code</button>`;
+
+        CodeHelp += `</div>`;
+
+        return CodeHelp;
+    }
+    else{
+        let len = CountB_in_A(code, "\n");
+        let wid = LongestSubstring(code, "\n");
+
+        let CodeHelp = "";
+        CodeHelp += `<div class="code_page" id="code_${id}_page">`;
+
+        CodeHelp += `<div class="code_lang_page" id="lang_${id}_page">`;
+        CodeHelp += `Language: ${langHelp[lang] || lang.slice(0, 1).toUpperCase() + lang.slice(1)}`;
+        CodeHelp += `</div>`;
+
+        CodeHelp += `<div class="code_desc_page" id="desc_${id}_page">`;
+        CodeHelp += `Description: ${desc}`;
+        CodeHelp += `</div>`;
+
+        CodeHelp += `<input type="button" class="code_resize_page" id="code_resize_${id}_page" 
+            value="Close this page." onClick="CodePageClose(${id})">`;
+        CodeHelp += `<p class="code_buttons_page">`;
+        CodeHelp += `<input type="button" class="code_readonly_page" id="code_readonly_${id}_page" onclick="ChangeReadonly(${id},'yeah')" value="Change from readonly">`;
+        CodeHelp += `<input type="button" class="code_reset_page" id="code_reset_${id}_page" onclick="CodeReset(${id},'yeah')" value="Reset the code">`;
+        CodeHelp += `</p>`;
+
+        CodeHelp += `<div class="code_help_page" id="code_help_${id}_page">`;
+
+        // Add the HTML structure for code display
+        CodeHelp +=
+            `<pre class="line-numbers code_out_page" id="code_out_${id}_page" style="height: ${len * 20 + len / 2}px"><code class="language-${lang} code_code_page" id="code_code_${id}_page">${code}</code></pre>`;
+
+        CodeHelp += `</div>`;
+
+        CodeHelp += `<button onclick="CopyCode(${id},'yeah')" class="code_copy_page">Copy Code</button>`;
+
+        CodeHelp += `</div>`;
+
+        return CodeHelp;
+    }
+};
+
+
+
 function DisplayAllData(Selected) {
+    CodeOutput.innerHTML="";
     Data.forEach(({ id, lang, desc, code }) => {
         if ((!Selected||Selected?.includes(id)) && code !== "none") {
             let codeHTML = generateCodeHTML({ id, lang, desc, code });
@@ -97,9 +138,12 @@ function DataById(id) {
     // If the item exists and its code is not "none"
     if (dataItem && dataItem.code !== "none") {
         // Generate the HTML for this piece of data
-        let codeHTML = generateCodeHTML(dataItem);
-        return codeHTML;
+        let codeHTML = generateCodeHTML(dataItem,"page");
+        Page.innerHTML = codeHTML;
+        Prism.highlightElement(document.getElementById(`code_code_${id}_page`));
+        return "no error";
     } else {
+        console.log("something error");
         return null;
     }
 }
@@ -135,11 +179,12 @@ function selectStuff(language) {
 }
 
 
-function CopyCode(id) {
+function CopyCode(id,helper) {
     // Check if the Clipboard API is available
     if (navigator.clipboard) {
         // Get the text to copy
-        let textToCopy = document.getElementById(`code_code_${id}`).innerText;
+        let textToCopy = document.getElementById(`code_code_${helper?id+"_page":id}`).innerText;
+        //console.log(`code_code_${helper?id+"_page":id}`);
         if (!textToCopy) {
             modalOpen('Copy Error', 'Failed to copy:', "text to copy is null")
         } else {
@@ -162,10 +207,11 @@ function CopyCode(id) {
 
 
 function ChangeReadonly(id, helper) {
-    let readonlyButton = document.getElementById(`code_readonly_${id}`);
-    let toChange = document.getElementById(`code_code_${id}`);
-    let helpChange = document.getElementById(`code_help_${id}`);
-    if (!helper && toChange.contentEditable !== "true") {
+    let readonlyButton = document.getElementById(`code_readonly_${helper?id+"_page":id}`);
+    let toChange = document.getElementById(`code_code_${helper?id+"_page":id}`);
+    let helpChange = document.getElementById(`code_help_${helper?id+"_page":id}`);
+    console.log(`code_code_${helper?id+"_page":id}`);
+    if (toChange.contentEditable !== "true") {
         toChange.contentEditable = "true";
         readonlyButton.value = "Change to Readonly";
         //toChange.style.backgroundColor = "dodgerblue";
@@ -179,9 +225,9 @@ function ChangeReadonly(id, helper) {
 
 }
 
-function CodeReset(id) {
-    let toReset = document.getElementById(`code_code_${id}`);
-    let resetButton = document.getElementById(`code_reset_${id}`);
+function CodeReset(id,helper) {
+    let toReset = document.getElementById(`code_code_${helper?id+"_page":id}`);
+    let resetButton = document.getElementById(`code_reset_${helper?id+"_page":id}`);
     toReset.textContent = `${Data[id].code}`;
     // if text is changed prism highlight will break, so I send it to rescan the new content
     Prism.highlightElement(toReset);
@@ -201,17 +247,20 @@ function CodeReset(id) {
     resetButton.onclick = null;
 }
 
-function CodeOpen(id) {
-    let codeToDisplay = DataById(id);
-    if (codeToDisplay){
-        body.innerHTML = "<br/>"+codeToDisplay;
-        Prism.highlightElement(document.getElementById(`code_code_${id}`));
-    }
-    else
-        modalOpen('Display Error', `No data found for id: ${id} or there is no code for it`);
+function CodePageOpen(id) {
+        let displayRun = DataById(id);
+        if (displayRun){
+            console.log("single page open");
+            Page.style.display="block";
+        }
+        else
+            modalOpen('Display Error', `No data found for id: ${id} or there is no code for it`);
 
+}
 
-    console.log("Currently Disabled!");
+function CodePageClose() {
+    console.log("single page close");
+    Page.style.display="none";
 }
 
 
