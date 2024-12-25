@@ -15,7 +15,6 @@
 @media (max-width: 700px) {
     .code{
         transition: display 0.5s;
-        border-radius: 20px !important;
     }
     #codes_helper {
         transition: display,opacity 0.5s;
@@ -58,7 +57,7 @@
     height: 100%;
     background-color: #2c2c2c;
     border: 2px solid #888888; /* Subtle border */
-    border-radius: 50px 50px 20px 20px;
+    border-radius: 20px;
     overflow: hidden;
     padding: 5px 10px; /* Padding: up-down left-right */
     display: flex;
@@ -154,7 +153,7 @@
 #code_page{
     position: absolute;
     width: 100%;
-    height: 100%;
+    height: 100vw;
     top: 0;
     background-color: rgb(0, 0, 0); /* Fallback color */
     background-color: rgba(0, 0, 0, 0.4); /* Black w/ opacity */
@@ -172,9 +171,10 @@
     left: 25%;
     width: 50%;
     min-width: 400px !important;
+    height: auto;
     background-color: #2c2c2c;
     border: 2px solid #888888; /* Subtle border */
-    border-radius: 50px 50px 20px 20px;
+    border-radius: 20px;
     overflow: hidden;
     padding: 5px 10px; /* Padding: up-down left-right */
     display: flex;
@@ -184,85 +184,20 @@
     transition: transform 0.3s ease, background-color 0.3s ease; /* Adds smooth hover effect */
 }
 
-/* Hover Effect for Code Blocks */
-.code_page:hover {
-    background-color: #3a3a3a;
-    transform: translateY(-5px); /* Subtle lift effect */
+.code_help_page {
+    border: 1px solid lightgrey !important;
+    border-radius: 8px !important;
+    overflow: hidden !important;
+    font-size: 80% !important;
+    background-color: lightgrey !important;
 }
 
-/* Focus Styling to Remove Outline */
-.code_code_page:focus, .code_out_page:focus {
-    outline: none !important;
-}
-
-/* Code Display Styling */
-.code_code_page {
-    outline: none !important;
-    text-shadow: black 1px 1px 1px !important;
-    height: max-content;
-}
-
-/* Language and Description Text Styling */
-.code_lang_page, .code_desc_page {
-    color: lightgrey;
-    text-shadow: lightgrey 1px 1px 1px;
-    margin-bottom: 4px;
-    font-weight: bold;
-}
-
-/* Button Container */
 .code_buttons_page {
     align-self: center;
     display: flex;
     gap: 5px;
     margin: 10px auto;
 }
-
-/* Code Help Section */
-.code_help_page {
-    border: 1px solid lightgrey !important;
-    border-radius: 8px !important;
-    overflow: auto !important;
-    margin: 10px !important;
-    font-size: 80% !important;
-    background-color: lightgrey !important;
-}
-
-.code_out_page, .code_code_page {
-    background-color: lightgrey !important;
-    overflow: auto !important;
-}
-
-/* Styling for Action Buttons (Copy, Resize, etc.) */
-.code_copy_page, .code_resize_page, .code_readonly_page, .code_reset_page {
-    border-radius: 4px;
-    border: 1px solid lightgrey;
-    font-size: 80%;
-    width: 40%;
-    margin-top: 3px;
-    align-self: center;
-    color: #222222;
-    text-shadow: #888888 2px 1px 2px;
-    background-color: lightgrey;
-    padding: 6px 12px; /* Adds padding for better click targets */
-    cursor: pointer;
-    transition: background-color 0.5s ease, color 0.5s ease, transform 1s ease;
-}
-
-.code_copy_page:hover, .code_resize_page:hover, .code_readonly_page:hover, .code_reset_page:hover {
-    background-color: #505050;
-    color: lightgrey;
-    transform: scale(1.05); /* Slightly enlarge the button */
-}
-
-.code_readonly_page, .code_reset_page {
-    width: 100%;
-    margin: 1px;
-}
-.code_copy_page:focus, .code_resize_page:focus, .code_readonly_page:focus, .code_reset_page:focus {
-    outline: none;
-}
-
 
 
 

@@ -38,12 +38,13 @@ fetchData();
 function Start_Everything() {
     DisplayAllData();
     DropDownLanguage();
+
 }
 
 //console.log("I love bread");
 
-const generateCodeHTML = ({id, lang, desc, code},help) => {
-    if(!help){
+const generateCodeHTML = ({id, lang, desc, code}, help) => {
+    if (!help) {
         let len = CountB_in_A(code, "\n");
         let wid = LongestSubstring(code, "\n");
 
@@ -78,52 +79,51 @@ const generateCodeHTML = ({id, lang, desc, code},help) => {
         CodeHelp += `</div>`;
 
         return CodeHelp;
-    }
-    else{
+    } else {
         let len = CountB_in_A(code, "\n");
         let wid = LongestSubstring(code, "\n");
 
         let CodeHelp = "";
         CodeHelp += `<div class="code_page" id="code_${id}_page">`;
 
-        CodeHelp += `<div class="code_lang_page" id="lang_${id}_page">`;
+        CodeHelp += `<div class="code_lang" id="lang_${id}">`;
         CodeHelp += `Language: ${langHelp[lang] || lang.slice(0, 1).toUpperCase() + lang.slice(1)}`;
         CodeHelp += `</div>`;
 
-        CodeHelp += `<div class="code_desc_page" id="desc_${id}_page">`;
+        CodeHelp += `<div class="code_desc" id="desc_${id}">`;
         CodeHelp += `Description: ${desc}`;
         CodeHelp += `</div>`;
 
-        CodeHelp += `<input type="button" class="code_resize_page" id="code_resize_${id}_page" 
+        CodeHelp += `<input type="button" class="code_resize" id="code_resize_${id}_page" 
             value="Close this page." onClick="CodePageClose(${id})">`;
         CodeHelp += `<p class="code_buttons_page">`;
-        CodeHelp += `<input type="button" class="code_readonly_page" id="code_readonly_${id}_page" onclick="ChangeReadonly(${id},'yeah')" value="Change from readonly">`;
-        CodeHelp += `<input type="button" class="code_reset_page" id="code_reset_${id}_page" onclick="CodeReset(${id},'yeah')" value="Reset the code">`;
+        CodeHelp += `<input type="button" class="code_readonly" id="code_readonly_${id}_page" onclick="ChangeReadonly(${id},'yeah')" value="Change from readonly">`;
+        CodeHelp += `<input type="button" class="code_reset" id="code_reset_${id}_page" onclick="CodeReset(${id},'yeah')" value="Reset the code">`;
         CodeHelp += `</p>`;
 
         CodeHelp += `<div class="code_help_page" id="code_help_${id}_page">`;
 
         // Add the HTML structure for code display
         CodeHelp +=
-            `<pre class="line-numbers code_out_page" id="code_out_${id}_page" style="height: ${len * 20 + len / 2}px"><code class="language-${lang} code_code_page" id="code_code_${id}_page">${code}</code></pre>`;
+            `<pre class="line-numbers code_out" style="height: ${len * 20 + len / 2}px"><code class="language-${lang} code_code" id="code_code_${id}_page">${code}</code></pre>`;
 
         CodeHelp += `</div>`;
 
-        CodeHelp += `<button onclick="CopyCode(${id},'yeah')" class="code_copy_page">Copy Code</button>`;
+        CodeHelp += `<button onclick="CopyCode(${id},'yeah')" class="code_copy">Copy Code</button>`;
 
         CodeHelp += `</div>`;
 
         return CodeHelp;
+
     }
 };
 
 
-
 function DisplayAllData(Selected) {
-    CodeOutput.innerHTML="";
-    Data.forEach(({ id, lang, desc, code }) => {
-        if ((!Selected||Selected?.includes(id)) && code !== "none") {
-            let codeHTML = generateCodeHTML({ id, lang, desc, code });
+    CodeOutput.innerHTML = "";
+    Data.forEach(({id, lang, desc, code}) => {
+        if ((!Selected || Selected?.includes(id)) && code !== "none") {
+            let codeHTML = generateCodeHTML({id, lang, desc, code});
             CodeOutput.insertAdjacentHTML('beforeend', codeHTML);
             Prism.highlightElement(document.getElementById(`code_code_${id}`));
         }
@@ -138,7 +138,7 @@ function DataById(id) {
     // If the item exists and its code is not "none"
     if (dataItem && dataItem.code !== "none") {
         // Generate the HTML for this piece of data
-        let codeHTML = generateCodeHTML(dataItem,"page");
+        let codeHTML = generateCodeHTML(dataItem, "page");
         Page.innerHTML = codeHTML;
         Prism.highlightElement(document.getElementById(`code_code_${id}_page`));
         return "no error";
@@ -179,11 +179,11 @@ function selectStuff(language) {
 }
 
 
-function CopyCode(id,helper) {
+function CopyCode(id, helper) {
     // Check if the Clipboard API is available
     if (navigator.clipboard) {
         // Get the text to copy
-        let textToCopy = document.getElementById(`code_code_${helper?id+"_page":id}`).innerText;
+        let textToCopy = document.getElementById(`code_code_${helper ? id + "_page" : id}`).innerText;
         //console.log(`code_code_${helper?id+"_page":id}`);
         if (!textToCopy) {
             modalOpen('Copy Error', 'Failed to copy:', "text to copy is null")
@@ -207,10 +207,10 @@ function CopyCode(id,helper) {
 
 
 function ChangeReadonly(id, helper) {
-    let readonlyButton = document.getElementById(`code_readonly_${helper?id+"_page":id}`);
-    let toChange = document.getElementById(`code_code_${helper?id+"_page":id}`);
-    let helpChange = document.getElementById(`code_help_${helper?id+"_page":id}`);
-    console.log(`code_code_${helper?id+"_page":id}`);
+    let readonlyButton = document.getElementById(`code_readonly_${helper ? id + "_page" : id}`);
+    let toChange = document.getElementById(`code_code_${helper ? id + "_page" : id}`);
+    let helpChange = document.getElementById(`code_help_${helper ? id + "_page" : id}`);
+    //console.log(`code_code_${helper?id+"_page":id}`);
     if (toChange.contentEditable !== "true") {
         toChange.contentEditable = "true";
         readonlyButton.value = "Change to Readonly";
@@ -225,9 +225,9 @@ function ChangeReadonly(id, helper) {
 
 }
 
-function CodeReset(id,helper) {
-    let toReset = document.getElementById(`code_code_${helper?id+"_page":id}`);
-    let resetButton = document.getElementById(`code_reset_${helper?id+"_page":id}`);
+function CodeReset(id, helper) {
+    let toReset = document.getElementById(`code_code_${helper ? id + "_page" : id}`);
+    let resetButton = document.getElementById(`code_reset_${helper ? id + "_page" : id}`);
     toReset.textContent = `${Data[id].code}`;
     // if text is changed prism highlight will break, so I send it to rescan the new content
     Prism.highlightElement(toReset);
@@ -248,25 +248,51 @@ function CodeReset(id,helper) {
 }
 
 function CodePageOpen(id) {
-        let displayRun = DataById(id);
-        if (displayRun){
-            console.log("single page open");
-            Page.style.display="block";
+    let displayRun = DataById(id);
+    if (displayRun) {
+        //console.log("single page open");
+        Page.style.display = "block";
+        document.body.style.overflow = 'hidden';
+
+        let PageInner = document.getElementById(`code_${id}_page`);
+
+        setTimeout(() => {
+            document.addEventListener('click', handleOutsideClick);
+        }, 10)
+
+        function handleOutsideClick(event) {
+            if (!PageInner.contains(event.target)) {
+                CodePageClose();
+                document.removeEventListener('click', handleOutsideClick);
+            }
         }
-        else
-            modalOpen('Display Error', `No data found for id: ${id} or there is no code for it`);
+    } else
+        modalOpen('Display Error', `No data found for id: ${id} or there is no code for it`);
 
 }
 
 function CodePageClose() {
-    console.log("single page close");
-    Page.style.display="none";
+    //console.log("single page close");
+    Page.style.display = "none";
+    document.body.style.overflow = '';
 }
 
 
-function openDropdown(dropdownContent) {
+function openDropdown(dropdownContent, dropdownButton) {
     dropdownContent.classList.add('show');
     dropdownContent.classList.remove('hide');
+
+    // Add an event listener to handle outside clicks
+    setTimeout(() => {
+        document.addEventListener('click', handleOutsideClick);
+    }, 10)
+
+    function handleOutsideClick(event) {
+        if (!dropdownContent.contains(event.target)) {
+            closeDropdown(dropdownContent);
+            document.removeEventListener('click', handleOutsideClick);
+        }
+    }
 }
 
 function closeDropdown(dropdownContent) {
@@ -284,32 +310,36 @@ function toggleDropdown(id) {
     if (isOpen) {
         closeDropdown(dropdownContent);
         //console.log("close dropdown", id);
-        document.removeEventListener('click', handleOutsideClick);
     } else {
-        openDropdown(dropdownContent);
+        openDropdown(dropdownContent, dropdownButton);
         //console.log("open dropdown", id);
 
-        // Add an event listener to handle outside clicks
-        document.addEventListener('click', handleOutsideClick);
-
-        function handleOutsideClick(event) {
-            if (!dropdownContent.contains(event.target) && !dropdownButton.contains(event.target)) {
-                closeDropdown(dropdownContent);
-                document.removeEventListener('click', handleOutsideClick);
-            }
-        }
     }
 }
 
-function hideHtmlElement(id,time){
-    if(time)
-    setTimeout(()=>{
+function hideHtmlElement(id, time) {
+    if (time)
+        setTimeout(() => {
+            let element = document.getElementById(id);
+            element.style.cssText += "display: none !important;";
+        }, time)
+    else {
         let element = document.getElementById(id);
-        element.style.cssText+="display: none !important;";
-    },time)
-    else{
-        let element = document.getElementById(id);
-        element.style.cssText+="display: none !important;";
+        element.style.cssText += "display: none !important;";
+    }
+}
+
+function copyStyles(sourceElement, targetElement) {
+    // not used
+    console.log(sourceElement)
+    sourceElement = document.getElementsByClassName(sourceElement)[0];
+    targetElement = document.getElementsByClassName(targetElement)[0];
+    console.log(sourceElement)
+    let centerHelper = getComputedStyle(sourceElement);
+
+    for (let property of centerHelper) {
+        // Apply only plain styles (excludes @media and others)
+        targetElement.style[property] = centerHelper.getPropertyValue(property);
     }
 }
 

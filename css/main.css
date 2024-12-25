@@ -1,6 +1,7 @@
 /*First the basics*/
 body {
     min-height: 100%;
+    height: 200%;
     color: snow;
     background-color: slategray;
     margin: 0;
