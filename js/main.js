@@ -52,7 +52,7 @@ function LoadBasicContent() {
 
 
     let modalContent = `
-    <div id="modal" class="modal" onClick="modalClose()">
+    <div id="modal" class="modal">
         
     </div>
     `;
@@ -134,23 +134,26 @@ function modalOpen(title, text, error) {
 
 
     let modalContent = document.getElementById("modal_content");
-    let modal = document.getElementById('modal');
 
-    modalContent.addEventListener('click', function (e) {
-        e.stopPropagation();
-    });
+    // Add an event listener to handle outside clicks
+    setTimeout(() => {
+        document.addEventListener('click', handleOutsideModalClick);
+    }, 1000)
 
-    modal.addEventListener('click', function (e) {
-        if (e.target !== modal)
+    function handleOutsideModalClick(event) {
+        if (!modalContent.contains(event.target)) {
             modalClose();
-    });
+            document.removeEventListener('click', handleOutsideModalClick);
+        }
+        event.stopPropagation();
+    }
 
-    document.getElementById('modal').style.display = "block";
+    Modal.style.display = "block";
 }
 
 
 function modalClose() {
-    document.getElementById('modal').style.display = "none";
+    Modal.style.display = "none";
 }
 
 function DarkModeLoad() {

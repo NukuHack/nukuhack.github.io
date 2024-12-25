@@ -258,7 +258,7 @@ function CodePageOpen(id) {
 
         setTimeout(() => {
             document.addEventListener('click', handleOutsidePageClick);
-        }, 10)
+        }, 1000)
 
         function handleOutsidePageClick(event) {
             if (!PageInner.contains(event.target)) {
@@ -266,6 +266,10 @@ function CodePageOpen(id) {
                 document.removeEventListener('click', handleOutsidePageClick);
             }
         }
+
+        PageInner.addEventListener('click', (event) => {
+            event.stopPropagation(); // Prevent the click from reaching the document
+        });
     } else
         modalOpen('Display Error', `No data found for id: ${id} or there is no code for it`);
 
@@ -285,7 +289,7 @@ function openDropdown(dropdownContent, dropdownButton) {
     // Add an event listener to handle outside clicks
     setTimeout(() => {
         document.addEventListener('click', handleOutsideDropdownClick);
-    }, 10)
+    }, 1000)
     // TODO : make the click go "down" to the next layer
     function handleOutsideDropdownClick(event) {
         if (!dropdownContent.contains(event.target)) {
@@ -293,6 +297,9 @@ function openDropdown(dropdownContent, dropdownButton) {
             document.removeEventListener('click', handleOutsideDropdownClick);
         }
     }
+    dropdownContent.addEventListener('click', (event) => {
+        event.stopPropagation(); // Prevent the click from reaching the document
+    });
 }
 
 function closeDropdown(dropdownContent) {
