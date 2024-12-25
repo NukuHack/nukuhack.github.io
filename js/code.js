@@ -289,7 +289,9 @@ function openDropdown(dropdownContent, dropdownButton) {
     // Add an event listener to handle outside clicks
     setTimeout(() => {
         document.addEventListener('click', handleOutsideDropdownClick);
-    }, 1000)
+        // did you know that if you set the SetTimout to 0 (what should mean it's 0 milisecond) even then it's not instant and in This case it would work perfectly
+        // ... but I set it to 10 if something is slow ...
+    }, 10)
     // TODO : make the click go "down" to the next layer
     function handleOutsideDropdownClick(event) {
         if (!dropdownContent.contains(event.target)) {
