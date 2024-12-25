@@ -257,13 +257,13 @@ function CodePageOpen(id) {
         let PageInner = document.getElementById(`code_${id}_page`);
 
         setTimeout(() => {
-            document.addEventListener('click', handleOutsideClick);
+            document.addEventListener('click', handleOutsidePageClick);
         }, 10)
 
-        function handleOutsideClick(event) {
+        function handleOutsidePageClick(event) {
             if (!PageInner.contains(event.target)) {
                 CodePageClose();
-                document.removeEventListener('click', handleOutsideClick);
+                document.removeEventListener('click', handleOutsidePageClick);
             }
         }
     } else
@@ -284,13 +284,13 @@ function openDropdown(dropdownContent, dropdownButton) {
 
     // Add an event listener to handle outside clicks
     setTimeout(() => {
-        document.addEventListener('click', handleOutsideClick);
+        document.addEventListener('click', handleOutsideDropdownClick);
     }, 10)
-
-    function handleOutsideClick(event) {
+    // TODO : make the click go "down" to the next layer
+    function handleOutsideDropdownClick(event) {
         if (!dropdownContent.contains(event.target)) {
             closeDropdown(dropdownContent);
-            document.removeEventListener('click', handleOutsideClick);
+            document.removeEventListener('click', handleOutsideDropdownClick);
         }
     }
 }
