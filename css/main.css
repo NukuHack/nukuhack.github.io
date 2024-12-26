@@ -19,6 +19,21 @@ a {
 }
 
 
+::-webkit-scrollbar {
+    background-color: lightgrey;
+    width: 1.5vw;
+}
+
+::-webkit-scrollbar-thumb {
+    background: grey;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #222222;
+}
+
+
 
 
 .navbar {

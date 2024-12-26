@@ -23,8 +23,8 @@ function fetchData() {
             }
             return res.json();
         })
-        .then((amabatukam) => {
-            Data = amabatukam.data;
+        .then((Re_Help) => {
+            Data = Re_Help.data;
             //console.log(Data);
             Start_Everything();
         })
@@ -44,11 +44,13 @@ function Start_Everything() {
 //console.log("I love bread");
 
 const generateCodeHTML = ({id, lang, desc, code}, help) => {
-    if (!help) {
-        let len = CountB_in_A(code, "\n");
-        let wid = LongestSubstring(code, "\n");
+    let len = CountB_in_A(code, "\n");
+    let wid = LongestSubstring(code, "\n");
+    let leng = len * 18 +40;
 
-        let CodeHelp = "";
+    let CodeHelp = "";
+
+    if (!help) {
         CodeHelp += `<div class="code" id="code_${id}">`;
 
         CodeHelp += `<div class="code_lang" id="lang_${id}">`;
@@ -70,7 +72,7 @@ const generateCodeHTML = ({id, lang, desc, code}, help) => {
 
         // Add the HTML structure for code display
         CodeHelp +=
-            `<pre class="line-numbers code_out" id="code_out_${id}" style="height: ${len * 20 + len / 2}px"><code class="language-${lang} code_code" id="code_code_${id}">${code}</code></pre>`;
+            `<pre class="line-numbers code_out" id="code_out_${id}" style="height: ${leng}px"><code class="language-${lang} code_code" id="code_code_${id}">${code}</code></pre>`;
 
         CodeHelp += `</div>`;
 
@@ -80,10 +82,6 @@ const generateCodeHTML = ({id, lang, desc, code}, help) => {
 
         return CodeHelp;
     } else {
-        let len = CountB_in_A(code, "\n");
-        let wid = LongestSubstring(code, "\n");
-
-        let CodeHelp = "";
         CodeHelp += `<div class="code_page" id="code_${id}_page">`;
 
         CodeHelp += `<div class="code_lang" id="lang_${id}">`;
@@ -105,7 +103,7 @@ const generateCodeHTML = ({id, lang, desc, code}, help) => {
 
         // Add the HTML structure for code display
         CodeHelp +=
-            `<pre class="line-numbers code_out" style="height: ${len * 20 + len / 2}px"><code class="language-${lang} code_code" id="code_code_${id}_page">${code}</code></pre>`;
+            `<pre class="line-numbers code_out" style="height: ${leng}px"><code class="language-${lang} code_code" id="code_code_${id}_page">${code}</code></pre>`;
 
         CodeHelp += `</div>`;
 
@@ -120,6 +118,8 @@ const generateCodeHTML = ({id, lang, desc, code}, help) => {
 
 
 function DisplayAllData(Selected) {
+    //TODO : limit the display to like 20 things (or less) and only ever show that much
+    // (and probably a next page stuff so new stuff and al ot more ...)
     CodeOutput.innerHTML = "";
     Data.forEach(({id, lang, desc, code}) => {
         if ((!Selected || Selected?.includes(id)) && code !== "none") {
@@ -182,26 +182,20 @@ function selectStuff(language) {
 function CopyCode(id, helper) {
     // Check if the Clipboard API is available
     if (navigator.clipboard) {
-        // Get the text to copy
         let textToCopy = document.getElementById(`code_code_${helper ? id + "_page" : id}`).innerText;
-        //console.log(`code_code_${helper?id+"_page":id}`);
-        if (!textToCopy) {
-            modalOpen('Copy Error', 'Failed to copy:', "text to copy is null")
-        } else {
-            // Write the text to the clipboard
+        if (!textToCopy)
+            modalOpen('Copy Error', 'Failed to copy:', "Nothing to copy");
+        else {
             navigator.clipboard.writeText(textToCopy)
                 .then(() => {
-                    // Display a message if the text was copied successfully
                     modalOpen('Copy Success', 'Code copied to clipboard!');
                 })
                 .catch((error) => {
-                    // Display an error message if there is an issue copying the text
                     modalOpen('Copy Error', 'Failed to copy:', error);
                 });
         }
     } else {
-        // If the Clipboard API is not available, display an error message
-        modalOpen('Browser Error', 'Failed to copy:', 'Your browser does not support the Clipboard API.\nOr the web hosting server.');
+        modalOpen('Browser Error', 'Failed to copy:', 'Your browser does not support the Clipboard API.\n(Or the web hosting server)');
     }
 }
 
@@ -248,6 +242,7 @@ function CodeReset(id, helper) {
 }
 
 function CodePageOpen(id) {
+    scrollToTop();
     let displayRun = DataById(id);
     if (displayRun) {
         //console.log("single page open");
@@ -265,6 +260,7 @@ function CodePageOpen(id) {
                 CodePageClose();
                 document.removeEventListener('click', handleOutsidePageClick);
             }
+            event.stopPropagation();
         }
 
         PageInner.addEventListener('click', (event) => {
@@ -298,10 +294,8 @@ function openDropdown(dropdownContent, dropdownButton) {
             closeDropdown(dropdownContent);
             document.removeEventListener('click', handleOutsideDropdownClick);
         }
+        event.stopPropagation();
     }
-    dropdownContent.addEventListener('click', (event) => {
-        event.stopPropagation(); // Prevent the click from reaching the document
-    });
 }
 
 function closeDropdown(dropdownContent) {
@@ -337,21 +331,6 @@ function hideHtmlElement(id, time) {
         element.style.cssText += "display: none !important;";
     }
 }
-
-function copyStyles(sourceElement, targetElement) {
-    // not used
-    console.log(sourceElement)
-    sourceElement = document.getElementsByClassName(sourceElement)[0];
-    targetElement = document.getElementsByClassName(targetElement)[0];
-    console.log(sourceElement)
-    let centerHelper = getComputedStyle(sourceElement);
-
-    for (let property of centerHelper) {
-        // Apply only plain styles (excludes @media and others)
-        targetElement.style[property] = centerHelper.getPropertyValue(property);
-    }
-}
-
 
 const CountB_in_A = ((sourceString, searchString) => {
     if (!searchString) {
@@ -389,6 +368,7 @@ const LongestSubstring = ((sourceString, deLimiter) => {
 
     return maxLength;
 });
+
 
 
 

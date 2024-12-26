@@ -3,3 +3,11 @@ https://prismjs.com/#examples
 http://vizsga.danielcsohany.testhosting.hu/
 
 http://www.informatikaismeretek.nhely.hu/
+
+for code before saving to json :
+
+replace every line break with \n
+replace every 4 space with 2
+replace every 4 space with \t
+done
+

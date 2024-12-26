@@ -91,6 +91,7 @@ function toggleNavbar() {
     else
         NavItems.classList.add('show');
 }
+
 // this closes the navbar if it is not clicked but open
 document.addEventListener('click', function (event) {
     if (!NavToggle.contains(event.target) && !NavItems.contains(event.target))
@@ -157,12 +158,13 @@ function modalClose() {
 }
 
 function DarkModeLoad() {
-    let prefersDark = localStorage.getItem("prefersDark") ||
-        (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    let prefersDark = getFromLocalStorage("prefersDark");
+    if (prefersDark===undefined){
+        prefersDark= window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        saveToLocalStorage("prefersDark", prefersDark);
+    }
 
-    prefersDark === "true" ? prefersDark = true : prefersDark = false
-
-    localStorage.setItem("prefersDark", prefersDark);
+    //console.log(prefersDark)
 
     if (!prefersDark) {
         DarkReader.disable();
@@ -173,18 +175,40 @@ function DarkModeLoad() {
     }
 }
 
+
 // Set initial Dark Mode state
 DarkModeLoad();
 
 // Dark Mode Toggle Function
 function toggleDarkMode() {
     if (DarkReader.isEnabled()) {
-        DarkReader.disable();
-        localStorage.setItem("prefersDark", false);
+        DarkReader.disable()
+        saveToLocalStorage("prefersDark", false);
     } else {
         DarkReader.enable();
-        localStorage.setItem("prefersDark", true);
+        saveToLocalStorage("prefersDark", true);
     }
 }
 
 
+
+function saveToLocalStorage(key, value) {
+    try {
+        localStorage.setItem(key, JSON.stringify(value));
+    } catch (error) {
+        console.error('Error saving to localStorage:', error);
+    }
+}
+
+function getFromLocalStorage(key) {
+    try {
+        const value = localStorage.getItem(key);
+        return value ? JSON.parse(value) : undefined;
+    } catch (error) {
+        console.error('Error retrieving from localStorage:', error);
+    }
+}
+
+function scrollToTop() {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
