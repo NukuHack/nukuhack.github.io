@@ -11,6 +11,7 @@ const langHelp = {
     "python": "Python",
     "css": "CSS",
 };
+let codeLangTypes=[];
 
 
 // just the json fetch
@@ -37,8 +38,11 @@ fetchData();
 
 function Start_Everything() {
     DisplayAllData();
+    Data.forEach(({lang})=>{
+        if (!codeLangTypes.includes(lang))
+            codeLangTypes.push(lang);
+    });
     DropDownLanguage();
-
 }
 
 //console.log("I love bread");
@@ -152,13 +156,10 @@ function DataById(id) {
 function DropDownLanguage() {
     let dropdown_language = document.getElementById('dropdown_language');
 
-    let dropdown_language_options = Data.map(({lang, code}) => {
-        return code !== "none" ? lang : null;
-    }).filter(lang => lang !== null);
     //console.log(dropdown_language_options);
 
     // Iterate over the data to generate the HTML
-    dropdown_language_options.forEach((lang) => {
+    codeLangTypes.forEach((lang) => {
         let dropdownHelp =
             `<button class="dropdown-item" onClick="selectStuff('${lang}')">${langHelp[lang]}</button>`;
         dropdown_language.insertAdjacentHTML("beforeend", dropdownHelp);
