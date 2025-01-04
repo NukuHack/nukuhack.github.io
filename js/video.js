@@ -118,6 +118,7 @@ function fetchAndSetFileSize(videoSrc) {
         .then(blob => {
             const size = formatFileSize(blob.size);
             FileSize.innerText = `File Size: ${size}`;
+            progressText.innerText = `${formatTime(videoPlayer.duration)}/${formatTime(videoPlayer.currentTime)}`;
         })
         .catch(error => {
             console.error('Error fetching file details:', error);
@@ -268,8 +269,4 @@ function formatTime(time) {
 
 seekBar.addEventListener('mouseleave', () => {
     timeDisplay.style.display = 'none';
-});
-
-videoPlayer.addEventListener("ended", () => {
-    seekBar.value = 0;
 });
