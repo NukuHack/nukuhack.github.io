@@ -1,0 +1,252 @@
+/* Body */
+body {
+    font-size: 16px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    font-family: 'Arial', sans-serif;
+}
+
+.video-img {
+    width: 20px;
+    height: auto;
+    background: rgba(255, 255, 255, 0.4);
+}
+
+/* Header */
+#header {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    background: rgba(44, 44, 44, 0.8);
+    padding: 10px 0;
+    z-index: 10;
+}
+
+#footer {
+    margin-top: 20px;
+}
+
+#title {
+    font-size: 3rem;
+    color: #888888;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    text-shadow: 0 3px 6px rgba(0, 0, 0, 0.5);
+}
+
+/* File Selection */
+.fileSelect {
+    background: linear-gradient(135deg, #3a3a3a, #888888);
+    color: snow;
+    border: 1px solid #888888;
+    border-radius: 30px;
+    padding: 12px 24px;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+}
+
+#fileInput {
+    display: none;
+}
+
+#fileDetails {
+    margin: 20px;
+}
+
+.fileSelect:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
+    background: linear-gradient(135deg, #505050, #aaaaaa);
+}
+
+/* Video Container */
+#videoContainer {
+    position: relative;
+    width: 80%;
+    height: auto;
+    max-width: 900px;
+    background: #3a3a3a;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 2px solid #888888;
+}
+
+#videoPlayer {
+    width: 100%;
+}
+
+/* Controls */
+.overlay {
+    position: absolute;
+    top: 78%;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 10px 20px;
+    background: rgba(0, 0, 0, 0.6);
+    border-radius: 8px;
+    justify-content: flex-end;
+    z-index: 20;
+}
+
+#videoContainer .control-inline {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    justify-content: space-between;
+    width: 100%;
+}
+
+/* Control buttons */
+.control-buttons button {
+    background-color: #505050;
+    color: snow;
+    border: 1px solid #888888;
+    border-radius: 5px;
+    padding: 4px 6px;
+    cursor: pointer;
+    transition: transform 0.2s ease, background-color 0.3s ease;
+}
+
+.control-buttons button:hover {
+    background-color: #aaaaaa;
+    transform: translateY(-2px);
+}
+
+/* Fullscreen Button */
+#fullscreenButton {
+    background-color: #505050;
+    color: snow;
+    border: 1px solid #888888;
+    border-radius: 5px;
+    padding: 4px 6px;
+    cursor: pointer;
+    transition: transform 0.2s ease, background-color 0.3s ease;
+}
+
+#fullscreenButton:hover {
+    background-color: #aaaaaa;
+    transform: translateY(-2px);
+}
+
+.slider-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 50%;
+    justify-content: flex-start;
+}
+
+.controls input[type="range"] {
+    appearance: none;
+    width: 35%;
+    height: 5px;
+    background: #444;
+    border-radius: 5px;
+    outline: none;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.controls input[type="range"]::-webkit-slider-thumb {
+    appearance: none;
+    width: 15px;
+    height: 15px;
+    background: #888;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid #333;
+}
+
+
+/* Seek Bar */
+#videoContainer .time-control {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 10px;
+    width: 100%;
+}
+
+#videoContainer #seekBar {
+    width: 100%;
+    margin-top: 10px;
+}
+
+#timeDisplay {
+    position: absolute;
+    top: -30px;
+    left: 0%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.7);
+    color: snow;
+    display: none;
+    padding: 4px 8px;
+    border-radius: 5px;
+    font-size: 12px;
+    pointer-events: none;
+    white-space: nowrap;
+    text-align: center;
+    z-index: 30;
+}
+
+#speedValue {
+    color: snow;
+    font-size: 0.9rem;
+    margin-left: 5px;
+    cursor: default;
+    min-width: 3.5rem;
+    text-align: center;
+}
+
+label[for="speedSlider"], label[for="volumeControl"] {
+    color: snow;
+    font-size: 0.9rem;
+    margin-right: 10px;
+}
+
+.small-buttons {
+    display: inline-block;
+}
+
+@media (max-width: 1200px) {
+    #videoContainer {
+        width: 95%;
+    }
+}
+
+@media (max-width: 840px) {
+    .overlay {
+        top: 70%;
+    }
+
+    #small-backw-button {
+        display: none;
+    }
+
+    #small-forw-button {
+        display: none;
+    }
+
+    .slider-controls {
+        display: none;
+    }
+
+    #title {
+        font-size: 2rem;
+    }
+}
+
+@media (max-width: 500px) {
+    #title {
+        font-size: 1.7rem;
+    }
+}

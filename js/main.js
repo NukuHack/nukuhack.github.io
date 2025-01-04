@@ -34,6 +34,9 @@ function LoadBasicContent() {
                   <li class="navbar_li">
                     <p class="navbar_item" onclick="ChangePage('links')">Links & Connection</p>
                   </li>
+                  <li class="navbar_li">
+                    <p class="navbar_item" onclick="ChangePage('video')">Video Display</p>
+                  </li>
                 </ul>
               </div>
                 <div class="slider-container">

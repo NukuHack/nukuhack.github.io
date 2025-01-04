@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link href="./assets/favicon.png" rel="shortcut icon" type="image/x-icon" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stupid Webpage</title>
+    <link rel="stylesheet" type="text/css" href="./css/main.css">
+    <link rel="stylesheet" type="text/css" href="css/video.css">
+</head>
+<body>
+
+<section id="fileSelection">
+    <button onclick="document.getElementById('fileInput').click();" class="fileSelect" id="fileSelect"
+            aria-label="Select a file to display">
+        Select a File
+    </button>
+    <button onclick="displayVideo('resources/demo.mp4')" class="fileSelect" id="fileSelectDemo"
+            aria-label="Select a file to display">
+        Try the demo File
+    </button>
+
+    <input type="file" id="fileInput" onchange="handleFileSelection(event)" accept="*">
+
+</section>
+
+<section id="fileDetails">
+    <p id="fileName"></p>
+    <p id="fileSize"></p>
+</section>
+
+<div id="videoContainer" style="display: none;">
+    <video id="videoPlayer" aria-labelledby="videoControls">
+        Your browser does not support the video tag.
+    </video>
+
+    <div class="overlay" id="overlay">
+        <div class="control-inline">
+            <div class="control-buttons">
+                <button onclick="playPause()" aria-label="Play/Pause" id="playButton" class="small-buttons">
+                    <img class="video-img" id="playImage" src="assets/play-icon.png" alt="Play/Pause">
+                </button>
+                <button onclick="setTime(-5)" aria-label="Rewind 5 seconds" id="small-backw-button"
+                        class="small-buttons">
+                    <img class="video-img" src="assets/single-left-arrow.png" alt="Rewind 5 seconds">
+                </button>
+                <button onclick="setTime(-10)" aria-label="Rewind 10 seconds" id="big-backw-button"
+                        class="small-buttons">
+                    <img class="video-img" src="assets/double-left-arrow.png" alt="Rewind 10 seconds">
+                </button>
+                <button onclick="setTime(10)" aria-label="Forward 10 seconds" id="big-forw-button"
+                        class="small-buttons">
+                    <img class="video-img" src="assets/double-right-arrow.png" alt="Forward 10 seconds">
+                </button>
+                <button onclick="setTime(5)" aria-label="Forward 5 seconds" id="small-forw-button"
+                        class="small-buttons">
+                    <img class="video-img" src="assets/single-right-arrow.png" alt="Forward 5 seconds">
+                </button>
+                <button onclick="loop()" aria-label="Toggle Loop" id="loopButton" class="small-buttons">
+                    <img class="video-img" id="loopImage" src="assets/loop-icon.png" alt="Toggle Loop">
+                </button>
+            </div>
+
+            <div class="slider-controls">
+                <label for="speedSlider"><img class="video-img" src="assets/speed-icon.png" alt="Fullscreen"></label>
+                <input type="range" id="speedSlider" min="0" max="2" step="0.01" value="1"
+                       oninput="speedSliderChange()"
+                       aria-labelledby="speedSlider">
+                <p id="speedValue">1x</p>
+                <label for="volumeSlider"><img class="video-img" src="assets/volume-icon.png" alt="Fullscreen"></label>
+                <input type="range" id="volumeSlider" value="100" max="100" oninput="changeVolume()"
+                       aria-labelledby="volumeControl">
+            </div>
+
+            <button id="fullscreenButton" onclick="toggleFullscreen()" aria-label="Toggle fullscreen">
+                <img class="video-img" id="fullscreenImage" src="assets/fullscreen-icon.png" alt="Fullscreen">
+            </button>
+        </div>
+        <div class="time-control">
+            <label for="seekBar" id="progressText">Progress:</label>
+            <input type="range" id="seekBar" min="0" value="0" max="100" oninput="seekVideo()"
+                   onmousemove="updateTimeDisplay(event)" aria-labelledby="seekBar">
+            <div id="timeDisplay" aria-live="polite"></div>
+        </div>
+    </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/darkreader@4.9.34/darkreader.min.js"></script>
+<script type="text/javascript" src="js/main.js"></script>
+<script type="text/javascript" src="js/video.js"></script>
+</body>
+</html>

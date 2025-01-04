@@ -1,3 +1,12 @@
+/* General Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: content-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+
 /*First the basics*/
 body {
     min-height: 100%;
@@ -21,7 +30,7 @@ a {
 
 ::-webkit-scrollbar {
     background-color: lightgrey;
-    width: 1.5vw;
+    width: 1vw;
 }
 
 ::-webkit-scrollbar-thumb {
