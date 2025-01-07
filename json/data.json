@@ -185,6 +185,12 @@
   "lang": "csharp",
   "desc": "Save and load (external file)",
   "code": "private void save_all()\n{\n  try\n  {\n\tStreamWriter wr = new StreamWriter(\"save.txt\");\n\tforeach (var x in Output.Items)\n\t  wr.WriteLine(x);\n\twr.Close();\n  }\n  catch (error){\n\tMessageBox.Show(\n\t  \"Task failed somehow\\n\" +\n\t  error,\n\t  \"bad\",\n\t  MessageBoxButtons.OK,\n\t  MessageBoxIcon.Error);\n  }\n}\nprivate void load_all()\n{\n  string[] adat = File.ReadAllLines(\"save.txt\");\n  foreach (var x in adat)\n  // do something with loaded data\n}"
+  },
+  {
+  "id": 31,
+  "lang": "javascript",
+  "desc": "Filter array by string",
+  "code": "function FilterByString(query) {\\n  if (!query || typeof query !== \"string\") {\\n\\tconsole.log(\"not good input\");\\n\\treturn;\\n  }\\n  // Normalize query for consistent comparison\\n  SearchedDescription = query.toLowerCase().trim();\\n  // Split by spaces into an array of words\\n  const SearchTerms = SearchedDescription.split(/\\s+/);\\n  // Filter Data based on search terms\\n  SearchedByDescription = Data.filter(({desc}) => {\\n\\t// Ensure all search terms are found in the description\\n\\treturn SearchTerms.every(term => desc.toLowerCase().includes(term));\\n  }).map(({id}) => id); // Extract only the id from the filtered items\\n  console.log(\"Found\", SearchedByDescription);\\n}"
   }
   ]
 }

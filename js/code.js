@@ -1,22 +1,27 @@
-const CodeOutput = document.getElementById('codes');
-const Modal = document.getElementById('modal');
-const Page = document.getElementById('code_page');
-const Dropdowns = document.getElementById('dropdowns');
+const codeOutput = document.getElementById('codes');
+const modalBox = document.getElementById('modal');
+const pageDiv = document.getElementById('code_page');
+const searchStuff = document.getElementById('search_stuff');
+const languageDropdown = document.getElementById('dropdown_language');
 const True = false;
-let Data; // the main data storage ... yeah
-
 const langHelp = {
     "csharp": "C#",
     "javascript": "JavaScript",
     "python": "Python",
     "css": "CSS",
 };
-let codeLangTypes=[];
+
+let Data; // the main data storage ... yeah
+let SelectedLanguage = "all";
+let SelectedByLanguage = [];
+let SearchedDescription = "all";
+let SearchedByDescription = [];
+let codeLangTypes = [];
 
 
 // just the json fetch
-function fetchData() {
-    fetch('./json/data.json')
+function FetchData(from) {
+    fetch(from)
         .then((res) => {
             if (!res.ok) {
                 throw new Error
@@ -34,11 +39,11 @@ function fetchData() {
         });
 }
 
-fetchData();
+FetchData('./json/data.json');
 
 function Start_Everything() {
-    DisplayAllData();
-    Data.forEach(({lang})=>{
+    DisplayData();
+    Data.forEach(({lang}) => {
         if (!codeLangTypes.includes(lang))
             codeLangTypes.push(lang);
     });
@@ -47,24 +52,28 @@ function Start_Everything() {
 
 //console.log("I love bread");
 
-const generateCodeHTML = ({id, lang, desc, code}, help) => {
-    let len = CountB_in_A(code, "\n");
-    let wid = LongestSubstring(code, "\n");
-    let leng = len * 18 +40;
+function GenerateCodeHTML({id, lang, desc, code}, help = undefined) {
+    const len = CountB_in_A(code, "\n");
+    const wid = LongestSubstring(code, "\n");
+    const Leng = len * 18 + 40;
 
     let CodeHelp = "";
 
     if (!help) {
         CodeHelp += `<div class="code" id="code_${id}">`;
+    } else {
+        CodeHelp += `<div class="code_page" id="code_${id}_page">`;
+    }
+    CodeHelp += `<div class="code_lang" id="lang_${id}">`;
+    CodeHelp += `Language: ${langHelp[lang] || lang.slice(0, 1).toUpperCase() + lang.slice(1)}`;
+    CodeHelp += `</div>`;
 
-        CodeHelp += `<div class="code_lang" id="lang_${id}">`;
-        CodeHelp += `Language: ${langHelp[lang] || lang.slice(0, 1).toUpperCase() + lang.slice(1)}`;
-        CodeHelp += `</div>`;
+    CodeHelp += `<div class="code_desc" id="desc_${id}">`;
+    CodeHelp += `Description: ${desc}`;
+    CodeHelp += `</div>`;
 
-        CodeHelp += `<div class="code_desc" id="desc_${id}">`;
-        CodeHelp += `Description: ${desc}`;
-        CodeHelp += `</div>`;
 
+    if (!help) {
         CodeHelp += `<input type="button" class="code_resize" id="code_resize_${id}" 
             value="More about the code!" onClick="CodePageOpen(${id})">`;
         CodeHelp += `<p class="code_buttons">`;
@@ -76,26 +85,9 @@ const generateCodeHTML = ({id, lang, desc, code}, help) => {
 
         // Add the HTML structure for code display
         CodeHelp +=
-            `<pre class="line-numbers code_out" id="code_out_${id}" style="height: ${leng}px"><code class="language-${lang} code_code" id="code_code_${id}">${code}</code></pre>`;
+            `<pre class="line-numbers code_out" id="code_out_${id}" style="height: ${Leng}px"><code class="language-${lang} code_code" id="code_code_${id}">${code}</code></pre>`;
 
-        CodeHelp += `</div>`;
-
-        CodeHelp += `<button onclick="CopyCode(${id})" class="code_copy">Copy Code</button>`;
-
-        CodeHelp += `</div>`;
-
-        return CodeHelp;
     } else {
-        CodeHelp += `<div class="code_page" id="code_${id}_page">`;
-
-        CodeHelp += `<div class="code_lang" id="lang_${id}">`;
-        CodeHelp += `Language: ${langHelp[lang] || lang.slice(0, 1).toUpperCase() + lang.slice(1)}`;
-        CodeHelp += `</div>`;
-
-        CodeHelp += `<div class="code_desc" id="desc_${id}">`;
-        CodeHelp += `Description: ${desc}`;
-        CodeHelp += `</div>`;
-
         CodeHelp += `<input type="button" class="code_resize" id="code_resize_${id}_page" 
             value="Close this page." onClick="CodePageClose(${id})">`;
         CodeHelp += `<p class="code_buttons_page">`;
@@ -105,34 +97,40 @@ const generateCodeHTML = ({id, lang, desc, code}, help) => {
 
         CodeHelp += `<div class="code_help_page" id="code_help_${id}_page">`;
 
-        // Add the HTML structure for code display
         CodeHelp +=
-            `<pre class="line-numbers code_out" style="height: ${leng}px"><code class="language-${lang} code_code" id="code_code_${id}_page">${code}</code></pre>`;
-
-        CodeHelp += `</div>`;
-
-        CodeHelp += `<button onclick="CopyCode(${id},'yeah')" class="code_copy">Copy Code</button>`;
-
-        CodeHelp += `</div>`;
-
-        return CodeHelp;
+            `<pre class="line-numbers code_out" style="height: ${Leng}px"><code class="language-${lang} code_code" id="code_code_${id}_page">${code}</code></pre>`;
 
     }
-};
+
+    CodeHelp += `</div>`;
+    CodeHelp += `<button onclick="CopyCode(${id})" class="code_copy">Copy Code</button>`;
+    CodeHelp += `</div>`;
 
 
-function DisplayAllData(Selected) {
-    //TODO : limit the display to like 20 things (or less) and only ever show that much
-    // (and probably a next page stuff so new stuff and al ot more ...)
-    CodeOutput.innerHTML = "";
+    return CodeHelp;
+}
+
+//TODO : limit the display to like 20 things (or less) and only ever show that much
+// (and probably a next page stuff so new stuff and al ot more ...)
+
+function filterData() {
+    return Data.filter(({id, lang, desc, code}) => {
+        const matchesLang = SelectedLanguage === 'all' || SelectedByLanguage.includes(id);
+        const matchesDesc = SearchedDescription === 'all' || SearchedByDescription.includes(id);
+        return matchesLang && matchesDesc && code !== 'none';
+    }).map(({id}) => id);
+}
+
+function DisplayData() {
+    codeOutput.innerHTML = '';
+    const filteredData = filterData();
     Data.forEach(({id, lang, desc, code}) => {
-        if ((!Selected || Selected?.includes(id)) && code !== "none") {
-            let codeHTML = generateCodeHTML({id, lang, desc, code});
-            CodeOutput.insertAdjacentHTML('beforeend', codeHTML);
+        if(filteredData.includes(id)) {
+            const CodeHTML = GenerateCodeHTML({id, lang, desc, code});
+            codeOutput.insertAdjacentHTML('beforeend', CodeHTML);
             Prism.highlightElement(document.getElementById(`code_code_${id}`));
         }
     });
-
 }
 
 function DataById(id) {
@@ -142,144 +140,169 @@ function DataById(id) {
     // If the item exists and its code is not "none"
     if (dataItem && dataItem.code !== "none") {
         // Generate the HTML for this piece of data
-        let codeHTML = generateCodeHTML(dataItem, "page");
-        Page.innerHTML = codeHTML;
+        const CodeHTML = GenerateCodeHTML(dataItem, "page");
+        pageDiv.insertAdjacentHTML("afterbegin",CodeHTML);
         Prism.highlightElement(document.getElementById(`code_code_${id}_page`));
         return "no error";
     } else {
-        console.log("something error");
+        ModalOpen("something error");
         return null;
     }
 }
 
 
 function DropDownLanguage() {
-    let dropdown_language = document.getElementById('dropdown_language');
-
-    //console.log(dropdown_language_options);
-
     // Iterate over the data to generate the HTML
     codeLangTypes.forEach((lang) => {
-        let dropdownHelp =
-            `<button class="dropdown-item" onClick="selectStuff('${lang}')">${langHelp[lang]}</button>`;
-        dropdown_language.insertAdjacentHTML("beforeend", dropdownHelp);
+        let DropdownHelp =
+            `<button class="dropdown-item" onClick="SelectByLanguage('${lang}')">${langHelp[lang]}</button>`;
+        languageDropdown.insertAdjacentHTML("beforeend", DropdownHelp);
     });
 }
 
 
-function selectStuff(language) {
+function SelectByLanguage(language) {
+    SelectedLanguage = language;
     //console.log(language)
-    CodeOutput.innerHTML = "";
+    codeOutput.innerHTML = "";
     if (language !== "all") {
-        let dataToDisplay = Data.filter(({lang}) => lang === language);
-        let Selected = dataToDisplay.map(({id}) => id);
+        SelectedByLanguage = Data.filter(({lang}) => lang === language).map(({id}) => id);
         //console.log(Selected);
-        DisplayAllData(Selected);
-    } else
-        DisplayAllData();
+    } else {
+        SelectedByLanguage = [];
+    }
+
+    DisplayData();
+}
+
+function SearchDescription(query) {
+    console.log("query", query);
+    if (!query || typeof query !== "string") {
+        SearchedDescription = "all";
+        DisplayData();
+        return;
+    }
+
+    // Normalize query for consistent comparison
+    SearchedDescription = query.toLowerCase().trim();
+    const SearchTerms = SearchedDescription.split(/\s+/); // Split by spaces into an array of words
+    console.log("SearchTerms", SearchTerms);
+
+    // Filter Data based on search terms
+    SearchedByDescription = Data.filter(({desc}) => {
+        // Ensure all search terms are found in the description
+        return SearchTerms.every(term => desc.toLowerCase().includes(term));
+    }).map(({id}) => id); // Extract only the id from the filtered items
+    console.log("Found", SearchedByDescription);
+
+    DisplayData();
 }
 
 
 function CopyCode(id, helper) {
+    const TextToCopy = document.getElementById(`code_code_${helper ? id + "_page" : id}`).innerText;
+    CopyText(TextToCopy);
+}
+
+function CopyText(text) {
     // Check if the Clipboard API is available
     if (navigator.clipboard) {
-        let textToCopy = document.getElementById(`code_code_${helper ? id + "_page" : id}`).innerText;
-        if (!textToCopy)
-            modalOpen('Copy Error', 'Failed to copy:', "Nothing to copy");
+        if (!text)
+            ModalOpen('Copy Error', 'Failed to copy:', "Nothing to copy");
         else {
-            navigator.clipboard.writeText(textToCopy)
+            navigator.clipboard.writeText(text)
                 .then(() => {
-                    modalOpen('Copy Success', 'Code copied to clipboard!');
+                    ModalOpen('Copy Success', 'Code copied to clipboard!');
                 })
                 .catch((error) => {
-                    modalOpen('Copy Error', 'Failed to copy:', error);
+                    ModalOpen('Copy Error', 'Failed to copy:', error);
                 });
         }
     } else {
-        modalOpen('Browser Error', 'Failed to copy:', 'Your browser does not support the Clipboard API.\n(Or the web hosting server)');
+        ModalOpen('Browser Error', 'Failed to copy:', 'Your browser does not support the Clipboard API.\n(Or the web hosting server)');
     }
 }
 
 
 function ChangeReadonly(id, helper) {
-    let readonlyButton = document.getElementById(`code_readonly_${helper ? id + "_page" : id}`);
-    let toChange = document.getElementById(`code_code_${helper ? id + "_page" : id}`);
-    let helpChange = document.getElementById(`code_help_${helper ? id + "_page" : id}`);
+    let ReadonlyButton = document.getElementById(`code_readonly_${helper ? id + "_page" : id}`);
+    let ToChange = document.getElementById(`code_code_${helper ? id + "_page" : id}`);
+    let ChangeHelper = document.getElementById(`code_help_${helper ? id + "_page" : id}`);
     //console.log(`code_code_${helper?id+"_page":id}`);
-    if (toChange.contentEditable !== "true") {
-        toChange.contentEditable = "true";
-        readonlyButton.value = "Change to Readonly";
+    if (ToChange.contentEditable !== "true") {
+        ToChange.contentEditable = "true";
+        ReadonlyButton.value = "Change to Readonly";
         //toChange.style.backgroundColor = "dodgerblue";
-        helpChange.style.cursor = "text";
+        ChangeHelper.style.cursor = "text";
     } else {
-        toChange.contentEditable = "false";
-        readonlyButton.value = "Change from Readonly";
+        ToChange.contentEditable = "false";
+        ReadonlyButton.value = "Change from Readonly";
         //RemoveCss(toChange, 'background-color');
-        RemoveCss(helpChange, 'cursor');
+        RemoveCss(ChangeHelper, 'cursor');
     }
 
 }
 
 function CodeReset(id, helper) {
-    let toReset = document.getElementById(`code_code_${helper ? id + "_page" : id}`);
-    let resetButton = document.getElementById(`code_reset_${helper ? id + "_page" : id}`);
-    toReset.textContent = `${Data[id].code}`;
+    const ToReset = document.getElementById(`code_code_${helper ? id + "_page" : id}`);
+    const ResetButton = document.getElementById(`code_reset_${helper ? id + "_page" : id}`);
+    ToReset.textContent = `${Data[id].code}`;
     // if text is changed prism highlight will break, so I send it to rescan the new content
-    Prism.highlightElement(toReset);
+    Prism.highlightElement(ToReset);
 
     setTimeout(() => {
-        resetButton.value = "Resetting code..";
+        ResetButton.value = "Resetting code..";
     }, 180);
     setTimeout(() => {
-        resetButton.value = "Resetting code...";
+        ResetButton.value = "Resetting code...";
     }, 350);
     setTimeout((ogValue, ogOnclick) => {
-        resetButton.value = ogValue; // Reset everything after half second
-        resetButton.onclick = ogOnclick;
-    }, 500, resetButton.value, resetButton.onclick);
+        ResetButton.value = ogValue; // Reset everything after half second
+        ResetButton.onclick = ogOnclick;
+    }, 500, ResetButton.value, ResetButton.onclick);
 
-    resetButton.value = "Resetting code."; // Change the button value
-    resetButton.onclick = null;
+    ResetButton.value = "Resetting code."; // Change the button value
+    ResetButton.onclick = null;
 }
 
 function CodePageOpen(id) {
-    scrollToTop();
-    let displayRun = DataById(id);
-    if (displayRun) {
+    ScrollToTop();
+    const DisplayRun = DataById(id);
+    if (DisplayRun) {
         //console.log("single page open");
-        Page.style.display = "block";
+        pageDiv.style.display = "block";
         document.body.style.overflow = 'hidden';
 
-        let PageInner = document.getElementById(`code_${id}_page`);
+        const PageContent = document.getElementById(`code_${id}_page`);
 
         setTimeout(() => {
             document.addEventListener('click', handleOutsidePageClick);
         }, 1000)
 
         function handleOutsidePageClick(event) {
-            if (!PageInner.contains(event.target)) {
+            if (!PageContent.contains(event.target)) {
                 CodePageClose();
                 document.removeEventListener('click', handleOutsidePageClick);
             }
             event.stopPropagation();
         }
 
-        PageInner.addEventListener('click', (event) => {
+        PageContent.addEventListener('click', (event) => {
             event.stopPropagation(); // Prevent the click from reaching the document
         });
     } else
-        modalOpen('Display Error', `No data found for id: ${id} or there is no code for it`);
+        ModalOpen('Display Error', `No data found for id: ${id} or there is no code for it`);
 
 }
 
 function CodePageClose() {
     //console.log("single page close");
-    Page.style.display = "none";
+    pageDiv.style.display = "none";
     document.body.style.overflow = '';
 }
 
 
-function openDropdown(dropdownContent, dropdownButton) {
+function OpenDropdown(dropdownContent, dropdownButton) {
     dropdownContent.classList.add('show');
     dropdownContent.classList.remove('hide');
 
@@ -289,56 +312,59 @@ function openDropdown(dropdownContent, dropdownButton) {
         // did you know that if you set the SetTimout to 0 (what should mean it's 0 milisecond) even then it's not instant and in This case it would work perfectly
         // ... but I set it to 10 if something is slow ...
     }, 10)
+
     // TODO : make the click go "down" to the next layer
     function handleOutsideDropdownClick(event) {
-        if (!dropdownContent.contains(event.target)&&!dropdownButton.contains(event.target)) {
-            closeDropdown(dropdownContent);
+        if (!dropdownContent.contains(event.target) && !dropdownButton.contains(event.target)) {
+            CloseDropdown(dropdownContent);
             document.removeEventListener('click', handleOutsideDropdownClick);
         }
         event.stopPropagation();
     }
 }
 
-function closeDropdown(dropdownContent) {
+function CloseDropdown(dropdownContent) {
     dropdownContent.classList.add('hide');
     dropdownContent.classList.remove('show');
     setTimeout(() => dropdownContent.classList.remove('hide'), 500); // Clear `hide` class after animation
 }
 
-function toggleDropdown(id) {
-    let dropdownContent = document.getElementById(`${id}`);
-    let dropdownButton = document.getElementById(`${id}_button`);
+function ToggleDropdown(id) {
+    const dropdownContent = document.getElementById(`${id}`);
+    const dropdownButton = document.getElementById(`${id}_button`);
     // Check if the dropdown is already open
-    let isOpen = dropdownContent.classList.contains('show');
+    const isOpen = dropdownContent.classList.contains('show');
 
     if (isOpen) {
-        closeDropdown(dropdownContent);
+        CloseDropdown(dropdownContent);
         //console.log("close dropdown", id);
     } else {
-        openDropdown(dropdownContent, dropdownButton);
+        OpenDropdown(dropdownContent, dropdownButton);
         //console.log("open dropdown", id);
 
     }
 }
 
-function hideHtmlElement(id, time) {
+function PhoneCssHelp() {
+    ModalOpen('Css stuff', 'The codes in phone version are not displayed, you have to go open the page about the code to view it.');
+    HideHtmlElement('codes_helper');
+}
+
+function HideHtmlElement(id, time) {
+    const element = document.getElementById(id);
     if (time)
         setTimeout(() => {
-            let element = document.getElementById(id);
             element.style.cssText += "display: none !important;";
         }, time)
     else {
-        let element = document.getElementById(id);
         element.style.cssText += "display: none !important;";
     }
 }
 
 const CountB_in_A = ((sourceString, searchString) => {
-    if (!searchString) {
-        throw new Error("Search string cannot be empty");
-    }
+    if (!searchString) throw new Error("Search string cannot be empty");
 
-    let searchLength = searchString.length;
+    const searchLength = searchString.length;
     let count = 0;
     let index = 0;
 
@@ -351,9 +377,7 @@ const CountB_in_A = ((sourceString, searchString) => {
 });
 
 const LongestSubstring = ((sourceString, deLimiter) => {
-    if (!deLimiter) {
-        throw new Error("Delimiter cannot be empty");
-    }
+    if (!deLimiter) throw new Error("Delimiter cannot be empty");
 
     let maxLength = 0;
     let lastPosition = -1; // Tracks the position of the last occurrence of the delimiter

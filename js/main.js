@@ -17,7 +17,7 @@ function LoadBasicContent() {
           <nav class="navbar" id="navbar">
             <div class="navbar_in">
               <p class="navbar_link" onclick="ChangePage()">Current Webpage</p>
-              <button type="button" class="navbar_toggle" id="navbarToggle" onclick="toggleNavbar()">
+              <button type="button" class="navbar_toggle" id="navbarToggle" onclick="ToggleNavbar()">
                 <img src="./assets/menu_bars.png" alt="Menu" />
               </button>
               <div class="navbar_items" id="navbarDropdown">
@@ -41,7 +41,7 @@ function LoadBasicContent() {
               </div>
                 <div class="slider-container">
                     <label class="switch">
-                        <input type="checkbox" id="darkModeToggle" onchange="toggleDarkMode()">
+                        <input type="checkbox" id="darkModeToggle" onchange="ToggleDarkMode()">
                         <span class="slider"></span>
                     </label>
                 </div>
@@ -85,28 +85,28 @@ function LoadBasicContent() {
 
 LoadBasicContent();
 
-const NavItems = document.getElementById("navbarDropdown");
-const NavToggle = document.getElementById("navbarToggle");
+const navItems = document.getElementById("navbarDropdown");
+const navToggle = document.getElementById("navbarToggle");
 
-function toggleNavbar() {
-    if (NavItems.classList.contains('show'))
-        NavItems.classList.remove('show');
+function ToggleNavbar() {
+    if (navItems.classList.contains('show'))
+        navItems.classList.remove('show');
     else
-        NavItems.classList.add('show');
+        navItems.classList.add('show');
 }
 
 // this closes the navbar if it is not clicked but open
 document.addEventListener('click', function (event) {
-    if (!NavToggle.contains(event.target) && !NavItems.contains(event.target))
-        if (NavItems.classList.contains('show'))
-            toggleNavbar();
+    if (!navToggle.contains(event.target) && !navItems.contains(event.target))
+        if (navToggle.classList.contains('show'))
+            ToggleNavbar();
 });
 
 function ChangePage(url) {
-    let urlHelp = window.location.href;
+    let UrlHelp = window.location.href;
     if (url)
         window.location.href = `${url}.html`;
-    else if (urlHelp.indexOf('#') == -1)
+    else if (UrlHelp.indexOf('#') == -1)
         window.location.href += '#';
     else
         window.location.href = window.location.href;
@@ -123,21 +123,21 @@ function RemoveCss(item, type) {
     item.style.cssText = CssT.replace(CssT.slice(TypePlace, TypeStart + CssT.slice(TypePlace).indexOf(';')), '');
 }
 
-function modalOpen(title, text, error) {
-    let modalHelp = `
+function ModalOpen(title, text, error) {
+    let ModalHelp = `
         <div class="modal-content" id="modal_content">
             <h4 class="modal_title">${title}</h4>
             <p class="modal_text">${text}</p>
             ${!error ? "" : `<p class="modal-error">${error}</p>`}
             <div class="modal-footer">
-                <button onClick="modalClose()" class="modal-button">Ok</button>
+                <button onClick="ModalClose()" class="modal-button">Ok</button>
             </div>
         </div>
     `;
-    Modal.innerHTML = modalHelp;
+    modalBox.innerHTML = ModalHelp;
 
 
-    let modalContent = document.getElementById("modal_content");
+    let ModalContent = document.getElementById("modal_content");
 
     // Add an event listener to handle outside clicks
     setTimeout(() => {
@@ -145,31 +145,29 @@ function modalOpen(title, text, error) {
     }, 1000)
 
     function handleOutsideModalClick(event) {
-        if (!modalContent.contains(event.target)) {
-            modalClose();
+        if (!ModalContent.contains(event.target)) {
+            ModalClose();
             document.removeEventListener('click', handleOutsideModalClick);
         }
         event.stopPropagation();
     }
 
-    Modal.style.display = "block";
+    modalBox.style.display = "block";
 }
 
 
-function modalClose() {
-    Modal.style.display = "none";
+function ModalClose() {
+    modalBox.style.display = "none";
 }
 
 function DarkModeLoad() {
-    let prefersDark = getFromLocalStorage("prefersDark");
-    if (prefersDark===undefined){
-        prefersDark= window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-        saveToLocalStorage("prefersDark", prefersDark);
+    let PrefersDark = GetFromLocalStorage("PrefersDark");
+    if (PrefersDark===undefined){
+        PrefersDark= window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        SaveToLocalStorage("PrefersDark", PrefersDark);
     }
 
-    //console.log(prefersDark)
-
-    if (!prefersDark) {
+    if (!PrefersDark) {
         DarkReader.disable();
         document.getElementById("darkModeToggle").checked = false;
     } else {
@@ -178,24 +176,21 @@ function DarkModeLoad() {
     }
 }
 
-
 // Set initial Dark Mode state
 DarkModeLoad();
 
 // Dark Mode Toggle Function
-function toggleDarkMode() {
+function ToggleDarkMode() {
     if (DarkReader.isEnabled()) {
         DarkReader.disable()
-        saveToLocalStorage("prefersDark", false);
+        SaveToLocalStorage("PrefersDark", false);
     } else {
         DarkReader.enable();
-        saveToLocalStorage("prefersDark", true);
+        SaveToLocalStorage("PrefersDark", true);
     }
 }
 
-
-
-function saveToLocalStorage(key, value) {
+function SaveToLocalStorage(key, value) {
     try {
         localStorage.setItem(key, JSON.stringify(value));
     } catch (error) {
@@ -203,7 +198,7 @@ function saveToLocalStorage(key, value) {
     }
 }
 
-function getFromLocalStorage(key) {
+function GetFromLocalStorage(key) {
     try {
         const value = localStorage.getItem(key);
         return value ? JSON.parse(value) : undefined;
@@ -212,6 +207,6 @@ function getFromLocalStorage(key) {
     }
 }
 
-function scrollToTop() {
+function ScrollToTop() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
