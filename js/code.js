@@ -176,7 +176,7 @@ function SelectByLanguage(language) {
 }
 
 function SearchDescription(query) {
-    console.log("query", query);
+    //console.log("query", query);
     if (!query || typeof query !== "string") {
         SearchedDescription = "all";
         DisplayData();
@@ -186,14 +186,14 @@ function SearchDescription(query) {
     // Normalize query for consistent comparison
     SearchedDescription = query.toLowerCase().trim();
     const SearchTerms = SearchedDescription.split(/\s+/); // Split by spaces into an array of words
-    console.log("SearchTerms", SearchTerms);
+    //console.log("SearchTerms", SearchTerms);
 
     // Filter Data based on search terms
     SearchedByDescription = Data.filter(({desc}) => {
         // Ensure all search terms are found in the description
         return SearchTerms.every(term => desc.toLowerCase().includes(term));
     }).map(({id}) => id); // Extract only the id from the filtered items
-    console.log("Found", SearchedByDescription);
+    //console.log("Found", SearchedByDescription);
 
     DisplayData();
 }
