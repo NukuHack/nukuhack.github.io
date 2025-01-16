@@ -13,27 +13,27 @@
     list-style: none;
     margin: 5px;
     width: max(300px, 100%);
-    background: #444444;
+    background: var(--background-middle-color);
     border-radius: 50px;
     overflow: hidden;
 }
 
 .list_item:hover {
     transition: background-color 0.5s ease;
-    background-color: #888888;
+    background-color: var(--background-light-color);
 
     .list_content {
         transition: background-color,color 0.5s ease;
-        background-color: lightgray;
-        color: black;
+        background-color: var(--background-normal-color);
+        color: var(--font-dark-color);
     }
 }
 
 .list_content {
     font-size: 140%;
     width: 100%;
-    color: white;
-    background-color: grey;
+    color: var(--font-cold-color);
+    background-color: var(--background-light-color);
     padding: 3px;
     margin-top: 2px;
     margin-bottom: 2px;

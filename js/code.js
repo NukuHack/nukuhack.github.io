@@ -3,6 +3,7 @@ const modalBox = document.getElementById('modal');
 const pageDiv = document.getElementById('code_page');
 const searchStuff = document.getElementById('search_stuff');
 const languageDropdown = document.getElementById('dropdown_language');
+const languageDropdownButton = document.getElementById('dropdown_language_button');
 const True = false;
 const langHelp = {
     "csharp": "C#",
@@ -89,7 +90,7 @@ function GenerateCodeHTML({id, lang, desc, code}, help = undefined) {
 
     } else {
         CodeHelp += `<input type="button" class="code_resize" id="code_resize_${id}_page" 
-            value="Close this page." onClick="CodePageClose(${id})">`;
+            value="Close this page" onClick="CodePageClose(${id})">`;
         CodeHelp += `<p class="code_buttons_page">`;
         CodeHelp += `<input type="button" class="code_readonly" id="code_readonly_${id}_page" onclick="ChangeReadonly(${id},'yeah')" value="Change from readonly">`;
         CodeHelp += `<input type="button" class="code_reset" id="code_reset_${id}_page" onclick="CodeReset(${id},'yeah')" value="Reset the code">`;
@@ -113,20 +114,19 @@ function GenerateCodeHTML({id, lang, desc, code}, help = undefined) {
 //TODO : limit the display to like 20 things (or less) and only ever show that much
 // (and probably a next page stuff so new stuff and al ot more ...)
 
-function filterData() {
-    return Data.filter(({id, lang, desc, code}) => {
-        const matchesLang = SelectedLanguage === 'all' || SelectedByLanguage.includes(id);
-        const matchesDesc = SearchedDescription === 'all' || SearchedByDescription.includes(id);
-        return matchesLang && matchesDesc && code !== 'none';
-    }).map(({id}) => id);
-}
 
 function DisplayData() {
     codeOutput.innerHTML = '';
-    const filteredData = filterData();
+    const filteredData =
+        Data.filter(({id, lang, desc, code}) => {
+            const matchesLang = SelectedLanguage === 'all' || SelectedByLanguage.includes(id);
+            const matchesDesc = SearchedDescription === 'all' || SearchedByDescription.includes(id);
+            return matchesLang && matchesDesc && code !== 'none';
+        }).map(({id}) => id);
     Data.forEach(({id, lang, desc, code}) => {
-        if(filteredData.includes(id)) {
+        if (filteredData.includes(id)) {
             const CodeHTML = GenerateCodeHTML({id, lang, desc, code});
+            //const CodeHTML = id+"<br>"; //just replacing it to make it quicker
             codeOutput.insertAdjacentHTML('beforeend', CodeHTML);
             Prism.highlightElement(document.getElementById(`code_code_${id}`));
         }
@@ -141,7 +141,7 @@ function DataById(id) {
     if (dataItem && dataItem.code !== "none") {
         // Generate the HTML for this piece of data
         const CodeHTML = GenerateCodeHTML(dataItem, "page");
-        pageDiv.insertAdjacentHTML("afterbegin",CodeHTML);
+        pageDiv.insertAdjacentHTML("afterbegin", CodeHTML);
         Prism.highlightElement(document.getElementById(`code_code_${id}_page`));
         return "no error";
     } else {
@@ -153,6 +153,7 @@ function DataById(id) {
 
 function DropDownLanguage() {
     // Iterate over the data to generate the HTML
+    languageDropdownButton.innerText = "Select a language";
     codeLangTypes.forEach((lang) => {
         let DropdownHelp =
             `<button class="dropdown-item" onClick="SelectByLanguage('${lang}')">${langHelp[lang]}</button>`;
@@ -167,9 +168,11 @@ function SelectByLanguage(language) {
     codeOutput.innerHTML = "";
     if (language !== "all") {
         SelectedByLanguage = Data.filter(({lang}) => lang === language).map(({id}) => id);
+        languageDropdownButton.innerHTML = "Selected language: " + langHelp[SelectedLanguage];
         //console.log(Selected);
     } else {
         SelectedByLanguage = [];
+        languageDropdownButton.innerText = "Select a language";
     }
 
     DisplayData();
@@ -304,16 +307,15 @@ function CodePageClose() {
 
 function OpenDropdown(dropdownContent, dropdownButton) {
     dropdownContent.classList.add('show');
-    dropdownContent.classList.remove('hide');
 
     // Add an event listener to handle outside clicks
     setTimeout(() => {
         document.addEventListener('click', handleOutsideDropdownClick);
-        // did you know that if you set the SetTimout to 0 (what should mean it's 0 milisecond) even then it's not instant and in This case it would work perfectly
+        // did you know that if you set the SetTimout to 0 (what should mean it's 0 millisecond) even then it's not instant and in This case it would work perfectly
         // ... but I set it to 10 if something is slow ...
     }, 10)
 
-    // TODO : make the click go "down" to the next layer
+    // TODO : make the click not go "down" to the next layer
     function handleOutsideDropdownClick(event) {
         if (!dropdownContent.contains(event.target) && !dropdownButton.contains(event.target)) {
             CloseDropdown(dropdownContent);
@@ -324,9 +326,7 @@ function OpenDropdown(dropdownContent, dropdownButton) {
 }
 
 function CloseDropdown(dropdownContent) {
-    dropdownContent.classList.add('hide');
     dropdownContent.classList.remove('show');
-    setTimeout(() => dropdownContent.classList.remove('hide'), 500); // Clear `hide` class after animation
 }
 
 function ToggleDropdown(id) {

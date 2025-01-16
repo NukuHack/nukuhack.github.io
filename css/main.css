@@ -6,13 +6,42 @@
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
+:root{
+    --white:white;
+    --black:black;
+    --red:red;
+    --blue:blue;
+    --green:green;
+    --dark-red:dark-red;
+
+    --page-background-color: slategray;
+
+    --font-basic-color: snow;
+    --font-cold-color: #cccccc;
+    --font-light-color: #888888;
+    --font-dark-color: #222222;
+    --font-error-color: var(--red);
+    --font-errordark-color: var(--dark-red);
+
+    --background-cold-color: #cccccc;
+    --background-light-color: #888888;
+    --background-normal-color: #666666;
+    --background-middle-color: #444444;
+    --background-dark-color: #333333;
+    --background-darkest-color: #2c2c2c;
+
+    --border-cold-color: #cccccc;
+    --border-light-color: #888888;
+    --border-medium-color: #444444;
+    --border-dark-color: var(--black);
+}
 
 /*First the basics*/
 body {
     min-height: 100%;
     height: 200%;
-    color: snow;
-    background-color: slategray;
+    color: var(--font-basic-color);
+    background-color: var(--page-background-color);
     margin: 0;
     display: flex;
     justify-content: center;
@@ -20,6 +49,7 @@ body {
     flex-direction: column;
     text-align: center;
     cursor: default;
+    font-family: 'Arial', sans-serif;
 }
 
 a {
@@ -49,10 +79,10 @@ a {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background-color: #333333; /* Navbar background */
+    background-color: var(--background-dark-color); /* Navbar background */
     padding: 10px;
     left: 0;
-    color: snow;
+    color: var(--font-basic-color);
     position: fixed;
     top: 0;
     width: 100%;
@@ -83,7 +113,7 @@ a {
 }
 
 .navbar_link, .navbar_item {
-    color: snow;
+    color: var(--font-basic-color);
     text-decoration: none;
     font-size: 1.4rem;
     margin: 0 10px;
@@ -116,7 +146,7 @@ a {
     visibility: hidden;
     width: 250px;
     flex-direction: column; /* Stack items vertically in dropdown */
-    background-color: #444;
+    background-color: var(--background-middle-color);
     position: absolute;
     top: 100%;
     left: 40%;
@@ -162,7 +192,7 @@ a {
 
 
 /* Dark mode toggler */
-.slider-container {
+.darkmode-slider {
     margin-left: 10%;
     display: flex;
     justify-content: flex-end;
@@ -171,12 +201,12 @@ a {
 }
 
 /* Hidden checkbox */
-.switch input {
+.darkmode-slider .switch input {
     display: none;
 }
 
 /* Slider base */
-.switch {
+.darkmode-slider .switch {
     position: relative;
     display: inline-block;
     width: 50px;
@@ -184,7 +214,7 @@ a {
 }
 
 /* Track background */
-.slider {
+.darkmode-slider .slider {
     position: absolute;
     cursor: pointer;
     top: 0;
@@ -198,25 +228,25 @@ a {
 }
 
 /* Slider thumb */
-.slider:before {
+.darkmode-slider .slider:before {
     position: absolute;
     content: "";
     height: 18px;
     width: 18px;
     left: 3px;
     bottom: 3px;
-    background-color: white;
+    background-color: var(--white);
     transition: transform 0.4s;
     border-radius: 50%;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 /* Checked state */
-#darkModeToggle:checked + .slider {
+.darkmode-slider #darkModeToggle:checked + .slider {
     background-color: #4CAF50;
 }
 
-#darkModeToggle:checked + .slider:before {
+.darkmode-slider #darkModeToggle:checked + .slider:before {
     transform: translateX(26px);
 }
 
@@ -233,14 +263,14 @@ a {
 /*Footer*/
 footer {
     position: fixed;
-    color: snow;
+    color: var(--font-basic-color);
     bottom: 0;
     left: 0;
     width: 100%;
-    background-color: #888888; /* Adjust to your preferred color */
+    background-color: var(--background-middle-color);
     padding: 10px 20px;
     text-align: center;
-    border-top: 1px solid #111; /* Optional styling */
+    border-top: 1px solid var(--border-dark-color);
     z-index: 101; /* Ensure it stays on top of other content */
 }
 
@@ -271,7 +301,7 @@ footer h5, footer h6 {
 .modal {
     display: none;
     position: fixed;
-    color: #222222;
+    color: var(--font-dark-color);
     z-index: 102;
     padding-top: 100px;
     left: 0;
@@ -279,7 +309,7 @@ footer h5, footer h6 {
     width: 100%;
     height: 100%;
     overflow: auto;
-    background-color: rgb(0, 0, 0); /* Fallback color */
+    background-color: var(--black); /* Fallback color */
     background-color: rgba(0, 0, 0, 0.4); /* Black w/ opacity */
     align-items: center;
     justify-content: center;
@@ -287,17 +317,17 @@ footer h5, footer h6 {
 
 /* Modal Content */
 .modal-content {
-    background-color: grey;
+    background-color: var(--background-light-color);
     margin: auto;
     padding: 20px;
-    border: 2px solid black;
+    border: 2px solid var(--border-dark-color);
     border-radius: 25px;
     width: min(70%, 500px);
 }
 
 .modal-error {
-    color: red;
-    text-shadow: 0.5px 0.5px 1px darkred;
+    color: var(--font-error-color);
+    text-shadow: 0.5px 0.5px 1px var(--font-errordark-color);
     background-color: black;
 }
 
@@ -317,21 +347,21 @@ footer h5, footer h6 {
 
 /* The Close Button */
 .modal-button {
-    background-color: lightgray;
-    color: black;
+    background-color: var(--background-normal-color);
+    color: var(--font-dark-color);
     font-size: 120%;
     border: none;
     cursor: pointer;
     padding: 10px;
-    margin: 0 10px;
+    margin: 10px;
     width: 50px;
     border-radius: 5px;
 }
 
 .modal-button:hover {
     transition: background-color 0.5s ease;
-    background-color: #222222;
-    color: #888888;
+    background-color: var(--background-dark-color);
+    color: var(--font-light-color);
 }
 
 

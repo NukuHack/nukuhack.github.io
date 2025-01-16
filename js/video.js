@@ -22,6 +22,9 @@ const progressText = document.getElementById("progressText");
 let FileName = document.getElementById('fileName');
 let FileSize = document.getElementById('fileSize');
 
+let videoStateHelper = false;
+let clickTimer = null;
+
 const normalStep = 0.01;
 const snapStep = 0.25;
 
@@ -51,14 +54,12 @@ function resetALL() {
         loopImage.src = "assets/loop-icon.png";
     }
 
-    setTimeout(()=>{
+    setTimeout(() => {
         seekBar.value = 0;
         progressText.innerText = `${formatTime(videoPlayer.duration)}/${formatTime(videoPlayer.currentTime)}`;
-    },300)
+    }, 300)
 
 }
-
-
 
 
 function handleFileSelection(event) {
@@ -91,6 +92,10 @@ function displayVideo(file) {
         fileUrl = URL.createObjectURL(file);
         FileName.innerText = `File Name: ${file.name}`;
         FileSize.innerText = `File Size: ${formatFileSize(file.size)}`;
+
+        setTimeout(() => {
+            ScrollToBottom();
+        }, 100);
     } else {
         fileUrl = file;
         FileName.innerText = `File Name: ${file.split('/').pop()}`;
@@ -102,7 +107,6 @@ function displayVideo(file) {
     videoPlayer.src = fileUrl;
     videoContainer.style.display = 'block';
     document.getElementById("fileDetails").style.display = "block";
-
     resetALL();
 }
 
@@ -124,6 +128,9 @@ function fetchAndSetFileSize(videoSrc) {
             console.error('Error fetching file details:', error);
             FileSize.innerText = 'File Size: Unable to fetch';
         });
+    setTimeout(() => {
+        ScrollToBottom();
+    }, 100);
 }
 
 
@@ -177,34 +184,57 @@ function setTime(x) {
 
 
 function speedSliderChange() {
+    if (speedSlider.value < 0.07)
+        speedSlider.value = 0.07;
     videoPlayer.playbackRate = parseFloat(speedSlider.value);
     speedValue.textContent = `${speedSlider.value}x`;
 }
 
 speedSlider.addEventListener('input', (event) => {
-    if (event.shiftKey) {
-        // Snap to the closest 0.25 increment when Shift is pressed
-        speedSlider.value = Math.round((parseFloat(speedSlider.value) / snapStep)) * snapStep - 0.1;
+    if (speedSlider.step == normalStep) {
+    } else {
+        // Snap to the closest 0.25 increment when Shift is not pressed
+        speedSlider.value = Math.round((parseFloat(speedSlider.value) / snapStep)) * snapStep;
     }
+
     speedSliderChange();
 });
 
 speedSlider.addEventListener('keydown', (event) => {
     if (event.key === 'Shift') {
-        speedSlider.step = snapStep;
+        speedSlider.step = normalStep;
     }
 });
 
 speedSlider.addEventListener('keyup', (event) => {
     if (event.key === 'Shift') {
-        speedSlider.step = normalStep;
+        speedSlider.step = snapStep;
+        speedSlider.value = Math.round((parseFloat(speedSlider.value) / snapStep)) * snapStep;
     }
+    speedSliderChange();
 });
 
 
 function seekVideo() {
     videoPlayer.currentTime = (seekBar.value / 100) * videoPlayer.duration;
 }
+
+function seekMouseDown() {
+    videoStateHelper = !videoPlayer.paused;
+    videoPlayer.pause(); // Pause the video
+    seekBar.removeEventListener("mousedown", seekMouseDown);
+    seekBar.addEventListener("mouseup", seekMouseUp);
+}
+
+function seekMouseUp() {
+    if (videoStateHelper)
+        videoPlayer.play(); // Resume playing
+    seekBar.removeEventListener("mouseup", seekMouseUp);
+    seekBar.addEventListener("mousedown", seekMouseDown);
+}
+
+seekBar.addEventListener("mousedown", seekMouseDown);
+
 
 function toggleFullscreen() {
     if (!document.fullscreenElement) {
@@ -222,43 +252,32 @@ function toggleFullscreen() {
             fullscreenButton.style.cssText = "";
             overlay.style.cssText = "";
             Fullscreen = false;
+            setTimeout(() => {
+                ScrollToBottom();
+            }, 100);
         });
     }
 }
 
 function changeVolume() {
-    videoPlayer.volume = calculateVolume(volumeSlider.value) / 100;
+    videoPlayer.volume = volumeSlider.value / 100;
+    if(volumeSlider.value==0){
+
+    }
 }
 
-function calculateVolume(sliderValue) {
-    if (sliderValue <= 50) return Math.round(sliderValue * (40 / 50));
-    else if (sliderValue <= 70) return Math.round(60 + (sliderValue - 60) * (40 / 30));
-    else return Math.round(70 + (sliderValue - 70) * (40 / 40));
-}
 
 function updateTimeDisplay(event) {
     const seekBarRect = seekBar.getBoundingClientRect();
     const mouseX = event.clientX - seekBarRect.left;
-    const transitionAmount = videoPlayer.duration / 56;
-    const middlePoint = videoPlayer.duration / 2;
 
     let time = videoPlayer.duration * mouseX / seekBar.offsetWidth;
-    time = adjustTime(time, middlePoint, transitionAmount);
 
     if (time < 0 || time > videoPlayer.duration) return;
     timeDisplay.innerText = formatTime(time);
-    timeDisplay.style.left = `${mouseX+95}px`;
+    timeDisplay.style.left = `${mouseX + 95}px`;
     timeDisplay.style.top = "50%";
     timeDisplay.style.display = 'block';
-}
-
-function adjustTime(time, middlePoint, transitionAmount) {
-    if (time < middlePoint)
-        time -= transitionAmount * (1 - (time / middlePoint) ** 2);
-    else
-        time += transitionAmount * ((time - middlePoint) / (videoPlayer.duration - middlePoint)) ** 2;
-
-    return time;
 }
 
 function formatTime(time) {
@@ -270,3 +289,28 @@ function formatTime(time) {
 seekBar.addEventListener('mouseleave', () => {
     timeDisplay.style.display = 'none';
 });
+
+videoPlayer.addEventListener('ended', () => {
+    playButton.style.cssText = "";
+    playImage.src = "assets/play-icon.png";
+    Playing = false;
+});
+
+
+function videoMouseDown() {
+    clickTimer = setTimeout(() => {
+        clickTimer = null; // Clear the timer to indicate it was a hold
+    }, 200);
+}
+
+function videoMouseUp() {
+    if (clickTimer) {
+        // If the timer is still active, it's a click
+        clearTimeout(clickTimer);
+        clickTimer = null;
+        playPause();
+    }
+}
+
+videoPlayer.addEventListener("mousedown", videoMouseDown);
+videoPlayer.addEventListener("mouseup", videoMouseUp);

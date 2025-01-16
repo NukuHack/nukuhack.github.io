@@ -32,7 +32,7 @@ linkHelper.forEach(({id, title, content, link="#",extra}, index) => {
                 ${title}
             </p>
             <div class="list_content">
-                <a class="link" href="${link}" target="_blank"><span class="link_content">${content}</span></a>
+                <a class="link" href="${link}" target="_blank">${content}</a>
             </div>
             <div class="list_extra">
                 ${extra}

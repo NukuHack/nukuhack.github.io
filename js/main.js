@@ -1,5 +1,14 @@
 const body = document.querySelector("body");
-
+const Url = window.location.href;
+const urlImportant = Url.slice(Url.lastIndexOf('/')+1);
+const currentUrl = urlImportant.slice(0,urlImportant.indexOf("."));
+const PageHelper = ((url)=>{
+    if (url!="index")
+        return url.slice(0,1).toUpperCase() + url.slice(1);
+    else
+        return "Main";
+});
+console.log("current page: ",PageHelper(currentUrl));
 
 /*
 let url = window.location.href;
@@ -16,7 +25,7 @@ function LoadBasicContent() {
 
           <nav class="navbar" id="navbar">
             <div class="navbar_in">
-              <p class="navbar_link" onclick="ChangePage()">Current Webpage</p>
+              <p class="navbar_link" onclick="ChangePage()">${PageHelper(currentUrl)} Page</p>
               <button type="button" class="navbar_toggle" id="navbarToggle" onclick="ToggleNavbar()">
                 <img src="./assets/menu_bars.png" alt="Menu" />
               </button>
@@ -39,7 +48,7 @@ function LoadBasicContent() {
                   </li>
                 </ul>
               </div>
-                <div class="slider-container">
+                <div class="darkmode-slider">
                     <label class="switch">
                         <input type="checkbox" id="darkModeToggle" onchange="ToggleDarkMode()">
                         <span class="slider"></span>
@@ -88,22 +97,25 @@ LoadBasicContent();
 const navItems = document.getElementById("navbarDropdown");
 const navToggle = document.getElementById("navbarToggle");
 
+// Toggle Navbar
 function ToggleNavbar() {
-    if (navItems.classList.contains('show'))
-        navItems.classList.remove('show');
-    else
-        navItems.classList.add('show');
+    navItems.classList.toggle('show');
 }
 
-// this closes the navbar if it is not clicked but open
-document.addEventListener('click', function (event) {
-    if (!navToggle.contains(event.target) && !navItems.contains(event.target))
-        if (navToggle.classList.contains('show'))
-            ToggleNavbar();
-});
+// Close Navbar when clicking outside
+function HandleDocumentClick(event) {
+    if (!navToggle.contains(event.target)) {
+        navItems.classList.remove('show');
+    }
+}
+
+document.addEventListener('click', HandleDocumentClick);
+
+
 
 function ChangePage(url) {
     let UrlHelp = window.location.href;
+
     if (url)
         window.location.href = `${url}.html`;
     else if (UrlHelp.indexOf('#') == -1)
@@ -112,6 +124,7 @@ function ChangePage(url) {
         window.location.href = window.location.href;
     // here the url can only be set after the last /
     // so I don't actually need to check for anything
+
 }
 
 
@@ -209,4 +222,8 @@ function GetFromLocalStorage(key) {
 
 function ScrollToTop() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function ScrollToBottom() {
+    window.scrollTo({ top: 10000, behavior: 'smooth' });
 }
