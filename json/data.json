@@ -4,204 +4,238 @@
       "id": 0,
       "lang": "javascript",
       "desc": "Fetch an external json",
+      "keywords": ["fetch","external","url","file","json","api","load"],
       "code": "function fetchData() {\n  fetch('./json/data.json')\n  .then((res) => {\n\tif (!res.ok) {\n\tthrow new Error\n\t  (`HTTP error status: ${res.status}`);\n\t}\n  return res.json();\n  })\n  .then((hElpEr) => {\n\tData = hElpEr.data;\n\t//console.log(Data);\n  })\n  .catch((error) =>{\n\tconsole.error('Json load error:', error)\n  });\n}"
     },
     {
       "id": 1,
       "lang": "csharp",
       "desc": "Read an external file",
+      "keywords": ["read","external","file","array","dynamic","load"],
       "code": "using System.IO;\n\nprivate string[,] Data;\nprivate int len;\nprivate int wid;\n\nprivate void Read_file() {\n  string filePlace = \"hid.csv\"; // the file to read\n  string cut = \";\"; // the char used in splitting\n\n  string[] adat = File.ReadAllLines(filePlace);\n  len = adat.Length; // the length\n  wid = adat[0].Split(cut).Length; // the width\n  Data = new string[len, wid]; // len*wid=matrix\n  StreamReader fireReader = new StreamReader(filePlace);\n  int n = 0;\n  while (!fireReader.EndOfStream) {\n  string[]line = fireReader.ReadLine().Split(cut);\n  for (int i = 0; i < wid; i++)\n  Data[n, i] =line[i];\n  n++;\n  }\n  fireReader.Close();\n}"
     },
     {
       "id": 2,
       "lang": "css",
       "desc": "A basic animation (a bouncing ball)",
+      "keywords": ["ball","animat","effect"],
       "code": ".ball {\n  width: 50px;\n  height: 50px;\n  background-color: red;\n  border-radius: 50%;\n  position: fixed;\n  top: 0;\n  left: 50%;\n  transform: translateX(-50%);\n  animation: bounce 2s infinite;\n}\n\n@keyframes bounce {\n  0%, 100% { top: 100px; }\n  50% { top: 500px; }\n}"
     },
     {
       "id": 3,
       "lang": "javascript",
       "desc": "Local storage save and load",
+      "keywords": ["local","storage","load","save","read","write"],
       "code": "function saveToLocalStorage(key, value) {\n  try {\n\tlocalStorage.setItem(key, JSON.stringify(value));\n  } catch (error) {\n\tconsole.error('Error saving to localStorage:', error);\n  }\n}\n\nfunction getFromLocalStorage(key) {\n  try {\n\tconst value = localStorage.getItem(key);\n\treturn value ? JSON.parse(value) : undefined;\n  } catch (error) {\n\tconsole.error('Error retrieving from localStorage:', error);\n  }\n}"
     },
     {
       "id": 4,
       "lang": "css",
       "desc": "Button Hover Effect",
+      "keywords": ["animat","effect","hover","button"],
       "code": ".button {\n  background-color: #007BFF;\n  color: white;\n  padding: 10px 20px;\n  border: none;\n  border-radius: 5px;\n  transition: background-color 0.3s ease;\n}\n\n.button:hover {\n  background-color: #0056b3;\n}}"
     },
     {
       "id": 5,
       "lang": "javascript",
       "desc": "Random number generator",
+      "keywords": ["random","number","generat"],
       "code": "function getRandomNumber(min, max) {\n  return Math.floor(Math.random() * (max - min + 1)) + min;\n}"
     },
     {
       "id": 6,
       "lang": "css",
       "desc": "Responsive Grid Layout",
+      "keywords": ["grid","display","responsiv"],
       "code": ".grid-container {\n  display: grid;\n  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));\n  gap: 20px;\n}\n/*Slight Variation:*/\n.responsive-grid {\n  display: grid;\n  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));\n  gap: 10px;\n}"
     },
     {
       "id": 7,
       "lang": "javascript",
       "desc": "Hide html element by id",
-      "code": "function hideHtmlElement(id, time) {\n  if (time)\n\tsetTimeout(() => {\n\t  let element = document.getElementById(id);\n\t  element.style.cssText += \"display: none !important;\";\n\t}, time)\n  else {\n\tlet element = document.getElementById(id);\n\telement.style.cssText += \"display: none !important;\";\n  }\n}"
+      "keywords": ["hide","element","html"],
+      "code": "function hideHtmlElement(id,) {\n  let element = document.getElementById(id);\n  element.style.cssText += \"display: none !important;\";\n}"
     },
     {
       "id": 8,
       "lang": "javascript",
       "desc": "Get Current Timestamp",
+      "keywords": ["time","current"],
       "code": "function getCurrentTimestamp() {\n  return Date.now();\n}\n//Slight Variation Example:\nfunction timestampNow() {\n  return new Date().getTime();\n}"
     },
     {
       "id": 9,
       "lang": "css",
       "desc": "Custom Scrollbar",
+      "keywords": ["scroll","webkit","design"],
       "code": "::-webkit-scrollbar {\n  background-color: lightgrey;\n  width: 1.5vw;\n}\n\n::-webkit-scrollbar-thumb {\n  background: grey;\n  border-radius: 10px;\n}\n\n::-webkit-scrollbar-thumb:hover {\n  background: #222222;\n}"
     },
     {
       "id": 10,
       "lang": "css",
       "desc": "Spinner",
+      "keywords": ["spin","load","effect","animat"],
       "code": ".loader {\n  border: 5px solid #f3f3f3;\n  border-top: 5px solid #3498db;\n  border-radius: 50%;\n  width: 50px;\n  height: 50px;\n  animation: rotate 2s linear infinite;\n}\n\n@keyframes rotate {\n  0% {\n\ttransform: rotate(0deg);\n  }\n  100% {\n\ttransform: rotate(360deg);\n  }\n}"
     },
     {
       "id": 11,
       "lang": "css",
       "desc": "Overlay Effect",
+      "keywords": ["effect","display"],
       "code": ".overlay {\n  position: fixed;\n  top: 0;\n  left: 0;\n  width: 100%;\n  height: 100%;\n  background: rgba(0, 0, 0, 0.5);\n  z-index: 100;\n}"
     },
     {
       "id": 12,
       "lang": "css",
       "desc": "Fullscreen Modal",
+      "keywords": ["display","effect","fullscreen","modal"],
       "code": ".modal {\n  position: fixed;\n  top: 0;\n  left: 0;\n  width: 100%;\n  height: 100%;\n  background: rgba(0, 0, 0, 0.8);\n  display: flex;\n  justify-content: center;\n  align-items: center;\n  z-index: 1000;\n}"
     },
     {
       "id": 13,
       "lang": "csharp",
       "desc": "Random number generator",
+      "keywords": ["random","number","generat"],
       "code": "Random random = new Random();\ndouble number = random.Next(1, 101); // Generates a number between 1 and 100"
     },
     {
       "id": 14,
       "lang": "csharp",
       "desc": "Random string generator",
+      "keywords": ["random","string","generat"],
       "code": "string GenerateRandomString(int length)\n{\n  const string chars = \"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789\";\n  return new string(Enumerable.Repeat(chars, length)\n\t.Select(s => s[new Random().Next(s.Length)]).ToArray());\n}"
     },
     {
       "id": 15,
       "lang": "csharp",
       "desc": "Delay",
+      "keywords": ["delay","throttle","debounce"],
       "code": "using System.Threading;\n\nThread.Sleep(1000);"
     },
     {
       "id": 16,
       "lang": "csharp",
       "desc": "Date time now",
+      "keywords": ["time","current"],
       "code": "DateTime now = DateTime.Now;\nConsole.WriteLine($\"Current date and time: {now}\");"
     },
     {
       "id": 17,
       "lang": "csharp",
-      "desc": "Read external JSon ... in C# ?",
+      "desc": "Work with JSon in C# ?",
+      "keywords": ["external","json","read","array","dynamic","load"],
       "code": "using System.Text.Json;\n\nstring jsonString = File.ReadAllText(\"data.json\");\nvar data = JsonSerializer.Deserialize<Dictionary<string, object>>(jsonString);\n\nforeach (var item in data)\n{\n  Console.WriteLine($\"{item.Key}: {item.Value}\");\n}"
     },
     {
       "id": 18,
       "lang": "csharp",
       "desc": "Basic dependency injection",
+      "keywords": ["dependency","inject","function","object"],
       "code": "public interface IGreetingService\n{\n  void Greet(string name);\n}\n\npublic class GreetingService : IGreetingService\n{\n  public void Greet(string name)\n  {\n\tConsole.WriteLine($\"Hello, {name}!\");\n  }\n}\n\n// Usage:\nIGreetingService service = new GreetingService();\nservice.Greet(\"John\");"
     },
     {
       "id": 19,
       "lang": "csharp",
       "desc": "File size checker",
+      "keywords": ["size","file","check","external"],
       "code": "FileInfo fileInfo = new FileInfo(\"example.txt\");\nConsole.WriteLine($\"File size: {fileInfo.Length} bytes\");"
     },
     {
       "id": 20,
       "lang": "csharp",
       "desc": "Send an HTTP GET Request",
+      "keywords": ["web","get","url","http","external"],
       "code": "using System.Net.Http;\n\nHttpClient client = new HttpClient();\nvar response = await client.GetAsync(\"https://jsonplaceholder.typicode.com/posts\");\nstring content = await response.Content.ReadAsStringAsync();\nConsole.WriteLine(content);"
     },
     {
       "id": 21,
       "lang": "csharp",
       "desc": "Check if file exist",
+      "keywords": ["exist","file","check","external"],
       "code": "if (File.Exists(\"example.txt\"))\n{\n  Console.WriteLine(\"File exists.\");\n}\nelse\n{\n  Console.WriteLine(\"File does not exist.\");\n}"
     },
     {
       "id": 22,
       "lang": "csharp",
       "desc": "Serialize an Object to JSON",
+      "keywords": ["array","json","object"],
       "code": "using System.Text.Json;\n\nvar person = new { Name = \"John\", Age = 30 };\nstring json = JsonSerializer.Serialize(person);\nConsole.WriteLine(json);"
     },
     {
       "id": 23,
       "lang": "csharp",
       "desc": "Async tasks",
+      "keywords": ["async","throttle","delay"],
       "code": "async Task DoWorkAsync()\n{\n  await Task.Delay(1000);\n  Console.WriteLine(\"Work completed!\");\n}\n\nawait DoWorkAsync();"
     },
     {
       "id": 24,
       "lang": "csharp",
       "desc": "Basic command line input",
+      "keywords": ["console","command line"],
       "code": "Console.Write(\"Enter your name: \");\nstring name = Console.ReadLine();\nConsole.WriteLine($\"Hello, {name}!\");"
     },
     {
       "id": 25,
       "lang": "csharp",
       "desc": "MySQL get from stuff",
+      "keywords": ["mysql","web","external"],
       "code": "using MySql.Data.MySqlClient;\n\nnamespace MySQLConnectionExample\n  {\n\tclass Program\n\t{\n\t  static void Main(string[] args)\n\t  {\n\t  Console.WriteLine(\"Add meg a földrészt, és megmutatja mely országok tartalmazza\");\n\t  string foldresz=Console.ReadLine();\n\t  // MySQL adatbázis kapcsolat string\n\t  string connectionString = \"Server=localhost;Database=foldrajz;Uid=root;Pwd=;\";\n\t  // ez hozza létre a kapcsolatot az adatbázissal\n\t\t// Kapcsolat létrehozása\n\t\tusing (MySqlConnection connection = new MySqlConnection(connectionString))\n\t\t{\n\t\t  try\n\t\t  {\n\t\t\tconnection.Open();\n\t\t  //  Console.WriteLine(\"Sikeres kapcsolat az adatbázishoz!\");\n\t\t  // SQL lekérdezés példa\n\t\t  string query = \"SELECT `orszag`, `fovaros`, `terulet`, `nepesseg` FROM `orszagok` WHERE foldr_hely LIKE @foldresz ORDER BY orszag\";\n\t\t\tMySqlCommand command = new MySqlCommand(query, connection);\n\t\t\tcommand.Parameters.AddWithValue(\"@foldresz\", \"%\" + foldresz + \"%\");\n\t\t\t// itt paraméterezve a lekérdezésem\n\t\t\t// Adatok lekérdezése\n\t\t\tusing (MySqlDataReader reader = command.ExecuteReader())\n\t\t\t{\n\t\t\t  while (reader.Read())\n\t\t\t  {   // ami a szelektbe van azokat kapcsosba\n\t\t\t\tConsole.WriteLine($\"{reader[\"orszag\"]} Fővárosa: {reader[\"fovaros\"]} Területe: {reader[\"terulet\"]} Népessége: {reader[\"nepesseg\"]} \");\n\t\t\t  }\n\t\t\t}\n\t\t  }\n\t\t  catch (Exception ex)\n\t\t  {\n\t\t\tConsole.WriteLine($\"Hiba történt: {ex.Message}\");\n\t\t  }\n\t\t}\n\t  Console.ReadLine();\n\t}\n\t}\n  }"
     },
     {
       "id": 26,
       "lang": "javascript",
       "desc": "Basic copy to clipboard",
+      "keywords": ["copy","clipboard"],
       "code": "function CopyTextToClipboard(id) {\n  // Check if the Clipboard API is available\n  if (navigator.clipboard) {\n\tlet textToCopy = document.getElementById(id).innerText;\n\tif (!textToCopy)\n\t  console.log('Copy Error', 'Failed to copy:', \"Nothing to copy\");\n\telse {\n\t  navigator.clipboard.writeText(textToCopy)\n\t\t.then(() => {\n\t\t  console.log('Copy Success', 'Code copied to clipboard!');\n\t\t})\n\t\t.catch((error) => {\n\t\t  console.log('Copy Error', 'Failed to copy:', error);\n\t\t});\n\t}\n  } else {\n\tconsole.log('Browser Error', 'Failed to copy:', 'Your browser does not support the Clipboard API.\n(Or the web hosting server)');\n  }\n}"
     },
     {
       "id": 27,
       "lang": "csharp",
       "desc": "Dialog result with popup",
+      "keywords": ["dialog","popup"],
       "code": "DialogResult a = MessageBox.Show(\n  \"will you close it for sure?\",\n  \"leave\",\n  MessageBoxButtons.YesNo,\n  MessageBoxIcon.Question);\nif (a == DialogResult.Yes)\n  Close();"
     },
     {
       "id": 28,
       "lang": "csharp",
       "desc": "Dictionary help",
+      "keywords": ["dictionary","array","list"],
       "code": "Dictionary<string, int> diction = new Dictionary<string, int>();\nfor (int i = 1; i < len; i++)\n{\n  if (diction.ContainsKey(matix[i, 1]))\n\tdiction[matix[i, 1]]++;\n  else\n\tdiction.Add(matix[i, 1], 1);\n}\nforeach (var x in diction)\nConsole.WriteLine(\"\t\" + x.Key + \" : \" + x.Value);"
     },
     {
       "id": 29,
       "lang": "csharp",
       "desc": "Write a file",
+      "keywords": ["file","external","write"],
       "code": "StreamWriter wr = new StreamWriter(\"orvosi.txt\");\nfor (int i = 0; i < matix.length; i++)\n  wr.WriteLine(matix[i, 0] + \" \" + matix[i, 1]);\nwr.Close();"
     },
     {
       "id": 30,
       "lang": "csharp",
       "desc": "Save and load (external file)",
+      "keywords": ["file","external","read","load","write"],
       "code": "private void save_all()\n{\n  try\n  {\n\tStreamWriter wr = new StreamWriter(\"save.txt\");\n\tforeach (var x in Output.Items)\n\t  wr.WriteLine(x);\n\twr.Close();\n  }\n  catch (error){\n\tMessageBox.Show(\n\t  \"Task failed somehow\n\" +\n\t  error,\n\t  \"bad\",\n\t  MessageBoxButtons.OK,\n\t  MessageBoxIcon.Error);\n  }\n}\nprivate void load_all()\n{\n  string[] adat = File.ReadAllLines(\"save.txt\");\n  foreach (var x in adat)\n  // do something with loaded data\n}"
     },
     {
       "id": 31,
       "lang": "javascript",
       "desc": "Filter array by string",
+      "keywords": ["array","search","filter"],
       "code": "function FilterByString(query) {\n  if (!query || typeof query !== \"string\") {\n\tconsole.log(\"not good input\");\n\treturn;\n  }\n  // Normalize query for consistent comparison\n  SearchedDescription = query.toLowerCase().trim();\n  // Split by spaces into an array of words\n  const SearchTerms = SearchedDescription.split(/\\s+/);\n  // Filter Data based on search terms\n  SearchedByDescription = Data.filter(({desc}) => {\n\t// Ensure all search terms are found in the description\n\treturn SearchTerms.every(term => desc.toLowerCase().includes(term));\n  }).map(({id}) => id); // Extract only the id from the filtered items\n  console.log(\"Found\", SearchedByDescription);\n}"
     },
     {
       "id": 32,
       "lang": "javascript",
       "desc": "Scrolling on the page",
+      "keywords": ["scroll","effect","animati"],
       "code": "function ScrollToTop() {\n  window.scrollTo({ top: 0, behavior: 'smooth' });\n}\n\nfunction ScrollToBottom() {\n  window.scrollTo({ top: 10000, behavior: 'smooth' });\n}"
     },
     {
       "id": 33,
       "lang": "javascript",
-      "desc": "Ajax Xhttp request also API",
+      "desc": "Basic Xhttp request",
+      "keywords": ["xhttp","api","ajax","url","read","external","file","load"],
       "code": "var xhttp = new XMLHttpRequest();\n\nxhttp.onreadystatechange = function () {\n  if (this.readyState == 4 && this.status == 200) {\n    var res = JSON.parse(this.responseText)\n    console.log(res);\n    return Data;\n  }\n}\n\nxhttp.open('GET', 'https://jsonplaceholder.typicode.com/users', true);\n\nxhttp.send();"
     }
   ]

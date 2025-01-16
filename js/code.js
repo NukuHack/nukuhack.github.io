@@ -4,6 +4,8 @@ const pageDiv = document.getElementById('code_page');
 const searchStuff = document.getElementById('search_stuff');
 const languageDropdown = document.getElementById('dropdown_language');
 const languageDropdownButton = document.getElementById('dropdown_language_button');
+const searchNoResult = document.getElementById('search_no_result');
+const searchTitle = document.getElementById('search_title');
 const True = false;
 const langHelp = {
     "csharp": "C#",
@@ -18,7 +20,7 @@ let SelectedByLanguage = [];
 let SearchedDescription = "all";
 let SearchedByDescription = [];
 let codeLangTypes = [];
-
+let Index = {}; // Inverted index
 
 // just the json fetch
 function FetchData(from) {
@@ -49,6 +51,13 @@ function Start_Everything() {
             codeLangTypes.push(lang);
     });
     DropDownLanguage();
+
+    Data.forEach(({id, keywords}) => {
+        keywords.forEach(keyword => {
+            if (!Index[keyword]) Index[keyword] = [];
+            Index[keyword].push(id);
+        });
+    });
 }
 
 //console.log("I love bread");
@@ -123,14 +132,20 @@ function DisplayData() {
             const matchesDesc = SearchedDescription === 'all' || SearchedByDescription.includes(id);
             return matchesLang && matchesDesc && code !== 'none';
         }).map(({id}) => id);
-    Data.forEach(({id, lang, desc, code}) => {
-        if (filteredData.includes(id)) {
-            const CodeHTML = GenerateCodeHTML({id, lang, desc, code});
-            //const CodeHTML = id+"<br>"; //just replacing it to make it quicker
-            codeOutput.insertAdjacentHTML('beforeend', CodeHTML);
-            Prism.highlightElement(document.getElementById(`code_code_${id}`));
-        }
-    });
+    if (filteredData.length > 0) {
+        searchNoResult.style.display = "none";
+        Data.forEach(({id, lang, desc, code}) => {
+            if (filteredData.includes(id)) {
+                const CodeHTML = GenerateCodeHTML({id, lang, desc, code});
+                //const CodeHTML = id+"<br>"; //just replacing it to make it quicker
+                codeOutput.insertAdjacentHTML('beforeend', CodeHTML);
+                Prism.highlightElement(document.getElementById(`code_code_${id}`));
+            }
+        });
+    } else {
+        searchNoResult.style.display = "block";
+    }
+
 }
 
 function DataById(id) {
@@ -178,26 +193,75 @@ function SelectByLanguage(language) {
     DisplayData();
 }
 
+
+
+let InputTimer;
+searchTitle.addEventListener("input", function () {
+    clearTimeout(InputTimer);
+    let searchHelp=this.value.toLowerCase().trim();
+    InputTimer = setTimeout(() => {
+        SearchDescription(searchHelp);
+    }, 500);
+});
+searchTitle.addEventListener("change", function () {
+    clearTimeout(InputTimer);
+    let searchHelp=this.value.toLowerCase().trim();
+        SearchDescription(searchHelp);
+});
+
+
 function SearchDescription(query) {
-    //console.log("query", query);
-    if (!query || typeof query !== "string") {
+    //console.log(query);
+    const SearchTerms = query.split(/\s+/).filter(term => term.length > 1);
+    //console.log(SearchTerms);
+    if (SearchTerms.length < 1) {
         SearchedDescription = "all";
         DisplayData();
         return;
     }
 
-    // Normalize query for consistent comparison
-    SearchedDescription = query.toLowerCase().trim();
-    const SearchTerms = SearchedDescription.split(/\s+/); // Split by spaces into an array of words
+    SearchedDescription = query;
+    // Split by spaces into an array of words
+    // decided to add a filter too, so if we want the user not to be able to input a single letter then we can do that too
     //console.log("SearchTerms", SearchTerms);
 
-    // Filter Data based on search terms
-    SearchedByDescription = Data.filter(({desc}) => {
-        // Ensure all search terms are found in the description
-        return SearchTerms.every(term => desc.toLowerCase().includes(term));
-    }).map(({id}) => id); // Extract only the id from the filtered items
-    //console.log("Found", SearchedByDescription);
+    // This will hold the final result (IDs that match all search terms)
+    let Results = [];
 
+    // Go through each search term and collect records containing any of the terms
+    SearchTerms.forEach(term => {
+        if (Index[term]) {
+            // Exact match found in the Index
+            termResults = Index[term];
+        } else {
+            // If no exact match, look for partial matches
+            termResults = Object.keys(Index)
+                .filter(key => key.includes(term) || term.includes(key)) // Reverse partial match
+                .flatMap(key => Index[key]); // Combine IDs from all matching keys
+        }
+
+        // If Results is empty, we initialize it with the first term's results
+        if (Results.length === 0) {
+            Results = [...termResults];
+        } else {
+            // If Results is not empty, filter out IDs that don't contain the current term
+            Results = Results.filter(id => termResults.includes(id));
+        }
+    });
+    //console.log(Results);
+    SearchedByDescription=Results;
+
+    /*
+    // Ensure that results show only records that match *all* search terms
+    // Additionally, implement partial matching for keywords
+    SearchedByDescription = Results.filter(id => {
+        const recordKeywords = Data.find(item => item.id === id).keywords;
+        console.log(recordKeywords);
+        return SearchTerms.every(term => {
+            return recordKeywords.some(keyword => keyword.includes(term)); // Partial match
+        });
+    });
+    */
     DisplayData();
 }
 
@@ -329,19 +393,16 @@ function CloseDropdown(dropdownContent) {
     dropdownContent.classList.remove('show');
 }
 
-function ToggleDropdown(id) {
-    const dropdownContent = document.getElementById(`${id}`);
-    const dropdownButton = document.getElementById(`${id}_button`);
+function ToggleDropdown() {
+    const dropdownContent = document.getElementById(`dropdown_language`);
+    const dropdownButton = document.getElementById(`dropdown_language_button`);
     // Check if the dropdown is already open
     const isOpen = dropdownContent.classList.contains('show');
 
     if (isOpen) {
         CloseDropdown(dropdownContent);
-        //console.log("close dropdown", id);
     } else {
         OpenDropdown(dropdownContent, dropdownButton);
-        //console.log("open dropdown", id);
-
     }
 }
 

@@ -13,12 +13,21 @@
 <body>
 
     <div class="search_stuff" id="search_stuff">
-        <button class="dropdown-button" id="dropdown_language_button" onclick="ToggleDropdown('dropdown_language')"></button>
-        <div class="dropdown-content" id="dropdown_language" onclick="ToggleDropdown('dropdown_language')">
+
+        <button class="dropdown-button" id="dropdown_language_button" onclick="ToggleDropdown()"></button>
+        <div class="dropdown-content" id="dropdown_language" onclick="ToggleDropdown()">
             <button class="dropdown-item" onClick="SelectByLanguage('all')">All</button>
         </div>
-        <input type="text" class="search_title" id="search_title" placeholder="Input the Description"
-               onchange="SearchDescription(document.getElementById('search_title').value)">
+
+        <input type="text" id="search_title" placeholder="Input the Description" oninput="">
+
+        <div id="search_no_result">
+            <p>We are really sorry for your inconvenience.</p>
+            <p>Currently, there are No matching codes in our database.</p>
+            <p>This page is still in development, look out for it in the future!</p>
+            <p>But for now, try with a different keyword</p>
+        </div>
+
     </div>
     <div id="codes_helper" onclick="PhoneCssHelp()">
         The codes in phone version are not displayed.<br>
