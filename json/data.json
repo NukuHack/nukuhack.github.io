@@ -237,6 +237,20 @@
       "desc": "Basic Xhttp request",
       "keywords": ["xhttp","api","ajax","url","read","external","file","load"],
       "code": "var xhttp = new XMLHttpRequest();\n\nxhttp.onreadystatechange = function () {\n  if (this.readyState == 4 && this.status == 200) {\n    var res = JSON.parse(this.responseText)\n    console.log(res);\n    return Data;\n  }\n}\n\nxhttp.open('GET', 'https://jsonplaceholder.typicode.com/users', true);\n\nxhttp.send();"
+    },
+    {
+      "id": 34,
+      "lang": "javascript",
+      "desc": "Do stuff right before unload",
+      "keywords": ["unload","event","listener","leave"],
+      "code": "function AtBeforeUnload() {\t\t// save all stuff before leaving\t\tconsole.log(\",yeet\",);\t\tCartLocalSet();\t  }\t\t  // Attach the function to the beforeunload event\t  window.addEventListener(\",beforeunload\", AtBeforeUnload);"
+    },
+    {
+      "id": 35,
+      "lang": "javascript",
+      "desc": "Throttle an input with Set-timeout",
+      "keywords": ["delay","throttle","debounce","event","settimeout"],
+      "code": "let InputTimer;\tsearchTitle.addEventListener(\",input\", function () {\t  clearTimeout(InputTimer);\t  let searchHelp=this.value.toLowerCase().trim();\t  InputTimer = setTimeout(() => {\t\tSearchDescription(searchHelp);\t  }, 500);\t});"
     }
   ]
 }
