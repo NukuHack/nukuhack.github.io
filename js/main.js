@@ -2,13 +2,11 @@ const body = document.querySelector("body");
 const Url = window.location.href;
 const urlImportant = Url.slice(Url.lastIndexOf('/')+1);
 const currentUrl = urlImportant.slice(0,urlImportant.indexOf("."));
+if (currentUrl=="") window.location.href="index.html";
 const PageHelper = ((url)=>{
-    if (url!="index")
-        return url.slice(0,1).toUpperCase() + url.slice(1);
-    else
-        return "Main";
+    if (url!="index") return url.slice(0,1).toUpperCase() + url.slice(1);
+    else return "Main";
 });
-console.log("current page: ",PageHelper(currentUrl));
 
 /*
 let url = window.location.href;
@@ -27,7 +25,7 @@ function LoadBasicContent() {
             <div class="navbar_in">
               <p class="navbar_link" onclick="ChangePage()">${PageHelper(currentUrl)} Page</p>
               <button type="button" class="navbar_toggle" id="navbarToggle" onclick="ToggleNavbar()">
-                <img src="./assets/menu_bars.png" alt="Menu" />
+                <img id="menu_image" src="./assets/menu_bars.png" alt="Menu" />
               </button>
               <div class="navbar_items" id="navbarDropdown">
                 <ul class="navbar_ul">
@@ -42,6 +40,9 @@ function LoadBasicContent() {
                   </li>
                   <li class="navbar_li">
                     <p class="navbar_item" onclick="ChangePage('links')">Links & Connection</p>
+                  </li>
+                  <li class="navbar_li">
+                    <p class="navbar_item" onclick="ChangePage('weather')">Weather App</p>
                   </li>
                   <li class="navbar_li">
                     <p class="navbar_item" onclick="ChangePage('video')">Video Display</p>
@@ -89,6 +90,11 @@ function LoadBasicContent() {
     body.insertAdjacentHTML("afterbegin", navContent);
     body.insertAdjacentHTML("beforeend", modalContent);
     body.insertAdjacentHTML("beforeend", footerContent);
+
+
+    document.getElementById("menu_image").onerror = function() {
+        this.src = '../assets/menu_bars.png';
+    };
 }
 
 
@@ -113,20 +119,45 @@ document.addEventListener('click', HandleDocumentClick);
 
 
 
-function ChangePage(url) {
+
+function ChangePage(url,isInFolder) {
     let UrlHelp = window.location.href;
+    isInFolder=isInsideFolder();
+    if (isInFolder) UrlHelp="../";
+    else UrlHelp="";
 
     if (url)
-        window.location.href = `${url}.html`;
+        UrlHelp += `${url}.html`;
     else if (UrlHelp.indexOf('#') == -1)
-        window.location.href += '#';
+        UrlHelp += '#';
     else
-        window.location.href = window.location.href;
+        UrlHelp = window.location.href;
     // here the url can only be set after the last /
     // so I don't actually need to check for anything
+    console.log(UrlHelp);
+    window.location.href = UrlHelp;
+}
+function isInsideFolder() {
+    // Get the current URL
+    let currentUrl = window.location.href;
+    let path="";
+    // Extract the path part of the URL (everything after the domain)
+    if (!currentUrl.includes("localhost"))
+        path = new URL(currentUrl).pathname;
+    else
+        path = currentUrl.slice("http://localhost:63342/".length)
+
+    // Check if the path contains more than one segment (i.e., contains a folder)
+    // For example, "/resources/index" has two segments: "resources" and "index"
+    console.log(path);
+    let stuff = path.split('/');
+    if (stuff[0].includes("localhost"))
+        // for testing in localhost ... yeah ....
+        return stuff.length > 4;
+    else
+        return stuff.length > 2;
 
 }
-
 
 function RemoveCss(item, type) {
     let CssT = item.style.cssText;
