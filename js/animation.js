@@ -271,7 +271,7 @@ const mainBall = new Ball(
 const otherBall = new Ball(
     canvas.width * 0.5 - canvas.width / 4, // x
     canvas.height * 0.5, // y
-    60, // radius
+    50, // radius
     0, // dx
     0, // dy
     0.1, // friction
@@ -475,6 +475,11 @@ function animate() {
 
         drawFPS(); // Draw the FPS counter
         trackMouse(); // Track mouse movement
+    } else {
+        // Draw "Paused" text on the canvas
+        ctx.fillStyle = "white";
+        ctx.font = "24px Arial";
+        ctx.fillText("Paused", canvas.width/20*9.5, canvas.height/15);
     }
     requestAnimationFrame(animate); // Always request the next frame
 }
@@ -601,7 +606,7 @@ function resolveBallBallCollision(ball1, ball2) {
     // Calculate the impulse (considering masses as 1/radius for simplicity)
     const massFactor1 = 1 / ball1.radius;
     const massFactor2 = 1 / ball2.radius;
-    const impulse = (-2 * dotProduct) / (massFactor1 + massFactor2) * 1.5; // Increased impulse strength
+    const impulse = (-2 * dotProduct) / (massFactor1 + massFactor2); // Increased impulse strength
 
     // Apply the impulse to the balls' velocities
     const impulseX = impulse * normal.x;
