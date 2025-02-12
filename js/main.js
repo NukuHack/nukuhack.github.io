@@ -45,6 +45,9 @@ function LoadBasicContent() {
                     <p class="navbar_item" onclick="ChangePage('weather')">Weather App</p>
                   </li>
                   <li class="navbar_li">
+                    <p class="navbar_item" onclick="ChangePage('animation')">Animation</p>
+                  </li>
+                  <li class="navbar_li">
                     <p class="navbar_item" onclick="ChangePage('video')">Video Display</p>
                   </li>
                 </ul>

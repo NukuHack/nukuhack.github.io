@@ -1,0 +1,28 @@
+
+canvas {
+    display: block;
+}
+/* Custom Context Menu Styling */
+#customContextMenu {
+    display: none;
+    position: absolute;
+    background-color: var(--background-normal-color);
+    border: 1px solid var(--border-medium-color);
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+    padding: 10px;
+    z-index: 1000;
+}
+#customContextMenu ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+#customContextMenu ul li {
+    padding: 8px 12px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+#customContextMenu ul li:hover {
+    background-color: var(--background-light-color);
+}
+
