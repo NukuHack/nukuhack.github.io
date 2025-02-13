@@ -7,7 +7,7 @@ TABLE OF CONTENTS
 3. Body Classes and Drawings
 4. Custom right click menu
 5. Populate canvas
-6. Ball animations
+6. Ball movement
 7. Animation Loop
 8. Collision
 
@@ -33,6 +33,7 @@ canvas.height = window.innerHeight*0.8;
 let mouseDownTime = 0;
 let mouseUpTime = 0;
 let paused = false; // Global variable to track pause state
+let isDragging= false;
 
 const ctx = canvas.getContext('2d');
 let lastTime = performance.now(); // Track the last frame time
@@ -144,17 +145,34 @@ class GameObject {
         this.identifier = identifier;
     }
 
-    update() {
-        // Common update logic (e.g., apply friction, update position)
-        this.dx *= (1 - this.friction);
-        this.dy *= (1 - this.friction);
+    // Apply friction to velocity
+    applyFriction() {
+        this.dx *= 1 - this.friction;
+        this.dy *= 1 - this.friction;
+    }
 
-        // Apply gravity
+    // Apply gravity to vertical velocity
+    applyGravity() {
         this.dy += currentGravity;
+    }
 
-        // Update item's position
+    // Update position based on velocity
+    updatePosition() {
+        this.updatePosX();
+        this.updatePosY();
+    }
+    updatePosX() {
         this.x += this.dx;
+    }
+    updatePosY() {
         this.y += this.dy;
+    }
+
+    // Default update method that calls all sub-methods
+    update() {
+        this.applyFriction();
+        this.applyGravity();
+        this.updatePosition();
     }
 }
 
@@ -174,14 +192,57 @@ class Ball extends GameObject {
     }
 
     update() {
-        super.update();
+        // Update ball position if not being dragged
+        // Suppress or conditionally execute parts of the update logic
+        if (!isDragging&&this.identifier==="main_ball")
+            this.updatePosX();
 
+        this.updatePosY();
+        this.applyFriction();
+        this.applyGravity();
+
+        this.handleEdgeCollision()
+
+    }
+    // Handle collisions with walls, ceiling, and bottom
+    handleEdgeCollision() {
+        const radius = this.radius;
+
+        this.wallCollision(radius)
+        //this.floorCollision(radius)
+        this.ceilingCollision(radius)
+    }
+    wallCollision(radius){
         // Bounce off the left and right walls
-        if (this.x - this.radius <= 0 || this.x + this.radius >= canvas.width)
-            this.dx *= -(1-this.friction); // Reduce horizontal velocity on wall collision
+        if (this.x - radius <= 0) {
+            this.dx = -(Math.abs(this.dx) * (1 - this.friction) * bounceFactor); // Reverse direction and reduce speed
+
+            // Optionally, stop the ball from sinking over the walls
+            this.x = 0 + radius;
+        } else if (this.x + radius >= canvas.width) {
+            this.dx = -(Math.abs(this.dx) * (1 - this.friction) * bounceFactor); // Reverse direction and reduce speed
+
+            // Optionally, stop the ball from sinking over the walls
+            this.x = canvas.width - radius;
+        }
+    }
+    floorCollision(radius){
+        // Bounce off the bottom of the canvas
+        if (this.y + radius >= canvas.height) {
+            this.dy = -(Math.abs(this.dy) * (1 - this.friction) * bounceFactor); // Reduce speed and reverse direction
+
+            // Optionally, stop the ball from sinking below the bottom edge
+            this.y = canvas.height - radius;
+        }
+    }
+    ceilingCollision(radius){
         // Bounce off the ceiling
-        else if (this.y - this.radius <= 0)
-            this.dy *= -(1-this.friction); // Reduce vertical velocity on ceiling collision
+        if (this.y - radius <= 0) {
+            this.dy = Math.abs(this.dy) * (1 - this.friction) * bounceFactor; // Reduce speed and reverse direction
+
+            // Optionally, stop the ball from sinking below the bottom edge
+            this.y = 0 + radius;
+        }
     }
 }
 
@@ -268,8 +329,8 @@ const mainBall = new Ball(
     'main_ball' // identifier
 );
 
-const otherBall = new Ball(
-    canvas.width * 0.5 - canvas.width / 4, // x
+const testBall = new Ball(
+    canvas.width * 0.3, // x
     canvas.height * 0.5, // y
     50, // radius
     0, // dx
@@ -280,9 +341,9 @@ const otherBall = new Ball(
 );
 
 // Triangle object
-const triangleMain = new Triangle(
-    canvas.width * 0.5 + canvas.width * 0.25, // x
-    canvas.height * 0.5, // y
+const testTriangle = new Triangle(
+    canvas.width * 0.9, // x
+    canvas.height * 0.55, // y
     60, // size
     0, // dx
     0, // dy
@@ -290,6 +351,17 @@ const triangleMain = new Triangle(
     0.1, // friction
     'blue', // color
     'blue_triangle' // identifier
+);
+const rotatedTriangle = new Triangle(
+    canvas.width * 0.68, // x
+    canvas.height * 0.5, // y
+    60, // size
+    0, // dx
+    0, // dy
+    1.05, // rotation
+    0.1, // friction
+    'black', // color
+    'black_triangle' // identifier
 );
 
 // Rectangle object
@@ -305,14 +377,28 @@ const floorRect = new Rectangle(
     'floor' // identifier
 );
 
+const testRect = new Rectangle(
+    canvas.width*0.45, // x
+    canvas.height * 0.6, // y
+    canvas.width/10, // width
+    50, // height
+    0, // dx
+    0, // dy
+    0.1, // friction
+    'grey', // color
+    'test_rectangle' // identifier
+);
+
 // Create an instance of GameObjectManager
 const gameObjectManager = new GameObjectManager();
 
 // Add your objects to the manager
 gameObjectManager.addObject(floorRect);
-gameObjectManager.addObject(triangleMain);
+gameObjectManager.addObject(testTriangle);
+gameObjectManager.addObject(rotatedTriangle);
 gameObjectManager.addObject(mainBall);
-gameObjectManager.addObject(otherBall);
+gameObjectManager.addObject(testBall);
+gameObjectManager.addObject(testRect);
 
 
 
@@ -400,6 +486,24 @@ function clearCanvas() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 }
 
+function drawPausedText(ctx, canvas) {
+    // Set text properties
+    ctx.fillStyle = "white"; // Text color
+    ctx.strokeStyle = "black"; // Optional: Add an outline for better visibility
+    ctx.lineWidth = 2; // Thickness of the outline
+    ctx.font = `${Math.min(canvas.width / 10, 48)}px Arial`; // Responsive font size
+    ctx.textAlign = "center"; // Center-align the text horizontally
+    ctx.textBaseline = "middle"; // Center-align the text vertically
+    // Draw the text with an outline (optional)
+    const text = "Paused";
+    const x = canvas.width * 0.5; // Center horizontally
+    const y = canvas.height * 0.5; // Center vertically
+
+    // Stroke the text (outline)
+    ctx.strokeText(text, x, y);
+    // Fill the text (color)
+    ctx.fillText(text, x, y);
+}
 
 
 
@@ -407,49 +511,93 @@ function clearCanvas() {
 
 
 // ======================
-// 6. Ball animations
+// 6. Ball movement
 // ======================
 
 
 
-// Jump and move in the X axes animations
-canvas.addEventListener('mousedown', () => {
-    if (event.button !== 0) return;
-    isMouseDown = true; // Set mouse button state to pressed
-    mouseDownTime = Date.now(); // Record the time when the mouse is pressed
-});
-canvas.addEventListener('mouseup', () => {
-    if (event.button !== 0) return;
-    isMouseDown = false; // Set mouse button state to released
-    mouseUpTime = Date.now(); // Record the time when the mouse is released
-    // Calculate the duration of the click
-    const clickDuration = mouseUpTime - mouseDownTime;
-    // Only trigger the jump if the click duration is less than 0.5 seconds (500 milliseconds)
-    if (clickDuration < 100) {
-        mainBall.dy = -5; // Apply upward force
-    }
-});
-canvas.addEventListener('mousemove', (event) => {
-    if (isMouseDown) { // Only update mouseX if the mouse is pressed
-        const rect = canvas.getBoundingClientRect();
-        mouseX = event.clientX - rect.left; // Calculate mouse X relative to the canvas
-    }
-});
-canvas.addEventListener('mouseleave', () => {
-    active = false;
-    isMouseDown = false; // Reset mouse button state when leaving the canvas
-});
-canvas.addEventListener('mouseenter', () => {
-    active = true;
-});
 
-// Update ball's horizontal position based on mouse movement
-function trackMouse() {
-    if (active && isMouseDown) { // Only update if the mouse is pressed and active
-        mainBall.x = mouseX===0?canvas.getBoundingClientRect().left:mouseX; // Directly set the ball's X position to match the mouse
-        mainBall.dx = 0; // Reset horizontal velocity to prevent inertia
+// Function to handle both mouse and touch events
+function handleScreenEvent(event, type, ball) {
+    const { clientX, clientY } = getEventCoordinates(event);
+    const rect = canvas.getBoundingClientRect();
+
+    // logic
+    if (type === 'touchstart' || type === 'mousedown' && event.button === 0) {
+        isDragging = true;
+        mouseDownTime = Date.now(); // Record the time when the mouse is pressed
+    } else if (isDragging&&(type === 'touchmove' || type === 'mousemove')) {
+        ball.x = clientX - rect.left; // Update ball position
+        ball.dx = 0; // Reset velocity while dragging
+    } else if (type === 'touchend' || type === 'mouseup' && event.button === 0) {
+        isDragging = false;
+        // Check for jump condition on mouse/touch release
+        const clickDuration = Date.now() - mouseDownTime;
+        //console.log(clickDuration);
+        if (clickDuration < 100)
+            mainBall.dy = -5; // Apply upward force for jumping
     }
 }
+
+// Helper function to extract coordinates from mouse or touch events
+function getEventCoordinates(event) {
+    return event.touches && event.touches.length > 0
+        ? { clientX: event.touches[0].clientX, clientY: event.touches[0].clientY }
+        : { clientX: event.clientX, clientY: event.clientY };
+}
+
+// Add event listeners for mouse and touch
+['mousedown', 'mousemove', 'mouseup'].forEach((eventType) => {
+    canvas.addEventListener(eventType, (event) => {
+        handleScreenEvent(event, eventType.toLowerCase(), mainBall);
+    });
+});
+['touchstart', 'touchmove', 'touchend'].forEach((eventType) => {
+    canvas.addEventListener(eventType, (event) => {
+        handleScreenEvent(event, eventType.toLowerCase(), mainBall);
+    });
+});
+
+
+/*
+// TODO: make this actually work
+
+
+// Gravity constants
+const GRAVITY_X_MULTIPLIER = 0.5; // Strength of gravity in the X-axis
+const GRAVITY_Y_MULTIPLIER = 0.5; // Strength of gravity in the Y-axis
+
+// Function to handle device orientation changes
+function handleOrientation(event,ball) {
+    const beta = event.beta || 0; // Front-to-back tilt (-180 to 180)
+    const gamma = event.gamma || 0; // Left-to-right tilt (-90 to 90)
+
+    // Normalize tilt angles to [-1, 1] range
+    const normalizedBeta = Math.min(Math.max(beta / 180, -1), 1);
+    const normalizedGamma = Math.min(Math.max(gamma / 90, -1), 1);
+
+    // Apply gravity forces based on the tilt angles
+    if (!isDragging) {
+        ball.dx += -normalizedGamma * GRAVITY_X_MULTIPLIER; // Negative because gamma increases to the right
+        ball.dy += normalizedBeta * GRAVITY_Y_MULTIPLIER; // Positive because beta increases forward
+    }
+}
+
+// Check if the DeviceOrientation API is supported
+if (window.DeviceOrientationEvent) {
+    // Start listening for orientation changes
+    window.addEventListener('deviceorientation', (event) => {
+        handleOrientation(event,mainBall);
+    }, true);
+} else {
+    console.warn("DeviceOrientation API is not supported on this device.");
+}
+*/
+
+
+
+
+
 
 
 
@@ -468,18 +616,26 @@ function animate() {
         updateFPS(); // Update the FPS counter
         clearCanvas();
         mainBall.update(); // Update the main ball's position and velocity
-        gameObjectManager.handleCollisionsForObject(mainBall); // Handle collisions
+
+        //for (let i = 0; i< 200000; i++) // With this many calculations I could still run it at 30fps
+        // this is basically for stress-test also small change checking ->
+        // like changing a single function to be quicker might not be noticeable
+        // but running it (200K * all items) is actually kinda slow ... not too much tho
+            gameObjectManager.handleCollisionsForObject(mainBall); // Handle collisions
 
         // Draw objects conditionally
         gameObjectManager.drawConditionally(ctx, hasFloor);
 
         drawFPS(); // Draw the FPS counter
-        trackMouse(); // Track mouse movement
     } else {
+        /*
         // Draw "Paused" text on the canvas
         ctx.fillStyle = "white";
         ctx.font = "24px Arial";
         ctx.fillText("Paused", canvas.width/20*9.5, canvas.height/15);
+
+         */
+        drawPausedText(ctx,canvas);
     }
     requestAnimationFrame(animate); // Always request the next frame
 }
@@ -489,10 +645,9 @@ animate();
 
 // Add event listener for spacebar to toggle pause/resume
 document.addEventListener("keydown", (event) => {
-    if (event.code === "Space") { // Check if the spacebar is pressed
+    if (event.code === "Space") // Check if the spacebar is pressed
         paused = !paused; // Toggle the pause state
-        console.log(paused ? "Animation paused" : "Animation resumed");
-    }
+        //console.log(paused ? "Animation paused" : "Animation resumed");
 });
 
 
@@ -506,76 +661,40 @@ document.addEventListener("keydown", (event) => {
 
 
 // Generalized function to handle collisions
-// Generalized function to handle collisions
 function handleCollision(ball, object) {
     if (ball === object) return;
-
     const ballRadius = ball.radius;
-    const padding = 50; // Add some padding to avoid unnecessary checks for nearby objects
-
-    // Quick distance check to skip faraway objects
-    if (!isWithinDistance(ball, object, ballRadius + padding)) return;
 
     if (object.type === "rectangle") {
         if (object.identifier === "floor" && !hasFloor) return;
 
-        // Rectangle collision logic
-        const closestPoint = getClosestPointOnRectangle(ball, object);
+        // Quick check: Is the ball far from the rectangle?
+        if (isBallFarFromRectangle(ball, object)) return;
 
-        // Calculate the distance between the ball's center and the closest point
-        const distanceX = ball.x - closestPoint.x;
-        const distanceY = ball.y - closestPoint.y;
-        const distanceSquared = distanceX ** 2 + distanceY ** 2;
-
-        // Check if the distance is less than the ball's radius
-        if (distanceSquared < ballRadius ** 2) {
-            const normal = getRectangleNormal(ball, object, closestPoint);
-            resolveCollision(ball, object, closestPoint, ball.friction, normal);
-        }
+        // Resolve the collision
+        resolveRectangleCollision(ball, object);
     } else if (object.type === "triangle") {
         // Use the precomputed transformed vertices from the triangle
         const triangleVertices = object.transformedVertices;
 
-        // Check for collision using the distance-based method
-        if (checkBallTriangleCollision(ball, triangleVertices)) {
-            // Resolve the collision using the new function
-            resolveBallTriangleCollision(ball, triangleVertices);
+        // Perform the quick check and get the closest point and distance
+        const { isFar, closestPoint, distanceSquared } = isBallFarFromTriangle(ball, triangleVertices);
+
+        if (isFar) return; // Quick exit if the ball is far from the triangle
+
+        // Check for collision using the precomputed distance
+        if (distanceSquared < ballRadius * ballRadius) {
+            resolveBallTriangleCollision(ball, triangleVertices, closestPoint, distanceSquared);
         }
     } else if (object.type === "ball") {
-        // Ball-to-ball collision logic
+        // Quick check: Are the balls far apart?
+        if (isBallFarFromBall(ball, object)) return; // Exit early if they are far apart
+        // Check for collision and resolve it
         if (checkBallBallCollision(ball, object)) {
             resolveBallBallCollision(ball, object);
         }
     }
 }
-
-// Function to resolve the collision
-function resolveCollision(ball, object, closest, frictionFactor, normal) {
-    const ballRadius = ball.radius;
-
-    // Calculate the overlap between the ball and the closest point
-    const overlapX = ball.x - closest.x;
-    const overlapY = ball.y - closest.y;
-    const overlapLength = Math.hypot(overlapX, overlapY);
-    const correctionDistance = ballRadius - overlapLength;
-
-    // Correct the ball's position along the normal vector
-    ball.x += normal.x * correctionDistance;
-    ball.y += normal.y * correctionDistance;
-
-    // Calculate the dot product of the velocity and the collision normal
-    const dotProduct = ball.dx * normal.x + ball.dy * normal.y;
-
-    // Reflect the velocity vector based on the collision normal
-    ball.dx -= 2 * dotProduct * normal.x * bounceFactor;
-    ball.dy -= 2 * dotProduct * normal.y * bounceFactor;
-
-    // Apply friction
-    ball.dx *= 1 - frictionFactor;
-    ball.dy *= 1 - frictionFactor;
-}
-
-
 
 
 
@@ -589,9 +708,20 @@ function resolveCollision(ball, object, closest, frictionFactor, normal) {
 
 
 
+
+// Function to check for collision between two balls
+function checkBallBallCollision(ball1, ball2) {
+    const radiusSum = ball1.radius + ball2.radius;
+    const distanceSquared = getDistanceSquared(ball1.x, ball1.y, ball2.x, ball2.y);
+    return distanceSquared <= radiusSum * radiusSum;
+}
+
 // Function to resolve collision between two balls
 function resolveBallBallCollision(ball1, ball2) {
-    const normal = getBallBallNormal(ball1, ball2);
+    // Calculate the normal vector between the two balls
+    const dx = ball1.x - ball2.x;
+    const dy = ball1.y - ball2.y;
+    const normal = normalizeVector(dx, dy);
 
     // Calculate relative velocity
     const relativeVelocityX = ball1.dx - ball2.dx;
@@ -603,60 +733,53 @@ function resolveBallBallCollision(ball1, ball2) {
     // If the balls are moving away from each other, no collision response is needed
     if (dotProduct > 0) return;
 
-    // Calculate the impulse (considering masses as 1/radius for simplicity)
-    const massFactor1 = 1 / ball1.radius;
-    const massFactor2 = 1 / ball2.radius;
-    const impulse = (-2 * dotProduct) / (massFactor1 + massFactor2); // Increased impulse strength
+    // Calculate the impulse (considering masses as inversely proportional to radii)
+    const massFactor1 = 1 / (ball1.radius + 0.001); // Add a small constant to avoid division by zero
+    const massFactor2 = 1 / (ball2.radius + 0.001);
+    const totalMassFactor = massFactor1 + massFactor2;
+    const impulse = (-2 * dotProduct) / totalMassFactor;
 
     // Apply the impulse to the balls' velocities
     const impulseX = impulse * normal.x;
     const impulseY = impulse * normal.y;
 
-    // Update velocities for both balls
     ball1.dx += impulseX * massFactor1;
     ball1.dy += impulseY * massFactor1;
 
+    /*
+    // currently ball2 is fixed
+    ball2.dx -= impulseX * massFactor2;
+    ball2.dy -= impulseY * massFactor2;
+    */
     // Correct positions to prevent overlap
-    const overlap = (ball1.radius + ball2.radius) - Math.hypot(ball1.x - ball2.x, ball1.y - ball2.y);
+    const distance = Math.sqrt(getDistanceSquared(ball1.x, ball1.y, ball2.x, ball2.y));
+    const overlap = (ball1.radius + ball2.radius) - distance;
+
     if (overlap > 0) {
         const correctionX = normal.x * overlap * 0.5;
         const correctionY = normal.y * overlap * 0.5;
 
         ball1.x += correctionX;
         ball1.y += correctionY;
-    }
+
+        /*
+        // currently ball2 is fixed
+        ball2.x -= correctionX;
+        ball2.y -= correctionY;
+         */
+}
 }
 
-// Function to check for collision between two balls
-function checkBallBallCollision(ball1, ball2) {
-    const ax = ball1.x - ball2.x;
-    const ay = ball1.y - ball2.y;
-    const radiusSum = ball1.radius + ball2.radius;
-    const distanceSquared = ax * ax + ay * ay;
+// Function to check if two balls are far apart
+function isBallFarFromBall(ball1, ball2) {
+const distanceSquared = getDistanceSquared(ball1.x, ball1.y, ball2.x, ball2.y);
+const radiusSum = ball1.radius + ball2.radius;
+const radiusSumSquared = radiusSum * radiusSum; // Square of the sum of radii
 
-    return distanceSquared <= radiusSum * radiusSum; // Use <= to include overlapping cases
+// Add a small epsilon value to account for floating-point inaccuracies
+const epsilon = 1; // Small tolerance
+return distanceSquared > radiusSumSquared + epsilon;
 }
-
-// Function to calculate the normal vector between two balls
-function getBallBallNormal(ball1, ball2) {
-    const ax = ball1.x - ball2.x;
-    const ay = ball1.y - ball2.y;
-    const distanceSquared = ax * ax + ay * ay;
-
-    // Avoid division by zero in case the balls are exactly overlapping
-    if (distanceSquared === 0)
-        return { x: 1, y: 0 }; // Default normal (arbitrary direction)
-
-    const invDistance = 1 / Math.sqrt(distanceSquared);
-    const normal = {
-        x: ax * invDistance,
-        y: ay * invDistance
-    };
-    return normal;
-}
-
-
-
 
 
 
@@ -666,9 +789,8 @@ function getBallBallNormal(ball1, ball2) {
 
 
 // ======================
-// 11. Triangle collision helper
+// 11. Triangle Collision Helper
 // ======================
-
 
 
 
@@ -676,57 +798,16 @@ function getBallBallNormal(ball1, ball2) {
 // Function to resolve collision between a ball and a triangle
 function resolveBallTriangleCollision(ball, triangleVertices) {
     const closestPoint = getClosestPointOnTriangle(ball, triangleVertices);
-
-    // Calculate the normal vector (from the closest point to the ball's center)
-    const normalX = ball.x - closestPoint.x;
-    const normalY = ball.y - closestPoint.y;
-    const distance = Math.hypot(normalX, normalY);
-
-    // Normalize the normal vector
-    const normal = {
-        x: normalX / distance,
-        y: normalY / distance
-    };
-
-    // Calculate the overlap between the ball and the closest point
-    const overlap = ball.radius - distance;
-
-    // If there's an overlap, resolve the collision
-    if (overlap > 0) {
-        // Correct the ball's position to prevent overlap
-        ball.x += normal.x * overlap;
-        ball.y += normal.y * overlap;
-
-        // Calculate the relative velocity (for a static triangle, ball's velocity is the relative velocity)
-        const relativeVelocityX = ball.dx;
-        const relativeVelocityY = ball.dy;
-
-        // Calculate the dot product of the relative velocity and the normal vector
-        const dotProduct = relativeVelocityX * normal.x + relativeVelocityY * normal.y;
-
-        // If the ball is moving away, no collision response is needed
-        if (dotProduct > 0) return;
-
-        // Calculate the impulse (assuming the triangle is static)
-        const impulse = -2 * dotProduct;
-
-        // Apply the impulse to the ball's velocity
-        ball.dx += impulse * normal.x;
-        ball.dy += impulse * normal.y;
-    }
-}
-
-// Function to check for collision between the ball and the triangle
-function checkBallTriangleCollision(ball, triangleVertices) {
-    const closestPoint = getClosestPointOnTriangle(ball, triangleVertices);
-
     // Calculate the squared distance between the ball's center and the closest point
-    const dx = ball.x - closestPoint.x;
-    const dy = ball.y - closestPoint.y;
-    const distanceSquared = dx * dx + dy * dy;
+    const distanceSquared = getDistanceSquared(ball.x, ball.y, closestPoint.x, closestPoint.y);
 
-    // Check if the distance is less than the ball's squared radius
-    return distanceSquared < ball.radius * ball.radius;
+    // Resolve the collision using the generic function
+    resolveCollision(
+        ball,
+        closestPoint,
+        distanceSquared,
+        (closestPoint, distance, invDistance) => normalizeVector(ball.x - closestPoint.x, ball.y - closestPoint.y)
+    );
 }
 
 // Function to find the closest point on the triangle to a given point (ball's center)
@@ -781,11 +862,29 @@ function getClosestPointOnLine(ball, start, end) {
 
     // Project the ball's center onto the line segment
     const t = ((ball.x - start.x) * dx + (ball.y - start.y) * dy) / lengthSquared;
-    const tClamped = Math.max(0, Math.min(1, t)); // Clamp t to the line segment
+
+    // Clamp t to the line segment
+    if (t <= 0) return start;
+    if (t >= 1) return end;
 
     return {
-        x: start.x + tClamped * dx,
-        y: start.y + tClamped * dy
+        x: start.x + t * dx,
+        y: start.y + t * dy
+    };
+}
+
+// Function to check if the ball is far from the triangle
+function isBallFarFromTriangle(ball, triangleVertices) {
+    const closestPoint = getClosestPointOnTriangle(ball, triangleVertices);
+
+    // Calculate the squared distance between the ball's center and the closest point
+    const distanceSquared = getDistanceSquared(ball.x, ball.y, closestPoint.x, closestPoint.y);
+
+    // Return an object with the closest point and squared distance
+    return {
+        isFar: distanceSquared > ball.radius * ball.radius,
+        closestPoint,
+        distanceSquared
     };
 }
 
@@ -795,65 +894,70 @@ function getClosestPointOnLine(ball, start, end) {
 
 
 
-
-
 // ======================
-// 12. Rectangle collision helper
+// 12. Rectangle Collision Helper
 // ======================
 
 
 
 
+// Function to resolve collision between a ball and a rectangle
+function resolveRectangleCollision(ball, rectangle) {
+    const closestPoint = getClosestPointOnRectangle(ball, rectangle);
+    // Calculate the squared distance between the ball's center and the closest point
+    const distanceSquared = getDistanceSquared(ball.x, ball.y, closestPoint.x, closestPoint.y);
 
-// Function to calculate the normal vector for a rectangle collision
-function getRectangleNormal(ball, rect, closestPoint) {
-    const { x: rectX, y: rectY, width, height } = rect;
-    const rectRight = rectX + width;
-    const rectBottom = rectY + height;
-
-    if (closestPoint.x === rectX) return { x: -1, y: 0 }; // Left edge
-    if (closestPoint.x === rectRight) return { x: 1, y: 0 }; // Right edge
-    if (closestPoint.y === rectY) return { x: 0, y: -1 }; // Top edge
-    if (closestPoint.y === rectBottom) return { x: 0, y: 1 }; // Bottom edge
-
-    return { x: 0, y: 1 }; // Default to bottom edge normal
+    // Resolve the collision using the generic function
+    resolveCollision(
+        ball,
+        closestPoint,
+        distanceSquared,
+        (closestPoint, distance, invDistance) => getRectangleNormal(ball, rectangle, closestPoint)
+    );
 }
-// Only use if the rectangle is rotated by an angle (like 30°)
-/*function getRectangleNormal(ball, rect, closestPoint) {
-    const epsilon = 0.1; // Small threshold to account for floating-point inaccuracies
 
-    // Destructure rectangle properties for readability
-    const { x: rectX, y: rectY, width, height } = rect;
-    const rectRight = rectX + width;
-    const rectBottom = rectY + height;
+// Function to check if the ball is far from the rectangle
+function isBallFarFromRectangle(ball, rect) {
+    const closestPoint = getClosestPointOnRectangle(ball, rect);
 
-    // Check which edge the closest point lies on
-    if (Math.abs(closestPoint.x - rectX) < epsilon) {
-        return { x: -1, y: 0 }; // Left edge
-    } else if (Math.abs(closestPoint.x - rectRight) < epsilon) {
-        return { x: 1, y: 0 }; // Right edge
-    } else if (Math.abs(closestPoint.y - rectY) < epsilon) {
-        return { x: 0, y: -1 }; // Top edge
-    } else if (Math.abs(closestPoint.y - rectBottom) < epsilon) {
-        return { x: 0, y: 1 }; // Bottom edge
-    }
+    // Calculate the squared distance from the ball to the closest point
+    const distanceSquared = getDistanceSquared(ball.x, ball.y, closestPoint.x, closestPoint.y);
 
-    // Default to bottom edge normal (fallback)
-    return { x: 0, y: 1 };
-}*/
-// Function to find the closest point on a rectangle to a given point (ball's center)
+    // Check if the distance is greater than the ball's radius
+    return distanceSquared > ball.radius * ball.radius;
+}
+
+// Helper function to calculate the closest point on a rectangle to a given point
 function getClosestPointOnRectangle(ball, rect) {
     const { x: ballX, y: ballY } = ball;
     const { x: rectX, y: rectY, width, height } = rect;
-    // Calculate the closest point on the rectangle
+
+    // Clamp the ball's position to the rectangle's boundaries
     const closestX = Math.max(rectX, Math.min(ballX, rectX + width));
     const closestY = Math.max(rectY, Math.min(ballY, rectY + height));
 
     return { x: closestX, y: closestY };
 }
 
+// Helper function to calculate the normal vector for a rectangle collision
+function getRectangleNormal(ball, rect, closestPoint) {
+    const { x: ballX, y: ballY } = ball;
+    const { x: rectX, y: rectY, width, height } = rect;
+    const { x: closestX, y: closestY } = closestPoint;
 
+    // Determine which edge the closest point lies on
+    const deltaX = ballX - closestX;
+    const deltaY = ballY - closestY;
 
+    // Check if the closest point is closer horizontally or vertically
+    if (Math.abs(deltaX) > Math.abs(deltaY)) {
+        // Closer to left or right edge
+        return deltaX > 0 ? { x: 1, y: 0 } : { x: -1, y: 0 };
+    } else {
+        // Closer to top or bottom edge
+        return deltaY > 0 ? { x: 0, y: 1 } : { x: 0, y: -1 };
+    }
+}
 
 
 
@@ -864,83 +968,73 @@ function getClosestPointOnRectangle(ball, rect) {
 
 
 
+// Function to resolve collision between a ball and any shape
+function resolveCollision(ball, closestPoint, distanceSquared, getNormal) {
+    // Early exit if the ball is not colliding
+    if (distanceSquared >= ball.radius * ball.radius) return;
 
+    const distance = Math.sqrt(distanceSquared);
+    const invDistance = 1 / distance; // Avoid division in the loop
+    const normal = getNormal(closestPoint, distance, invDistance);
 
+    // Calculate the overlap between the ball and the closest point
+    const overlap = ball.radius - distance;
 
+    // Correct the ball's position to prevent overlap
+    ball.x += normal.x * overlap;
+    ball.y += normal.y * overlap;
 
+    // Calculate the relative velocity (for a static object, ball's velocity is the relative velocity)
+    const relativeVelocityX = ball.dx;
+    const relativeVelocityY = ball.dy;
 
+    // Calculate the dot product of the relative velocity and the normal vector
+    const dotProduct = relativeVelocityX * normal.x + relativeVelocityY * normal.y;
 
+    // If the ball is moving away, no collision response is needed
+    if (dotProduct > 0) return;
 
-// ======================
-// 14. Quick distance check
-// ======================
+    // Calculate the impulse (assuming the object is static)
+    const impulse = -2 * dotProduct;
 
+    // Apply the impulse to the ball's velocity
+    ball.dx += impulse * normal.x * bounceFactor; // Apply bounce factor
+    ball.dy += impulse * normal.y * bounceFactor;
 
+    // Apply friction to reduce horizontal velocity
+    ball.dx *= 1 - ball.friction;
 
-// Helper function to check if the ball is within a certain distance of the object
-function isWithinDistance(ball, object, maxDistance) {
-    if (object.type === "rectangle" || object.type === "triangle") {
-        // Use bounding box for rectangles and triangles
-        const objectBounds = getBoundingBox(object);
-        const closestX = Math.max(objectBounds.left, Math.min(ball.x, objectBounds.right));
-        const closestY = Math.max(objectBounds.top, Math.min(ball.y, objectBounds.bottom));
-        const distanceX = ball.x - closestX;
-        const distanceY = ball.y - closestY;
-        return (distanceX ** 2 + distanceY ** 2) <= maxDistance ** 2;
-    } else if (object.type === "ball") {
-        // Use center-to-center distance for balls
-        const distanceX = ball.x - object.x;
-        const distanceY = ball.y - object.y;
-        return (distanceX ** 2 + distanceY ** 2) <= maxDistance ** 2;
+    // Handle resting state: Stop the ball if its vertical velocity is negligible
+    if (Math.abs(ball.dy) < 0.1 && normal.y > 0) { // Only stop if the ball is on top of the object
+        ball.dy = 0;
+        ball.y = closestPoint.y - ball.radius; // Ensure the ball rests exactly on top
     }
-    return false;
 }
 
-// Helper function to get the bounding box of an object
-function getBoundingBox(object) {
-    if (object.type === "rectangle") {
-        return {
-            left: object.x,
-            right: object.x + object.width,
-            top: object.y,
-            bottom: object.y + object.height,
-        };
-    } else if (object.type === "triangle") {
-        const vertices = object.transformedVertices;
-        const xs = vertices.map(v => v.x);
-        const ys = vertices.map(v => v.y);
-        return {
-            left: Math.min(...xs),
-            right: Math.max(...xs),
-            top: Math.min(...ys),
-            bottom: Math.max(...ys),
-        };
-    }
-    return null;
+// Function to get the normalized normal vector for a given shape
+function getNormalFromPoint(ball, closestPoint, distance, invDistance) {
+    return {
+        x: (ball.x - closestPoint.x) * invDistance,
+        y: (ball.y - closestPoint.y) * invDistance
+    };
 }
 
-
-function isBallFarFromTriangle(ball, triangleVertices) {
-    const minX = Math.min(...triangleVertices.map(v => v.x));
-    const maxX = Math.max(...triangleVertices.map(v => v.x));
-    const minY = Math.min(...triangleVertices.map(v => v.y));
-    const maxY = Math.max(...triangleVertices.map(v => v.y));
-
-    return (
-        ball.x + ball.radius < minX ||
-        ball.x - ball.radius > maxX ||
-        ball.y + ball.radius < minY ||
-        ball.y - ball.radius > maxY
-    );
+// Helper function to normalize a vector
+function normalizeVector(dx, dy) {
+    const length = Math.sqrt(dx * dx + dy * dy);
+    if (length === 0) return { x: 1, y: 0 }; // Default direction if zero length
+    return { x: dx / length, y: dy / length };
 }
-function isBallFarFromRectangle(ball, rect) {
-    const rectRight = rect.x + rect.width;
-    const rectBottom = rect.y + rect.height;
 
-    return (
-        ball.x + ball.radius < rect.x ||
-        ball.x - ball.radius > rectRight ||
-        ball.y + ball.radius < rect.y ||
-        ball.y - ball.radius > rectBottom
-    );
+// Utility function to clamp a value within a range
+function clamp(value, min, max) {
+    return Math.max(min, Math.min(max, value));
 }
+
+// Helper function to calculate squared distance between two points
+function getDistanceSquared(x1, y1, x2, y2) {
+    const dx = x1 - x2;
+    const dy = y1 - y2;
+    return dx * dx + dy * dy;
+}
+
