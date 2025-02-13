@@ -1,0 +1,89 @@
+{
+  "objects": [
+    {
+      "type": "ball",
+      "x": "50%",
+      "y": "50h%",
+      "radius": 20,
+      "dx": 0,
+      "dy": 0,
+      "friction": 0.01,
+      "color": "orange",
+      "identifier": "main_ball"
+    },
+    {
+      "type": "ball",
+      "x": "30%",
+      "y": "35h%",
+      "radius": 50,
+      "dx": 0,
+      "dy": 0,
+      "friction": 0.1,
+      "color": "red",
+      "identifier": "default"
+    },
+    {
+      "type": "triangle",
+      "x": "90%",
+      "y": "70h%",
+      "size": 60,
+      "dx": 0,
+      "dy": 0,
+      "rotation": 0,
+      "friction": 0.1,
+      "color": "blue",
+      "identifier": "default"
+    },
+    {
+      "type": "triangle",
+      "x": "70%",
+      "y": "35h%",
+      "size": 60,
+      "dx": 0,
+      "dy": 0,
+      "rotation": 1.05,
+      "friction": 0.1,
+      "color": "black",
+      "identifier": "default"
+    },
+    {
+      "type": "rectangle",
+      "x": "0",
+      "y": "90h%",
+      "width": "100%",
+      "height": 30,
+      "dx": 0,
+      "dy": 0,
+      "rotation": 0,
+      "friction": 0.1,
+      "color": "green",
+      "identifier": "floor"
+    },
+    {
+      "type": "rectangle",
+      "x": "45%",
+      "y": "60h%",
+      "width": "10%",
+      "height": 60,
+      "dx": 0,
+      "dy": 0,
+      "rotation": 0,
+      "friction": 0.1,
+      "color": "grey",
+      "identifier": "default"
+    },
+    {
+      "type": "rectangle",
+      "x": "8%",
+      "y": "60h%",
+      "width": "10%",
+      "height": 110,
+      "dx": 0,
+      "dy": 0,
+      "rotation": 0,
+      "friction": 0.1,
+      "color": "cyan",
+      "identifier": "default"
+    }
+  ]
+}

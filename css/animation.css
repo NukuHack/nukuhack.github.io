@@ -1,6 +1,10 @@
 
 canvas {
     display: block;
+    width: 95%;
+    height: auto;
+    align-self: center;
+    border: 1px solid var(--border-cold-color);
 }
 /* Custom Context Menu Styling */
 #customContextMenu {

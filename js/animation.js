@@ -5,6 +5,7 @@ TABLE OF CONTENTS
 1. Constants and basic helping values
 2. FPS counter
 3. Body Classes and Drawings
+3.5. Json and shape building
 4. Custom right click menu
 5. Populate canvas
 6. Ball movement
@@ -15,7 +16,6 @@ TABLE OF CONTENTS
 11. Triangle collision helper
 12. Rectangle collision helper
 13. Other Vector stuff
-14. Quick distance check
 */
 
 
@@ -31,17 +31,15 @@ const canvas = document.getElementById('gameCanvas');
 canvas.width = window.innerWidth; // Set canvas size to full screen
 canvas.height = window.innerHeight*0.8;
 let mouseDownTime = 0;
-let mouseUpTime = 0;
 let paused = false; // Global variable to track pause state
 let isDragging= false;
+let gameObjectManager;
+let mainBall;
+let floorRect;
 
 const ctx = canvas.getContext('2d');
 let lastTime = performance.now(); // Track the last frame time
 let fps = 0; // Store the current FPS
-
-let mouseX = 0; // Mouse tracking for horizontal movement
-let active = true;
-let isMouseDown = false; // Track whether the mouse button is pressed
 
 // Physics constants
 const gravity = 0.1; // Gravity strength
@@ -49,6 +47,9 @@ const bounceFactor = 0.8; // Adjust bounce factor (0.8 = 80% energy retained)
 let hasFloor = true; // Whether the floor exists
 let currentGravity = gravity;
 
+// Gravity constants
+const GRAVITY_X_MULTIPLIER = 0.5; // Strength of gravity in the X-axis
+const GRAVITY_Y_MULTIPLIER = 0.5; // Strength of gravity in the Y-axis
 
 
 
@@ -70,7 +71,7 @@ function updateFPS() {
 }
 
 function drawFPS() {
-    ctx.fillStyle = "white"; // Set the text color
+    ctx.fillStyle = PrefersDark ? "black" : "white"; // Set the text color
     ctx.font = "16px Arial"; // Set the font size and family
     ctx.fillText(`FPS: ${fps}`, canvas.width/30, canvas.height/15); // Display the FPS in the top-left corner
 }
@@ -136,13 +137,22 @@ class GameObjectManager {
 
 class GameObject {
     constructor(x, y, dx, dy, friction, color, identifier) {
-        this.x = x;
-        this.y = y;
-        this.dx = dx;
-        this.dy = dy;
-        this.friction = friction;
-        this.color = color;
-        this.identifier = identifier;
+        if (typeof x !== 'number' || typeof y !== 'number') {
+            throw new Error('Position values must be numbers.');
+        }
+        if (typeof dx !== 'number' || typeof dy !== 'number') {
+            throw new Error('Velocity values must be numbers.');
+        }
+        if (friction < 0 || friction > 1) {
+            throw new Error('Friction must be between 0 and 1.');
+        }
+        this.x = x || 0;
+        this.y = y || 0;
+        this.dx = dx || 0;
+        this.dy = dy || 0;
+        this.friction = friction || 0.2;
+        this.color = color || "purple";
+        this.identifier = identifier || "default";
     }
 
     // Apply friction to velocity
@@ -152,8 +162,9 @@ class GameObject {
     }
 
     // Apply gravity to vertical velocity
-    applyGravity() {
-        this.dy += currentGravity;
+    applyMovement(currentYMovement, currentXMovement) {
+        this.dy += currentYMovement;
+        this.dx += currentXMovement;
     }
 
     // Update position based on velocity
@@ -171,8 +182,42 @@ class GameObject {
     // Default update method that calls all sub-methods
     update() {
         this.applyFriction();
-        this.applyGravity();
+        this.applyMovement();
         this.updatePosition();
+    }
+
+    // Abstract method for drawing
+    draw(ctx) {
+        throw new Error('draw() method must be implemented by subclasses.');
+    }
+
+    handleEdgeCollision(canvas) {
+        const { x, y, radius } = this;
+
+        // Horizontal collision
+        this.handleEdgeHorizontalCollision(canvas, x, radius);
+        // Vertical collision
+        this.handleEdgeVerticalCollision(canvas, y, radius);
+    }
+
+    handleEdgeHorizontalCollision(canvas, x, radius) {
+        if (x - radius <= 0) {
+            this.dx = -(Math.abs(this.dx) * (1 - this.friction) * bounceFactor);
+            this.x = radius; // Prevent sinking
+        } else if (x + radius >= canvas.width) {
+            this.dx = -(Math.abs(this.dx) * (1 - this.friction) * bounceFactor);
+            this.x = canvas.width - radius; // Prevent sinking
+        }
+    }
+
+    handleEdgeVerticalCollision(canvas, y, radius) {
+        if (y - radius <= 0) {
+            this.dy = Math.abs(this.dy) * (1 - this.friction) * bounceFactor;
+            this.y = radius; // Prevent sinking
+        } else if (y + radius >= canvas.height) {
+            this.dy = -(Math.abs(this.dy) * (1 - this.friction) * bounceFactor);
+            this.y = canvas.height - radius; // Prevent sinking
+        }
     }
 }
 
@@ -199,50 +244,10 @@ class Ball extends GameObject {
 
         this.updatePosY();
         this.applyFriction();
-        this.applyGravity();
+        this.applyMovement(currentGravity,0);
 
-        this.handleEdgeCollision()
+        this.handleEdgeCollision(canvas);
 
-    }
-    // Handle collisions with walls, ceiling, and bottom
-    handleEdgeCollision() {
-        const radius = this.radius;
-
-        this.wallCollision(radius)
-        //this.floorCollision(radius)
-        this.ceilingCollision(radius)
-    }
-    wallCollision(radius){
-        // Bounce off the left and right walls
-        if (this.x - radius <= 0) {
-            this.dx = -(Math.abs(this.dx) * (1 - this.friction) * bounceFactor); // Reverse direction and reduce speed
-
-            // Optionally, stop the ball from sinking over the walls
-            this.x = 0 + radius;
-        } else if (this.x + radius >= canvas.width) {
-            this.dx = -(Math.abs(this.dx) * (1 - this.friction) * bounceFactor); // Reverse direction and reduce speed
-
-            // Optionally, stop the ball from sinking over the walls
-            this.x = canvas.width - radius;
-        }
-    }
-    floorCollision(radius){
-        // Bounce off the bottom of the canvas
-        if (this.y + radius >= canvas.height) {
-            this.dy = -(Math.abs(this.dy) * (1 - this.friction) * bounceFactor); // Reduce speed and reverse direction
-
-            // Optionally, stop the ball from sinking below the bottom edge
-            this.y = canvas.height - radius;
-        }
-    }
-    ceilingCollision(radius){
-        // Bounce off the ceiling
-        if (this.y - radius <= 0) {
-            this.dy = Math.abs(this.dy) * (1 - this.friction) * bounceFactor; // Reduce speed and reverse direction
-
-            // Optionally, stop the ball from sinking below the bottom edge
-            this.y = 0 + radius;
-        }
     }
 }
 
@@ -250,7 +255,7 @@ class Triangle extends GameObject {
     constructor(x, y, size, dx, dy, rotation, friction, color, identifier) {
         super(x, y, dx, dy, friction, color, identifier);
         this.size = size;
-        this.rotation = rotation;
+        this.rotation = rotation; // Rotation angle in radians
         this.type = "triangle";
 
         // Precompute the height of the equilateral triangle
@@ -264,7 +269,8 @@ class Triangle extends GameObject {
         ];
 
         // Initialize the transformed vertices
-        this.transformedVertices = this.localVertices.map(v => ({ ...v }));
+        this.transformedVertices = [{x:0,y:0},{x:0,y:0},{x:0,y:0},];
+        this.updateVertices();
     }
 
     // Update the transformed vertices based on rotation and position
@@ -303,102 +309,193 @@ class Triangle extends GameObject {
 }
 
 class Rectangle extends GameObject {
-    constructor(x, y, width, height, dx, dy, friction, color, identifier) {
+    constructor(x, y, width, height, dx, dy, rotation, friction, color, identifier) {
         super(x, y, dx, dy, friction, color, identifier);
         this.width = width;
         this.height = height;
+        this.rotation = rotation; // Rotation angle in radians
         this.type = "rectangle";
+
+        // Precompute the vertices in local space (relative to the center)
+        this.localVertices = [
+            { x: 0, y: 0}, // Top-left
+            { x: this.width, y: 0},  // Top-right
+            { x: this.width, y: this.height},   // Bottom-right
+            { x: 0, y: this.height}   // Bottom-left
+        ];
+
+        // Initialize the transformed vertices
+        this.transformedVertices = [{x:0,y:0},{x:0,y:0},{x:0,y:0},{x:0,y:0}];
+        this.updateVertices();
     }
 
+    // Update the transformed vertices based on rotation and position
+    updateVertices() {
+        const cosTheta = Math.cos(this.rotation);
+        const sinTheta = Math.sin(this.rotation);
+
+        for (let i = 0; i < this.localVertices.length; i++) {
+            const local = this.localVertices[i];
+            const transformed = this.transformedVertices[i];
+
+            // Apply rotation
+            transformed.x = local.x * cosTheta - local.y * sinTheta;
+            transformed.y = local.x * sinTheta + local.y * cosTheta;
+
+            // Apply translation
+            transformed.x += this.x;
+            transformed.y += this.y;
+        }
+    }
+
+    // Draw the rectangle
     draw(ctx) {
+        // Update the vertices if the rectangle has moved or rotated
+        this.updateVertices();
+
+        // Draw the rectangle
+        ctx.beginPath();
+        ctx.moveTo(this.transformedVertices[0].x, this.transformedVertices[0].y);
+        for (let i = 1; i < this.transformedVertices.length; i++) {
+            ctx.lineTo(this.transformedVertices[i].x, this.transformedVertices[i].y);
+        }
+        ctx.closePath(); // Close the path by connecting the last vertex to the first
+
         ctx.fillStyle = this.color;
-        ctx.fillRect(this.x, this.y, this.width, this.height);
+        ctx.fill();
     }
 }
-//TODO: Put this in an external Json file :)
 
-// Ball objects
-const mainBall = new Ball(
-    canvas.width * 0.5, // x
-    canvas.height * 0.5, // y
-    20, // radius
-    0, // dx
-    0, // dy
-    0.01, // friction
-    'orange', // color
-    'main_ball' // identifier
-);
 
-const testBall = new Ball(
-    canvas.width * 0.3, // x
-    canvas.height * 0.5, // y
-    50, // radius
-    0, // dx
-    0, // dy
-    0.1, // friction
-    'red', // color
-    'test_ball' // identifier
-);
 
-// Triangle object
-const testTriangle = new Triangle(
-    canvas.width * 0.9, // x
-    canvas.height * 0.55, // y
-    60, // size
-    0, // dx
-    0, // dy
-    0, // rotation
-    0.1, // friction
-    'blue', // color
-    'blue_triangle' // identifier
-);
-const rotatedTriangle = new Triangle(
-    canvas.width * 0.68, // x
-    canvas.height * 0.5, // y
-    60, // size
-    0, // dx
-    0, // dy
-    1.05, // rotation
-    0.1, // friction
-    'black', // color
-    'black_triangle' // identifier
-);
 
-// Rectangle object
-const floorRect = new Rectangle(
-    0, // x
-    canvas.height * 0.8, // y
-    canvas.width, // width
-    100, // height
-    0, // dx
-    0, // dy
-    0.1, // friction
-    'green', // color
-    'floor' // identifier
-);
 
-const testRect = new Rectangle(
-    canvas.width*0.45, // x
-    canvas.height * 0.6, // y
-    canvas.width/10, // width
-    50, // height
-    0, // dx
-    0, // dy
-    0.1, // friction
-    'grey', // color
-    'test_rectangle' // identifier
-);
 
-// Create an instance of GameObjectManager
-const gameObjectManager = new GameObjectManager();
 
-// Add your objects to the manager
-gameObjectManager.addObject(floorRect);
-gameObjectManager.addObject(testTriangle);
-gameObjectManager.addObject(rotatedTriangle);
-gameObjectManager.addObject(mainBall);
-gameObjectManager.addObject(testBall);
-gameObjectManager.addObject(testRect);
+// ======================
+// 3.5. Json and shape building
+// ======================
+
+
+
+
+
+
+
+
+// Function to create objects based on type
+function createObjectFromData(data, canvas) {
+    //console.log(data);
+    switch (data.type) {
+        case "ball":
+            return new Ball(
+                //(x, y, radius, dx, dy, friction, color, identifier)
+                evaluateValue(data.x, canvas),
+                evaluateValue(data.y, canvas),
+                data.radius,
+                data.dx,
+                data.dy,
+                data.friction,
+                data.color,
+                data.identifier,
+            );
+        case "triangle":
+            return new Triangle(
+                //(x, y, size, dx, dy, rotation, friction, color, identifier)
+                evaluateValue(data.x, canvas),
+                evaluateValue(data.y, canvas),
+                data.size,
+                data.dx,
+                data.dy,
+                data.rotation, // Rotation in radians
+                data.friction,
+                data.color,
+                data.identifier,
+            );
+        case "rectangle":
+            return new Rectangle(
+                //(x, y, width, height, dx, dy, rotation, friction, color, identifier)
+                evaluateValue(data.x, canvas),
+                evaluateValue(data.y, canvas),
+                evaluateValue(data.width, canvas),
+                evaluateValue(data.height, canvas),
+                data.dx,
+                data.dy,
+                data.rotation, // Rotation in radians
+                data.friction,
+                data.color,
+                data.identifier,
+            );
+        default:
+            throw new Error(`Unknown object type: ${data.type}`);
+    }
+}
+async function loadGameObjects(place,canvas) {
+    try {
+        const response = await fetch(place);
+        if (!response.ok) {
+            throw new Error(`Failed to load game objects: ${response.status}`);
+        }
+        const jsonData = await response.json();
+
+        // Create an instance of GameObjectManager
+        const gameObjectManager = new GameObjectManager();
+
+        // Add objects to the manager
+        jsonData.objects.forEach(objectData => {
+            const obj = createObjectFromData(objectData, canvas);
+            gameObjectManager.addObject(obj);
+        });
+
+        console.log("Game objects loaded successfully!");
+        return gameObjectManager;
+    } catch (error) {
+        console.error("Error loading game objects:", error);
+    }
+}
+
+// Function to evaluate relative values
+function evaluateValue(value, canvas) {
+    if (typeof value === "string") {
+        if (value.endsWith("%")) {
+            // Handle percentage values
+            const percent = parseFloat(value);
+            //console.log(percent)
+            if (value.includes("h")) {
+                return canvas.height * (percent / 100);
+            } else {
+                return canvas.width * (percent / 100); // Default to width
+            }
+        } else {
+            // Fallback to parsing as a number
+            try{
+                return parseFloat(value);
+            }
+            catch (e){
+                console.error(e);
+                return null;
+            }
+        }
+    }
+    return value; // Return as-is if not a string
+}
+
+// Call the function to load objects
+loadGameObjects('./json/gameObjects.json',canvas).then(a => {
+    if (a) {
+        gameObjectManager = a;
+        //console.log("Game Object Manager:", gameObjectManager);
+
+        // Initialize mainBall and floorRect
+        mainBall = gameObjectManager.getObjectByIdentifier("main_ball");
+        floorRect = gameObjectManager.getObjectByIdentifier("floor");
+
+        // Start the animation loop
+        animate();
+    }
+});
+
+
 
 
 
@@ -408,6 +505,7 @@ gameObjectManager.addObject(testRect);
 // ======================
 // 4. Custom right click menu
 // ======================
+
 
 
 // Function to show the custom context menu
@@ -424,7 +522,7 @@ function hideCustomContextMenu() {
 }
 
 // Add event listeners for showing/hiding the context menu
-document.addEventListener('contextmenu', showCustomContextMenu);
+canvas.addEventListener('contextmenu', showCustomContextMenu);
 document.addEventListener('click', hideCustomContextMenu);
 
 // Add functionality to menu options using delegation
@@ -462,17 +560,6 @@ customContextMenu.addEventListener('click', (event) => {
 
 
 
-// Function to draw the triangle's vertices (for debugging)
-function drawTriangleVertices(triangle) {
-    const vertices = triangle.transformedVertices;
-    ctx.fillStyle = "red";
-    vertices.forEach(vertex => {
-        ctx.beginPath();
-        ctx.arc(vertex.x, vertex.y, 5, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.closePath();
-    });
-}
 
 // Resize handler
 window.addEventListener('resize', () => {
@@ -520,22 +607,28 @@ function drawPausedText(ctx, canvas) {
 // Function to handle both mouse and touch events
 function handleScreenEvent(event, type, ball) {
     const { clientX, clientY } = getEventCoordinates(event);
-    const rect = canvas.getBoundingClientRect();
+    const rect = canvas.getBoundingClientRect(); // Get the bounding rectangle of the canvas
 
-    // logic
+    // Normalize the mouse/touch position relative to the canvas
+    const scaleX = canvas.width / rect.width; // Scale factor for width
+    const scaleY = canvas.height / rect.height; // Scale factor for height
+    const canvasX = (clientX - rect.left) * scaleX; // Adjusted X coordinate
+    const canvasY = (clientY - rect.top) * scaleY; // Adjusted Y coordinate
+
+    // Logic for dragging and jumping
     if (type === 'touchstart' || type === 'mousedown' && event.button === 0) {
         isDragging = true;
         mouseDownTime = Date.now(); // Record the time when the mouse is pressed
-    } else if (isDragging&&(type === 'touchmove' || type === 'mousemove')) {
-        ball.x = clientX - rect.left; // Update ball position
+    } else if (isDragging && (type === 'touchmove' || type === 'mousemove')) {
+        ball.x = canvasX; // Update ball position with normalized coordinates
         ball.dx = 0; // Reset velocity while dragging
     } else if (type === 'touchend' || type === 'mouseup' && event.button === 0) {
         isDragging = false;
         // Check for jump condition on mouse/touch release
         const clickDuration = Date.now() - mouseDownTime;
-        //console.log(clickDuration);
-        if (clickDuration < 100)
+        if (clickDuration < 100) {
             mainBall.dy = -5; // Apply upward force for jumping
+        }
     }
 }
 
@@ -559,40 +652,73 @@ function getEventCoordinates(event) {
 });
 
 
-/*
+
 // TODO: make this actually work
 
+/**
+ * Class to manage device orientation-based gravity for balls.
+ */
+class GravityManager {
+    constructor() {
+        this.isSupported = !!window.DeviceOrientationEvent; // Check if API is supported
+        this.isDragging = false; // Track if the user is dragging the ball
+    }
 
-// Gravity constants
-const GRAVITY_X_MULTIPLIER = 0.5; // Strength of gravity in the X-axis
-const GRAVITY_Y_MULTIPLIER = 0.5; // Strength of gravity in the Y-axis
+    /**
+     * Start listening for device orientation changes.
+     * @param {Ball} ball - The ball object affected by gravity.
+     */
+    start(ball) {
+        if (!this.isSupported) {
+            console.warn("DeviceOrientation API is not supported on this device.");
+            return;
+        }
 
-// Function to handle device orientation changes
-function handleOrientation(event,ball) {
-    const beta = event.beta || 0; // Front-to-back tilt (-180 to 180)
-    const gamma = event.gamma || 0; // Left-to-right tilt (-90 to 90)
+        window.addEventListener('deviceorientation', (event) => {
+            this.applyGravity(event, ball);
+        }, true);
+    }
 
-    // Normalize tilt angles to [-1, 1] range
-    const normalizedBeta = Math.min(Math.max(beta / 180, -1), 1);
-    const normalizedGamma = Math.min(Math.max(gamma / 90, -1), 1);
+    /**
+     * Apply gravity forces based on device orientation.
+     * @param {Event} event - The device orientation event.
+     * @param {Ball} ball - The ball object affected by gravity.
+     */
+    applyGravity(event, ball) {
+        const beta = event.beta || 0; // Front-to-back tilt (-180 to 180)
+        const gamma = event.gamma || 0; // Left-to-right tilt (-90 to 90)
 
-    // Apply gravity forces based on the tilt angles
-    if (!isDragging) {
-        ball.dx += -normalizedGamma * GRAVITY_X_MULTIPLIER; // Negative because gamma increases to the right
-        ball.dy += normalizedBeta * GRAVITY_Y_MULTIPLIER; // Positive because beta increases forward
+        // Normalize tilt angles to [-1, 1] range
+        const normalizedBeta = Math.min(Math.max(beta / 180, -1), 1);
+        const normalizedGamma = Math.min(Math.max(gamma / 90, -1), 1);
+
+        // Apply gravity forces only when the ball is not being dragged
+        if (!this.isDragging) {
+            ball.dx += -normalizedGamma * GRAVITY_X_MULTIPLIER; // Negative because gamma increases to the right
+            ball.dy += normalizedBeta * GRAVITY_Y_MULTIPLIER; // Positive because beta increases forward
+        }
+    }
+
+    /**
+     * Set the drag state of the ball.
+     * @param {boolean} isDragging - Whether the ball is being dragged.
+     */
+    setDraggingState(isDragging) {
+        this.isDragging = isDragging;
     }
 }
 
-// Check if the DeviceOrientation API is supported
-if (window.DeviceOrientationEvent) {
-    // Start listening for orientation changes
-    window.addEventListener('deviceorientation', (event) => {
-        handleOrientation(event,mainBall);
-    }, true);
-} else {
-    console.warn("DeviceOrientation API is not supported on this device.");
-}
-*/
+// Example usage:
+const gravityManager = new GravityManager();
+
+// Start applying gravity to the main ball
+const gravyStart = "gravityManager.start(mainBall);";
+
+// Optionally, you can toggle the drag state when interacting with the ball
+// For example, during mouse/touch events:
+// gravityManager.setDraggingState(true); // When drag starts
+// gravityManager.setDraggingState(false); // When drag ends
+
 
 
 
@@ -621,33 +747,23 @@ function animate() {
         // this is basically for stress-test also small change checking ->
         // like changing a single function to be quicker might not be noticeable
         // but running it (200K * all items) is actually kinda slow ... not too much tho
-            gameObjectManager.handleCollisionsForObject(mainBall); // Handle collisions
+        gameObjectManager.handleCollisionsForObject(mainBall); // Handle collisions
 
         // Draw objects conditionally
         gameObjectManager.drawConditionally(ctx, hasFloor);
 
         drawFPS(); // Draw the FPS counter
     } else {
-        /*
-        // Draw "Paused" text on the canvas
-        ctx.fillStyle = "white";
-        ctx.font = "24px Arial";
-        ctx.fillText("Paused", canvas.width/20*9.5, canvas.height/15);
-
-         */
         drawPausedText(ctx,canvas);
     }
     requestAnimationFrame(animate); // Always request the next frame
 }
 
-// Start the animation loop
-animate();
-
 // Add event listener for spacebar to toggle pause/resume
 document.addEventListener("keydown", (event) => {
     if (event.code === "Space") // Check if the spacebar is pressed
         paused = !paused; // Toggle the pause state
-        //console.log(paused ? "Animation paused" : "Animation resumed");
+    //console.log(paused ? "Animation paused" : "Animation resumed");
 });
 
 
@@ -767,18 +883,18 @@ function resolveBallBallCollision(ball1, ball2) {
         ball2.x -= correctionX;
         ball2.y -= correctionY;
          */
-}
+    }
 }
 
 // Function to check if two balls are far apart
 function isBallFarFromBall(ball1, ball2) {
-const distanceSquared = getDistanceSquared(ball1.x, ball1.y, ball2.x, ball2.y);
-const radiusSum = ball1.radius + ball2.radius;
-const radiusSumSquared = radiusSum * radiusSum; // Square of the sum of radii
+    const distanceSquared = getDistanceSquared(ball1.x, ball1.y, ball2.x, ball2.y);
+    const radiusSum = ball1.radius + ball2.radius;
+    const radiusSumSquared = radiusSum * radiusSum; // Square of the sum of radii
 
 // Add a small epsilon value to account for floating-point inaccuracies
-const epsilon = 1; // Small tolerance
-return distanceSquared > radiusSumSquared + epsilon;
+    const epsilon = 1; // Small tolerance
+    return distanceSquared > radiusSumSquared + epsilon;
 }
 
 
@@ -900,11 +1016,9 @@ function isBallFarFromTriangle(ball, triangleVertices) {
 
 
 
-
-// Function to resolve collision between a ball and a rectangle
+// Function to resolve collision between a ball and a rotated rectangle
 function resolveRectangleCollision(ball, rectangle) {
     const closestPoint = getClosestPointOnRectangle(ball, rectangle);
-    // Calculate the squared distance between the ball's center and the closest point
     const distanceSquared = getDistanceSquared(ball.x, ball.y, closestPoint.x, closestPoint.y);
 
     // Resolve the collision using the generic function
@@ -916,49 +1030,65 @@ function resolveRectangleCollision(ball, rectangle) {
     );
 }
 
-// Function to check if the ball is far from the rectangle
-function isBallFarFromRectangle(ball, rect) {
-    const closestPoint = getClosestPointOnRectangle(ball, rect);
+// Helper function to calculate the closest point on a rotated rectangle to a given point
+function getClosestPointOnRectangle(ball, rectangle) {
+    let closestPoint = null;
+    let minDistanceSquared = Infinity;
 
-    // Calculate the squared distance from the ball to the closest point
-    const distanceSquared = getDistanceSquared(ball.x, ball.y, closestPoint.x, closestPoint.y);
+    // Get the transformed vertices of the rectangle
+    const vertices = rectangle.transformedVertices;
 
-    // Check if the distance is greater than the ball's radius
-    return distanceSquared > ball.radius * ball.radius;
+    // Check each edge of the rectangle
+    for (let i = 0; i < vertices.length; i++) {
+        const start = vertices[i];
+        const end = vertices[(i + 1) % vertices.length]; // Next vertex (wraps around)
+        const point = getClosestPointOnLine(ball, start, end);
+
+        const dx = ball.x - point.x;
+        const dy = ball.y - point.y;
+        const distanceSquared = dx * dx + dy * dy;
+
+        if (distanceSquared < minDistanceSquared) {
+            minDistanceSquared = distanceSquared;
+            closestPoint = point;
+        }
+    }
+
+    // Check the rectangle's vertices
+    for (const vertex of vertices) {
+        const dx = ball.x - vertex.x;
+        const dy = ball.y - vertex.y;
+        const distanceSquared = dx * dx + dy * dy;
+
+        if (distanceSquared < minDistanceSquared) {
+            minDistanceSquared = distanceSquared;
+            closestPoint = vertex;
+        }
+    }
+
+    return closestPoint;
 }
 
-// Helper function to calculate the closest point on a rectangle to a given point
-function getClosestPointOnRectangle(ball, rect) {
+// Helper function to calculate the normal vector for a rotated rectangle collision
+function getRectangleNormal(ball, rectangle, closestPoint) {
     const { x: ballX, y: ballY } = ball;
-    const { x: rectX, y: rectY, width, height } = rect;
-
-    // Clamp the ball's position to the rectangle's boundaries
-    const closestX = Math.max(rectX, Math.min(ballX, rectX + width));
-    const closestY = Math.max(rectY, Math.min(ballY, rectY + height));
-
-    return { x: closestX, y: closestY };
-}
-
-// Helper function to calculate the normal vector for a rectangle collision
-function getRectangleNormal(ball, rect, closestPoint) {
-    const { x: ballX, y: ballY } = ball;
-    const { x: rectX, y: rectY, width, height } = rect;
     const { x: closestX, y: closestY } = closestPoint;
 
-    // Determine which edge the closest point lies on
-    const deltaX = ballX - closestX;
-    const deltaY = ballY - closestY;
+    // Calculate the vector from the closest point to the ball's center
+    const dx = ballX - closestX;
+    const dy = ballY - closestY;
 
-    // Check if the closest point is closer horizontally or vertically
-    if (Math.abs(deltaX) > Math.abs(deltaY)) {
-        // Closer to left or right edge
-        return deltaX > 0 ? { x: 1, y: 0 } : { x: -1, y: 0 };
-    } else {
-        // Closer to top or bottom edge
-        return deltaY > 0 ? { x: 0, y: 1 } : { x: 0, y: -1 };
-    }
+    // Normalize the vector to get the normal
+    return normalizeVector(dx, dy);
 }
 
+// Function to check if the ball is far from the rotated rectangle
+function isBallFarFromRectangle(ball, rectangle) {
+    const closestPoint = getClosestPointOnRectangle(ball, rectangle);
+    const distanceSquared = getDistanceSquared(ball.x, ball.y, closestPoint.x, closestPoint.y);
+
+    return distanceSquared > ball.radius * ball.radius;
+}
 
 
 

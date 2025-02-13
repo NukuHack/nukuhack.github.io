@@ -1,5 +1,6 @@
 const body = document.querySelector("body");
 const Url = window.location.href;
+let PrefersDark = true;
 const urlImportant = Url.slice(Url.lastIndexOf('/')+1);
 const currentUrl = urlImportant.slice(0,urlImportant.indexOf("."));
 if (currentUrl=="") window.location.href="index.html";
@@ -208,7 +209,7 @@ function ModalClose() {
 }
 
 function DarkModeLoad() {
-    let PrefersDark = GetFromLocalStorage("PrefersDark");
+    PrefersDark = GetFromLocalStorage("PrefersDark");
     if (PrefersDark===undefined){
         PrefersDark= window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
         SaveToLocalStorage("PrefersDark", PrefersDark);
@@ -230,10 +231,12 @@ DarkModeLoad();
 function ToggleDarkMode() {
     if (DarkReader.isEnabled()) {
         DarkReader.disable()
-        SaveToLocalStorage("PrefersDark", false);
+        PrefersDark = false;
+        SaveToLocalStorage("PrefersDark", PrefersDark);
     } else {
         DarkReader.enable();
-        SaveToLocalStorage("PrefersDark", true);
+        PrefersDark = true;
+        SaveToLocalStorage("PrefersDark", PrefersDark);
     }
 }
 
