@@ -657,14 +657,16 @@ document.addEventListener("keydown", (event) => {
 // Generalized function to handle collisions
 function handleCollision(ball, object) {
     if (ball === object) return;
-    const ballRadius = ball.radius;
+    if (ball.dy === 0 && ball.dx === 0) return;
+
+    if (object.rotation)
+        console.log(object.rotation);
 
     if (object.type === "rectangle") {
         if (object.identifier === "floor" && !hasFloor) return;
 
         // Quick check: Is the ball far from the rectangle?
         const { isFar, closestPoint, distanceSquared } = isBallFarFromRectangle(ball, object);
-        
         if (isFar) return; // Quick exit if the ball is far from the rectangle
 
         // Resolve the collision
@@ -675,13 +677,9 @@ function handleCollision(ball, object) {
 
         // Perform the quick check and get the closest point and distance
         const { isFar, closestPoint, distanceSquared } = isBallFarFromTriangle(ball, triangleVertices);
-
         if (isFar) return; // Quick exit if the ball is far from the triangle
 
-        // Check for collision using the precomputed distance
-        if (distanceSquared < ballRadius * ballRadius) {
-            resolveBallTriangleCollision(ball, triangleVertices, closestPoint, distanceSquared);
-        }
+        resolveBallTriangleCollision(ball, triangleVertices, closestPoint, distanceSquared);
     } else if (object.type === "ball") {
         // Check for collision and resolve it
         resolveBallBallCollision(ball, object);
