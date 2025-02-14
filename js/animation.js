@@ -785,7 +785,7 @@ function evaluateValue(value) {
                 return canvas.width * (percent / 100); // Default to width
             }
         } else if (value.endsWith("p")) {
-            const pyPercent = parseFloat(value)*0.01;
+            const pyPercent = parseFloat(value);
             return pyPercent* DEGREES_TO_RADIANS_MULTIPLIER;
         } else {
             // Fallback to parsing as a number
