@@ -5,13 +5,12 @@ TABLE OF CONTENTS
 1. Constants and basic helping values
 2. FPS counter
 3. Body Classes and Drawings
-3.5. Json and shape building
 4. Custom right click menu
 5. Populate canvas
 6. Ball movement
 7. Animation Loop
 8. Collision
-
+9. Json and shape building
 10. Ball collision helper
 11. Triangle collision helper
 12. Rectangle collision helper
@@ -379,134 +378,6 @@ class Rectangle extends GameObject {
 
 
 
-// ======================
-// 3.5. Json and shape building
-// ======================
-
-
-
-
-
-
-
-
-// Function to create objects based on type
-function createObjectFromData(data, canvas) {
-    //console.log(data);
-    switch (data.type) {
-        case "ball":
-            return new Ball(
-                //(x, y, radius, dx, dy, friction, color, identifier)
-                evaluateValue(data.x, canvas),
-                evaluateValue(data.y, canvas),
-                data.radius,
-                data.dx,
-                data.dy,
-                data.friction,
-                data.color,
-                data.identifier,
-            );
-        case "triangle":
-            return new Triangle(
-                //(x, y, size, dx, dy, rotation, friction, color, identifier)
-                evaluateValue(data.x, canvas),
-                evaluateValue(data.y, canvas),
-                data.size,
-                data.dx,
-                data.dy,
-                data.rotation, // Rotation in radians
-                data.friction,
-                data.color,
-                data.identifier,
-            );
-        case "rectangle":
-            return new Rectangle(
-                //(x, y, width, height, dx, dy, rotation, friction, color, identifier)
-                evaluateValue(data.x, canvas),
-                evaluateValue(data.y, canvas),
-                evaluateValue(data.width, canvas),
-                evaluateValue(data.height, canvas),
-                data.dx,
-                data.dy,
-                data.rotation, // Rotation in radians
-                data.friction,
-                data.color,
-                data.identifier,
-            );
-        default:
-            throw new Error(`Unknown object type: ${data.type}`);
-    }
-}
-async function loadGameObjects(place,canvas) {
-    try {
-        const response = await fetch(place);
-        if (!response.ok) {
-            throw new Error(`Failed to load game objects: ${response.status}`);
-        }
-        const jsonData = await response.json();
-
-        // Create an instance of GameObjectManager
-        const gameObjectManager = new GameObjectManager();
-
-        // Add objects to the manager
-        jsonData.objects.forEach(objectData => {
-            const obj = createObjectFromData(objectData, canvas);
-            gameObjectManager.addObject(obj);
-        });
-
-        console.log("Game objects loaded successfully!");
-        return gameObjectManager;
-    } catch (error) {
-        console.error("Error loading game objects:", error);
-    }
-}
-
-// Function to evaluate relative values
-function evaluateValue(value, canvas) {
-    if (typeof value === "string") {
-        if (value.endsWith("%")) {
-            // Handle percentage values
-            const percent = parseFloat(value);
-            //console.log(percent)
-            if (value.includes("h")) {
-                return canvas.height * (percent / 100);
-            } else {
-                return canvas.width * (percent / 100); // Default to width
-            }
-        } else {
-            // Fallback to parsing as a number
-            try{
-                return parseFloat(value);
-            }
-            catch (e){
-                console.error(e);
-                return null;
-            }
-        }
-    }
-    return value; // Return as-is if not a string
-}
-
-// Call the function to load objects
-loadGameObjects('./json/gameObjects.json',canvas).then(a => {
-    if (a) {
-        gameObjectManager = a;
-        //console.log("Game Object Manager:", gameObjectManager);
-
-        // Initialize mainBall and floorRect
-        mainBall = gameObjectManager.getObjectByIdentifier("main_ball");
-        floorRect = gameObjectManager.getObjectByIdentifier("floor");
-
-        // Start the animation loop
-        animate();
-    }
-});
-
-
-
-
-
-
 
 
 // ======================
@@ -818,6 +689,133 @@ function handleCollision(ball, object) {
         }
     }
 }
+
+
+
+
+
+
+
+
+// ======================
+// 9. Json and shape building
+// ======================
+
+
+
+
+
+// Function to create objects based on type
+function createObjectFromData(data, canvas) {
+    //console.log(data);
+    switch (data.type) {
+        case "ball":
+            return new Ball(
+                //(x, y, radius, dx, dy, friction, color, identifier)
+                evaluateValue(data.x, canvas),
+                evaluateValue(data.y, canvas),
+                data.radius,
+                data.dx,
+                data.dy,
+                data.friction,
+                data.color,
+                data.identifier,
+            );
+        case "triangle":
+            return new Triangle(
+                //(x, y, size, dx, dy, rotation, friction, color, identifier)
+                evaluateValue(data.x, canvas),
+                evaluateValue(data.y, canvas),
+                data.size,
+                data.dx,
+                data.dy,
+                data.rotation, // Rotation in radians
+                data.friction,
+                data.color,
+                data.identifier,
+            );
+        case "rectangle":
+            return new Rectangle(
+                //(x, y, width, height, dx, dy, rotation, friction, color, identifier)
+                evaluateValue(data.x, canvas),
+                evaluateValue(data.y, canvas),
+                evaluateValue(data.width, canvas),
+                evaluateValue(data.height, canvas),
+                data.dx,
+                data.dy,
+                data.rotation, // Rotation in radians
+                data.friction,
+                data.color,
+                data.identifier,
+            );
+        default:
+            throw new Error(`Unknown object type: ${data.type}`);
+    }
+}
+async function loadGameObjects(place,canvas) {
+    try {
+        const response = await fetch(place);
+        if (!response.ok) {
+            throw new Error(`Failed to load game objects: ${response.status}`);
+        }
+        const jsonData = await response.json();
+
+        // Create an instance of GameObjectManager
+        const gameObjectManager = new GameObjectManager();
+
+        // Add objects to the manager
+        jsonData.objects.forEach(objectData => {
+            const obj = createObjectFromData(objectData, canvas);
+            gameObjectManager.addObject(obj);
+        });
+
+        console.log("Game objects loaded successfully!");
+        return gameObjectManager;
+    } catch (error) {
+        console.error("Error loading game objects:", error);
+    }
+}
+
+// Function to evaluate relative values
+function evaluateValue(value, canvas) {
+    if (typeof value === "string") {
+        if (value.endsWith("%")) {
+            // Handle percentage values
+            const percent = parseFloat(value);
+            //console.log(percent)
+            if (value.includes("h")) {
+                return canvas.height * (percent / 100);
+            } else {
+                return canvas.width * (percent / 100); // Default to width
+            }
+        } else {
+            // Fallback to parsing as a number
+            try{
+                return parseFloat(value);
+            }
+            catch (e){
+                console.error(e);
+                return null;
+            }
+        }
+    }
+    return value; // Return as-is if not a string
+}
+
+// Call the function to load objects
+loadGameObjects('./json/gameObjects.json',canvas).then(a => {
+    if (a) {
+        gameObjectManager = a;
+        //console.log("Game Object Manager:", gameObjectManager);
+
+        // Initialize mainBall and floorRect
+        mainBall = gameObjectManager.getObjectByIdentifier("main_ball");
+        floorRect = gameObjectManager.getObjectByIdentifier("floor");
+
+        // Start the animation loop
+        animate();
+    }
+});
 
 
 
