@@ -663,10 +663,12 @@ function handleCollision(ball, object) {
         if (object.identifier === "floor" && !hasFloor) return;
 
         // Quick check: Is the ball far from the rectangle?
-        if (isBallFarFromRectangle(ball, object)) return;
+        const { isFar, closestPoint, distanceSquared } = isBallFarFromRectangle(ball, object);
+        
+        if (isFar) return; // Quick exit if the ball is far from the rectangle
 
         // Resolve the collision
-        resolveRectangleCollision(ball, object);
+        resolveRectangleCollision(ball, object, closestPoint, distanceSquared);
     } else if (object.type === "triangle") {
         // Use the precomputed transformed vertices from the triangle
         const triangleVertices = object.transformedVertices;
@@ -681,8 +683,6 @@ function handleCollision(ball, object) {
             resolveBallTriangleCollision(ball, triangleVertices, closestPoint, distanceSquared);
         }
     } else if (object.type === "ball") {
-        // Quick check: Are the balls far apart?
-        if (isBallFarFromBall(ball, object)) return; // Exit early if they are far apart
         // Check for collision and resolve it
         if (checkBallBallCollision(ball, object)) {
             resolveBallBallCollision(ball, object);
@@ -836,16 +836,16 @@ loadGameObjects('./json/gameObjects.json',canvas).then(a => {
 // Function to check for collision between two balls
 function checkBallBallCollision(ball1, ball2) {
     const radiusSum = ball1.radius + ball2.radius;
-    const distanceSquared = getDistanceSquared(ball1.x, ball1.y, ball2.x, ball2.y);
+    const distanceSquared = getDistanceSquared(ball1, ball2);
     return distanceSquared <= radiusSum * radiusSum;
 }
 
 // Function to resolve collision between two balls
 function resolveBallBallCollision(ball1, ball2) {
     // Calculate the normal vector between the two balls
-    const dx = ball1.x - ball2.x;
-    const dy = ball1.y - ball2.y;
-    const normal = normalizeVector(dx, dy);
+    const distanceSquared = getDistanceSquared(ball1, ball2); // Reuse distance calculation
+    const distance = Math.sqrt(distanceSquared); // Required for position correction
+    const normal = normalizeVector(ball1.x - ball2.x, ball1.y - ball2.y);
 
     // Calculate relative velocity
     const relativeVelocityX = ball1.dx - ball2.dx;
@@ -875,8 +875,8 @@ function resolveBallBallCollision(ball1, ball2) {
     ball2.dx -= impulseX * massFactor2;
     ball2.dy -= impulseY * massFactor2;
     */
+
     // Correct positions to prevent overlap
-    const distance = Math.sqrt(getDistanceSquared(ball1.x, ball1.y, ball2.x, ball2.y));
     const overlap = (ball1.radius + ball2.radius) - distance;
 
     if (overlap > 0) {
@@ -894,16 +894,6 @@ function resolveBallBallCollision(ball1, ball2) {
     }
 }
 
-// Function to check if two balls are far apart
-function isBallFarFromBall(ball1, ball2) {
-    const distanceSquared = getDistanceSquared(ball1.x, ball1.y, ball2.x, ball2.y);
-    const radiusSum = ball1.radius + ball2.radius;
-    const radiusSumSquared = radiusSum * radiusSum; // Square of the sum of radii
-
-// Add a small epsilon value to account for floating-point inaccuracies
-    const epsilon = 1; // Small tolerance
-    return distanceSquared > radiusSumSquared + epsilon;
-}
 
 
 
@@ -923,7 +913,7 @@ function isBallFarFromBall(ball1, ball2) {
 function resolveBallTriangleCollision(ball, triangleVertices) {
     const closestPoint = getClosestPointOnTriangle(ball, triangleVertices);
     // Calculate the squared distance between the ball's center and the closest point
-    const distanceSquared = getDistanceSquared(ball.x, ball.y, closestPoint.x, closestPoint.y);
+    const distanceSquared = getDistanceSquared(ball, closestPoint);
 
     // Resolve the collision using the generic function
     resolveCollision(
@@ -980,7 +970,7 @@ function isBallFarFromTriangle(ball, triangleVertices) {
     const closestPoint = getClosestPointOnTriangle(ball, triangleVertices);
 
     // Calculate the squared distance between the ball's center and the closest point
-    const distanceSquared = getDistanceSquared(ball.x, ball.y, closestPoint.x, closestPoint.y);
+    const distanceSquared = getDistanceSquared(ball, closestPoint);
 
     // Return an object with the closest point and squared distance
     return {
@@ -1003,10 +993,7 @@ function isBallFarFromTriangle(ball, triangleVertices) {
 
 
 // Function to resolve collision between a ball and a rotated rectangle
-function resolveRectangleCollision(ball, rectangle) {
-    const closestPoint = getClosestPointOnRectangle(ball, rectangle);
-    const distanceSquared = getDistanceSquared(ball.x, ball.y, closestPoint.x, closestPoint.y);
-
+function resolveRectangleCollision(ball, rectangle, closestPoint, distanceSquared) {
     // Resolve the collision using the generic function
     resolveCollision(
         ball,
@@ -1060,20 +1047,20 @@ function getRectangleNormal(ball, rectangle, closestPoint) {
     const { x: ballX, y: ballY } = ball;
     const { x: closestX, y: closestY } = closestPoint;
 
-    // Calculate the vector from the closest point to the ball's center
-    const dx = ballX - closestX;
-    const dy = ballY - closestY;
-
     // Normalize the vector to get the normal
-    return normalizeVector(dx, dy);
+    return normalizeVector(ballX - closestX, ballY - closestY);
 }
 
 // Function to check if the ball is far from the rotated rectangle
 function isBallFarFromRectangle(ball, rectangle) {
     const closestPoint = getClosestPointOnRectangle(ball, rectangle);
-    const distanceSquared = getDistanceSquared(ball.x, ball.y, closestPoint.x, closestPoint.y);
+    const distanceSquared = getDistanceSquared(ball, closestPoint);
 
-    return distanceSquared > ball.radius * ball.radius;
+    return {
+        isFar: distanceSquared > ball.radius * ball.radius,
+        closestPoint,
+        distanceSquared
+    };
 }
 
 
@@ -1172,9 +1159,9 @@ function clamp(value, min, max) {
 }
 
 // Helper function to calculate squared distance between two points
-function getDistanceSquared(x1, y1, x2, y2) {
-    const dx = x1 - x2;
-    const dy = y1 - y2;
-    return dx * dx + dy * dy;
+function getDistanceSquared(a,b) {
+    const x = a.x - b.x;
+    const y = a.y - b.y;
+    return x * x + y * y;
 }
 
