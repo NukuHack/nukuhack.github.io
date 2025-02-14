@@ -975,28 +975,6 @@ function getClosestPointOnTriangle(ball, triangleVertices) {
     return closestPoint;
 }
 
-// Function to find the closest point on a line segment to a given point
-function getClosestPointOnLine(ball, start, end) {
-    const dx = end.x - start.x;
-    const dy = end.y - start.y;
-    const lengthSquared = dx * dx + dy * dy;
-
-    // Handle the case where the line segment is degenerate (start and end are the same)
-    if (lengthSquared === 0) return start;
-
-    // Project the ball's center onto the line segment
-    const t = ((ball.x - start.x) * dx + (ball.y - start.y) * dy) / lengthSquared;
-
-    // Clamp t to the line segment
-    if (t <= 0) return start;
-    if (t >= 1) return end;
-
-    return {
-        x: start.x + t * dx,
-        y: start.y + t * dy
-    };
-}
-
 // Function to check if the ball is far from the triangle
 function isBallFarFromTriangle(ball, triangleVertices) {
     const closestPoint = getClosestPointOnTriangle(ball, triangleVertices);
@@ -1100,11 +1078,35 @@ function isBallFarFromRectangle(ball, rectangle) {
 
 
 
+
+
 // ======================
 // 13. Other Vector stuff
 // ======================
 
 
+
+// Function to find the closest point on a line segment to a given point
+function getClosestPointOnLine(ball, start, end) {
+    const dx = end.x - start.x;
+    const dy = end.y - start.y;
+    const lengthSquared = dx * dx + dy * dy;
+
+    // Handle the case where the line segment is degenerate (start and end are the same)
+    if (lengthSquared === 0) return start;
+
+    // Project the ball's center onto the line segment
+    const t = ((ball.x - start.x) * dx + (ball.y - start.y) * dy) / lengthSquared;
+
+    // Clamp t to the line segment
+    if (t <= 0) return start;
+    if (t >= 1) return end;
+
+    return {
+        x: start.x + t * dx,
+        y: start.y + t * dy
+    };
+}
 
 // Function to resolve collision between a ball and any shape
 function resolveCollision(ball, closestPoint, distanceSquared, getNormal) {
