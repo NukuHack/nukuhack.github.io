@@ -658,10 +658,10 @@ document.addEventListener("keydown", (event) => {
 function handleCollision(ball, object) {
     if (ball === object) return;
     if (ball.dy === 0 && ball.dx === 0) return;
-
+    /*
     if (object.rotation)
         console.log(object.rotation);
-
+    */
     if (object.type === "rectangle") {
         if (object.identifier === "floor" && !hasFloor) return;
 
