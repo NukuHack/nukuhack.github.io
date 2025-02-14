@@ -41,7 +41,7 @@
       "size": 60,
       "dx": 0,
       "dy": 0,
-      "rotation": 1.05,
+      "rotation": "180p",
       "friction": 0.1,
       "color": "black",
       "identifier": "default"
