@@ -80,7 +80,7 @@
       "height": 110,
       "dx": 0,
       "dy": 0,
-      "rotation": 0,
+      "rotation": "60p",
       "friction": 0.1,
       "color": "cyan",
       "identifier": "default"
