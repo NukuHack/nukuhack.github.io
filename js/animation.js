@@ -28,6 +28,8 @@ TABLE OF CONTENTS
 // Get the default stuff made
 const customContextMenu = document.getElementById('customContextMenu');
 const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+
 canvas.width = window.innerWidth; // Set canvas size to full screen
 canvas.height = window.innerHeight*0.8;
 let mouseDownTime = 0;
@@ -37,9 +39,10 @@ let gameObjectManager;
 let mainBall;
 let floorRect;
 
-const ctx = canvas.getContext('2d');
-let lastTime = performance.now(); // Track the last frame time
-let fps = 0; // Store the current FPS
+
+let frameCount = 0; // Counter for the number of frames rendered
+let lastFPSUpdate = performance.now(); // Timestamp for the last FPS update
+let fps = 0; // Current FPS value
 
 // Physics constants
 const gravity = 0.1; // Gravity strength
@@ -58,16 +61,20 @@ const GRAVITY_Y_MULTIPLIER = 0.5; // Strength of gravity in the Y-axis
 // 2. FPS counter
 // ======================
 
+
+
 function updateFPS() {
+    frameCount++; // Increment the frame counter
+
     const now = performance.now(); // Get the current time
-    const deltaTime = now - lastTime; // Calculate time elapsed since the last frame
+    const elapsedTime = now - lastFPSUpdate; // Calculate elapsed time since the last FPS update
 
-    // Avoid division by zero or invalid FPS on the first frame
-    if (deltaTime > 0) {
-        fps = Math.round(1000 / deltaTime); // Calculate FPS
+    // If 1 second has passed, calculate FPS
+    if (elapsedTime >= 500) {
+        fps = Math.round(frameCount / (elapsedTime / 500)); // Calculate FPS
+        frameCount = 0; // Reset the frame counter
+        lastFPSUpdate = now; // Update the timestamp
     }
-
-    lastTime = now; // Update the last frame time
 }
 
 function drawFPS() {
