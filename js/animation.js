@@ -51,6 +51,7 @@ let currentGravity = gravity;
 // Gravity constants
 const GRAVITY_X_MULTIPLIER = 0.5; // Strength of gravity in the X-axis
 const GRAVITY_Y_MULTIPLIER = 0.5; // Strength of gravity in the Y-axis
+const DEGREES_TO_RADIANS_MULTIPLIER = Math.PI / 180;
 
 
 
@@ -711,9 +712,9 @@ function createObjectFromData(data, canvas) {
         case "ball":
             return new Ball(
                 //(x, y, radius, dx, dy, friction, color, identifier)
-                evaluateValue(data.x, canvas),
-                evaluateValue(data.y, canvas),
-                data.radius,
+                evaluateValue(data.x),
+                evaluateValue(data.y),
+                evaluateValue(data.radius),
                 data.dx,
                 data.dy,
                 data.friction,
@@ -723,12 +724,12 @@ function createObjectFromData(data, canvas) {
         case "triangle":
             return new Triangle(
                 //(x, y, size, dx, dy, rotation, friction, color, identifier)
-                evaluateValue(data.x, canvas),
-                evaluateValue(data.y, canvas),
-                data.size,
+                evaluateValue(data.x),
+                evaluateValue(data.y),
+                evaluateValue(data.size),
                 data.dx,
                 data.dy,
-                data.rotation, // Rotation in radians
+                evaluateValue(data.rotation), // Rotation in radians
                 data.friction,
                 data.color,
                 data.identifier,
@@ -736,13 +737,13 @@ function createObjectFromData(data, canvas) {
         case "rectangle":
             return new Rectangle(
                 //(x, y, width, height, dx, dy, rotation, friction, color, identifier)
-                evaluateValue(data.x, canvas),
-                evaluateValue(data.y, canvas),
-                evaluateValue(data.width, canvas),
-                evaluateValue(data.height, canvas),
+                evaluateValue(data.x),
+                evaluateValue(data.y),
+                evaluateValue(data.width),
+                evaluateValue(data.height),
                 data.dx,
                 data.dy,
-                data.rotation, // Rotation in radians
+                evaluateValue(data.rotation), // Rotation in radians
                 data.friction,
                 data.color,
                 data.identifier,
@@ -751,7 +752,7 @@ function createObjectFromData(data, canvas) {
             throw new Error(`Unknown object type: ${data.type}`);
     }
 }
-async function loadGameObjects(place,canvas) {
+async function loadGameObjects(place) {
     try {
         const response = await fetch(place);
         if (!response.ok) {
@@ -776,7 +777,7 @@ async function loadGameObjects(place,canvas) {
 }
 
 // Function to evaluate relative values
-function evaluateValue(value, canvas) {
+function evaluateValue(value) {
     if (typeof value === "string") {
         if (value.endsWith("%")) {
             // Handle percentage values
@@ -787,6 +788,9 @@ function evaluateValue(value, canvas) {
             } else {
                 return canvas.width * (percent / 100); // Default to width
             }
+        } else if (value.endsWith("p")) {
+            const pyPercent = parseFloat(value)*0.01;
+            return pyPercent* DEGREES_TO_RADIANS_MULTIPLIER;
         } else {
             // Fallback to parsing as a number
             try{
