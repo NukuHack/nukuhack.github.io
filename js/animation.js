@@ -684,9 +684,7 @@ function handleCollision(ball, object) {
         }
     } else if (object.type === "ball") {
         // Check for collision and resolve it
-        if (checkBallBallCollision(ball, object)) {
-            resolveBallBallCollision(ball, object);
-        }
+        resolveBallBallCollision(ball, object);
     }
 }
 
@@ -833,18 +831,16 @@ loadGameObjects('./json/gameObjects.json',canvas).then(a => {
 
 
 
-// Function to check for collision between two balls
-function checkBallBallCollision(ball1, ball2) {
-    const radiusSum = ball1.radius + ball2.radius;
-    const distanceSquared = getDistanceSquared(ball1, ball2);
-    return distanceSquared <= radiusSum * radiusSum;
-}
 
 // Function to resolve collision between two balls
 function resolveBallBallCollision(ball1, ball2) {
-    // Calculate the normal vector between the two balls
-    const distanceSquared = getDistanceSquared(ball1, ball2); // Reuse distance calculation
+    const distanceSquared = getDistanceSquared(ball1, ball2);
+    const radiusSum = ball1.radius + ball2.radius;
+    // Quick exit if the balls are not touching 
+    if (distanceSquared > radiusSum * radiusSum) return;
+    
     const distance = Math.sqrt(distanceSquared); // Required for position correction
+    // Calculate the normal vector between the two balls
     const normal = normalizeVector(ball1.x - ball2.x, ball1.y - ball2.y);
 
     // Calculate relative velocity
