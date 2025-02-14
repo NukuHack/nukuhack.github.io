@@ -40,7 +40,6 @@ let floorRect;
 
 
 let frameCount = 0; // Counter for the number of frames rendered
-let lastFPSUpdate = performance.now(); // Timestamp for the last FPS update
 let fps = 0; // Current FPS value
 
 // Physics constants
@@ -62,17 +61,17 @@ const GRAVITY_Y_MULTIPLIER = 0.5; // Strength of gravity in the Y-axis
 
 
 
+
 function updateFPS() {
     frameCount++; // Increment the frame counter
 
-    const now = performance.now(); // Get the current time
-    const elapsedTime = now - lastFPSUpdate; // Calculate elapsed time since the last FPS update
-
-    // If 1 second has passed, calculate FPS
-    if (elapsedTime >= 500) {
-        fps = Math.round(frameCount / (elapsedTime / 500)); // Calculate FPS
-        frameCount = 0; // Reset the frame counter
-        lastFPSUpdate = now; // Update the timestamp
+    // Schedule the FPS calculation to happen after half second
+    if (!updateFPS.timeoutId) { // Ensure only one timeout is active at a time
+        updateFPS.timeoutId = setTimeout(() => {
+            fps = Math.round(frameCount / 2); // Set the FPS to the half of the number of frames counted in the last second
+            frameCount = 0; // Reset the frame counter
+            updateFPS.timeoutId = null; // Clear the timeout ID
+        }, 500); // Run this every half second
     }
 }
 
