@@ -19,40 +19,38 @@ console.log("current page url: ", url);
 console.log("basic url: ", window.location.href);
 */
 function LoadBasicContent() {
-
     let navContent = `
-
-          <nav class="navbar" id="navbar">
+        <nav class="navbar" id="navbar">
             <div class="navbar_in">
-              <p class="navbar_link" onclick="ChangePage()">${PageHelper(currentUrl)} Page</p>
-              <button type="button" class="navbar_toggle" id="navbarToggle" onclick="ToggleNavbar()">
-                <img id="menu_image" src="./assets/menu_bars.png" alt="Menu" />
-              </button>
-              <div class="navbar_items" id="navbarDropdown">
-                <ul class="navbar_ul">
-                  <li class="navbar_li">
-                    <p class="navbar_item" onclick="ChangePage('index')">Main Webpage</p>
-                  </li>
-                  <li class="navbar_li">
-                    <p class="navbar_item" onclick="ChangePage('code')">Actual Code</p>
-                  </li>
-                  <li class="navbar_li">
-                    <p class="navbar_item" onclick="ChangePage('extra')">Extra Things</p>
-                  </li>
-                  <li class="navbar_li">
-                    <p class="navbar_item" onclick="ChangePage('links')">Links & Connection</p>
-                  </li>
-                  <li class="navbar_li">
-                    <p class="navbar_item" onclick="ChangePage('weather')">Weather App</p>
-                  </li>
-                  <li class="navbar_li">
-                    <p class="navbar_item" onclick="ChangePage('animation')">Animation</p>
-                  </li>
-                  <li class="navbar_li">
-                    <p class="navbar_item" onclick="ChangePage('video')">Video Display</p>
-                  </li>
-                </ul>
-              </div>
+                <p class="navbar_link" onclick="ChangePage()">${PageHelper(currentUrl)} Page</p>
+                <button type="button" class="navbar_toggle" id="navbarToggle" onclick="ToggleNavbar()">
+                    <img id="menu_image" src="./assets/menu_bars.png" alt="Menu" />
+                </button>
+                <div class="navbar_items" id="navbarDropdown">
+                    <ul class="navbar_ul">
+                        <li class="navbar_li">
+                            <p class="navbar_item" onclick="ChangePage('index')">Main Webpage</p>
+                        </li>
+                        <li class="navbar_li">
+                            <p class="navbar_item" onclick="ChangePage('code')">Actual Code</p>
+                        </li>
+                        <li class="navbar_li">
+                            <p class="navbar_item" onclick="ChangePage('extra')">Extra Things</p>
+                        </li>
+                        <li class="navbar_li">
+                            <p class="navbar_item" onclick="ChangePage('links')">Links & Connection</p>
+                        </li>
+                        <li class="navbar_li">
+                            <p class="navbar_item" onclick="ChangePage('weather')">Weather App</p>
+                        </li>
+                        <li class="navbar_li">
+                            <p class="navbar_item animated-item" onclick="ChangePage('animation')">Animation</p>
+                        </li>
+                        <li class="navbar_li">
+                            <p class="navbar_item" onclick="ChangePage('video')">Video Display</p>
+                        </li>
+                    </ul>
+                </div>
                 <div class="darkmode-slider">
                     <label class="switch">
                         <input type="checkbox" id="darkModeToggle" onchange="ToggleDarkMode()">
@@ -60,47 +58,34 @@ function LoadBasicContent() {
                     </label>
                 </div>
             </div>
-          </nav>
-
-        <div id="navbarHelp">
-            .
-        </div>
+        </nav>
+        <div id="navbarHelp">.</div>
     `;
-
 
     let modalContent = `
-    <div id="modal" class="modal">
-        
-    </div>
+        <div id="modal" class="modal"></div>
     `;
-
 
     let footerContent = `
-
-    <div id="footerHelp">
-        .
-    </div>
-    
-    <footer id="footer">
-        <div class="footer_in">
-            <div class="footer_in_in">
-                <h5>Stupid webpage</h5>
-                <h6>Made by NukuHack ©2024</h6>
+        <div id="footerHelp">.</div>
+        <footer id="footer">
+            <div class="footer_in">
+                <div class="footer_in_in">
+                    <h5>Stupid webpage</h5>
+                    <h6>Made by NukuHack ©2024</h6>
+                </div>
             </div>
-        </div>
-    </footer>
+        </footer>
     `;
 
-    body.insertAdjacentHTML("afterbegin", navContent);
-    body.insertAdjacentHTML("beforeend", modalContent);
-    body.insertAdjacentHTML("beforeend", footerContent);
+    document.body.insertAdjacentHTML("afterbegin", navContent);
+    document.body.insertAdjacentHTML("beforeend", modalContent);
+    document.body.insertAdjacentHTML("beforeend", footerContent);
 
-
-    document.getElementById("menu_image").onerror = function() {
-        this.src = '../assets/menu_bars.png';
+    document.getElementById("menu_image").onerror = function () {
+        this.src = "../assets/menu_bars.png";
     };
 }
-
 
 LoadBasicContent();
 
