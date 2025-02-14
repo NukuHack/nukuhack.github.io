@@ -68,7 +68,7 @@ function updateFPS() {
     // Schedule the FPS calculation to happen after half second
     if (!updateFPS.timeoutId) { // Ensure only one timeout is active at a time
         updateFPS.timeoutId = setTimeout(() => {
-            fps = Math.round(frameCount / 2); // Set the FPS to the half of the number of frames counted in the last second
+            fps = frameCount * 2; // Set the FPS to the half of the number of frames counted in the last second
             frameCount = 0; // Reset the frame counter
             updateFPS.timeoutId = null; // Clear the timeout ID
         }, 500); // Run this every half second
