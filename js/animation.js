@@ -257,26 +257,14 @@ class Ball extends GameObject {
     }
 }
 
-class Triangle extends GameObject {
-    constructor(x, y, size, dx, dy, rotation, friction, color, identifier) {
+class Polygon extends GameObject {
+    constructor(x, y, localVertices, dx, dy, rotation, friction, color, identifier) {
         super(x, y, dx, dy, friction, color, identifier);
-        this.size = size;
-        this.rotation = rotation; // Rotation angle in radians
-        this.type = "triangle";
-
-        // Precompute the height of the equilateral triangle
-        this.height = (Math.sqrt(3) * 0.5) * this.size;
-
-        // Precompute the vertices in local space (relative to the center)
-        this.localVertices = [
-            { x: 0, y: -this.height }, // Top vertex
-            { x: -this.size, y: this.height}, // Bottom-left vertex
-            { x: this.size, y: this.height} // Bottom-right vertex
-        ];
-
-        // Initialize the transformed vertices
-        this.transformedVertices = [{x:0,y:0},{x:0,y:0},{x:0,y:0},];
-        this.updateVertices();
+        this.localVertices = localVertices; // Vertices in local space (relative to the center)
+        this.rotation = rotation || 0; // Rotation angle in radians
+        this.type = "polygon"; // Default type is "polygon"
+        this.transformedVertices = localVertices.map(() => ({ x: 0, y: 0 })); // Initialize transformed vertices
+        //console.log("super - should be 00 ",this.transformedVertices); // <- is not 00 ... idk why or how ...
     }
 
     // Update the transformed vertices based on rotation and position
@@ -298,77 +286,59 @@ class Triangle extends GameObject {
         }
     }
 
-    // Draw the triangle
+    // Draw the polygon
     draw(ctx) {
-        // Update the vertices if the triangle has moved or rotated
-        this.updateVertices();
+        this.updateVertices(); // Ensure vertices are updated before drawing
 
-        // Draw the triangle
         ctx.beginPath();
         ctx.moveTo(this.transformedVertices[0].x, this.transformedVertices[0].y);
-        ctx.lineTo(this.transformedVertices[1].x, this.transformedVertices[1].y);
-        ctx.lineTo(this.transformedVertices[2].x, this.transformedVertices[2].y);
-        ctx.closePath();
+
+        for (let i = 1; i < this.transformedVertices.length; i++) {
+            ctx.lineTo(this.transformedVertices[i].x, this.transformedVertices[i].y);
+        }
+
+        ctx.closePath(); // Close the path by connecting the last vertex to the first
         ctx.fillStyle = this.color;
         ctx.fill();
     }
 }
 
-class Rectangle extends GameObject {
-    constructor(x, y, width, height, dx, dy, rotation, friction, color, identifier) {
-        super(x, y, dx, dy, friction, color, identifier);
-        this.width = width;
-        this.height = height;
-        this.rotation = rotation; // Rotation angle in radians
-        this.type = "rectangle";
+class Triangle extends Polygon {
+    constructor(x, y, size, dx, dy, rotation, friction, color, identifier) {
+
+        // Precompute the height of the equilateral triangle
+        const height = (Math.sqrt(3) * 0.5) * size;
 
         // Precompute the vertices in local space (relative to the center)
-        this.localVertices = [
-            { x: 0, y: 0}, // Top-left
-            { x: this.width, y: 0},  // Top-right
-            { x: this.width, y: this.height},   // Bottom-right
-            { x: 0, y: this.height}   // Bottom-left
+        const localVertices = [
+            { x: 0, y: -height }, // Top vertex
+            { x: -size, y: height }, // Bottom-left vertex
+            { x: size, y: height } // Bottom-right vertex
         ];
 
-        // Initialize the transformed vertices
-        this.transformedVertices = [{x:0,y:0},{x:0,y:0},{x:0,y:0},{x:0,y:0}];
-        this.updateVertices();
+        super(x, y, localVertices, dx, dy, rotation, friction, color, identifier);
+        //this.transformedVertices = [{x:0,y:0},{x:0,y:0},{x:0,y:0}];
+        this.type = "triangle"; // Override type
+        this.height = height;
+        this.size = size; // Store the size for future reference
     }
+}
 
-    // Update the transformed vertices based on rotation and position
-    updateVertices() {
-        const cosTheta = Math.cos(this.rotation);
-        const sinTheta = Math.sin(this.rotation);
+class Rectangle extends Polygon {
+    constructor(x, y, width, height, dx, dy, rotation, friction, color, identifier) {
+        // Precompute the vertices in local space (relative to the center)
+        const localVertices = [
+            { x: 0, y: 0}, // Top-left
+            { x: width, y: 0 }, // Top-right
+            { x: width, y: height }, // Bottom-right
+            { x: 0, y: height } // Bottom-left
+        ];
 
-        for (let i = 0; i < this.localVertices.length; i++) {
-            const local = this.localVertices[i];
-            const transformed = this.transformedVertices[i];
-
-            // Apply rotation
-            transformed.x = local.x * cosTheta - local.y * sinTheta;
-            transformed.y = local.x * sinTheta + local.y * cosTheta;
-
-            // Apply translation
-            transformed.x += this.x;
-            transformed.y += this.y;
-        }
-    }
-
-    // Draw the rectangle
-    draw(ctx) {
-        // Update the vertices if the rectangle has moved or rotated
-        this.updateVertices();
-
-        // Draw the rectangle
-        ctx.beginPath();
-        ctx.moveTo(this.transformedVertices[0].x, this.transformedVertices[0].y);
-        for (let i = 1; i < this.transformedVertices.length; i++) {
-            ctx.lineTo(this.transformedVertices[i].x, this.transformedVertices[i].y);
-        }
-        ctx.closePath(); // Close the path by connecting the last vertex to the first
-
-        ctx.fillStyle = this.color;
-        ctx.fill();
+        super(x, y, localVertices, dx, dy, rotation, friction, color, identifier);
+        //this.transformedVertices = [{x:0,y:0},{x:0,y:0},{x:0,y:0},{x:0,y:0}];
+        this.type = "rectangle"; // Override type
+        this.width = width; // Store dimensions for future reference
+        this.height = height;
     }
 }
 
@@ -501,6 +471,7 @@ function handleScreenEvent(event, type, ball) {
         ball.x = canvasX; // Update ball position with normalized coordinates
         ball.dx = 0; // Reset velocity while dragging
     } else if (type === 'touchend' || type === 'mouseup' && event.button === 0) {
+        ball.dx = 0; // Reset the velocity what th ball might have collected while dragged (like at a rotated surface)
         isDragging = false;
         // Check for jump condition on mouse/touch release
         const clickDuration = Date.now() - mouseDownTime;
