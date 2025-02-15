@@ -39,7 +39,7 @@ function LoadBasicContent() {
                             <ul class="dropdown_menu">
                                 <li><p class="dropdown_item" onclick="ChangePage('animation')">Animation Page</p></li>
                                 <li><p class="dropdown_item" onclick="ChangePage('dice')">Dice Page</p></li>
-                                <li><p class="dropdown_item" onclick="ChangePage('fun3d')">3D Test Page</p></li>
+                                <li><p class="dropdown_item" onclick="ChangePage('test3d')">3D Test Page</p></li>
                             </ul>
                         </li>
                         <li class="navbar_li dropdown">
@@ -163,7 +163,7 @@ document.addEventListener('click', HandleDocumentClick);
 
 
 function ChangePage(url,isInFolder) {
-    let UrlHelp = window.location.href;
+    let UrlHelp;
     isInFolder=isInsideFolder();
     if (isInFolder) UrlHelp="../";
     else UrlHelp="";

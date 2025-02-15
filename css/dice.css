@@ -1,5 +1,12 @@
 
+
 canvas {
-    display: block;
-    background: var(--background-dark-color);
+    border: 2px solid var(--border-dark-color);
+    background-color: var(--background-cold-color);
+}
+button {
+    margin-top: 20px;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
 }

@@ -12,41 +12,6 @@
       "identifier": "main_ball"
     },
     {
-      "type": "ball",
-      "x": "30%",
-      "y": "35h%",
-      "radius": 50,
-      "dx": 0,
-      "dy": 0,
-      "friction": 0.1,
-      "color": "red",
-      "identifier": "default"
-    },
-    {
-      "type": "triangle",
-      "x": "90%",
-      "y": "70h%",
-      "size": 60,
-      "dx": 0,
-      "dy": 0,
-      "rotation": 0,
-      "friction": 0.1,
-      "color": "blue",
-      "identifier": "default"
-    },
-    {
-      "type": "triangle",
-      "x": "70%",
-      "y": "35h%",
-      "size": 60,
-      "dx": 0,
-      "dy": 0,
-      "rotation": "180p",
-      "friction": 0.1,
-      "color": "black",
-      "identifier": "default"
-    },
-    {
       "type": "rectangle",
       "x": "0",
       "y": "90h%",
@@ -59,6 +24,44 @@
       "color": "green",
       "identifier": "floor"
     },
+
+
+
+    {
+      "type": "ball",
+      "x": "30%",
+      "y": "35h%",
+      "radius": 50,
+      "dx": 2,
+      "dy": 2,
+      "friction": 0.98,
+      "color": "red",
+      "identifier": ""
+    },
+    {
+      "type": "triangle",
+      "x": "90%",
+      "y": "70h%",
+      "size": 60,
+      "dx": -1,
+      "dy": 0,
+      "rotation": 0,
+      "friction": 0.99,
+      "color": "blue",
+      "identifier": ""
+    },
+    {
+      "type": "triangle",
+      "x": "70%",
+      "y": "35h%",
+      "size": 60,
+      "dx": 1,
+      "dy": 0,
+      "rotation": "180p",
+      "friction": 0.99,
+      "color": "black",
+      "identifier": ""
+    },
     {
       "type": "rectangle",
       "x": "45%",
@@ -68,22 +71,23 @@
       "dx": 0,
       "dy": 0,
       "rotation": 0,
-      "friction": 0.1,
+      "friction": 1,
       "color": "grey",
-      "identifier": "default"
+      "identifier": ""
     },
     {
       "type": "rectangle",
-      "x": "8%",
-      "y": "60h%",
+      "x": "13%",
+      "y": "55h%",
       "width": "10%",
       "height": 110,
       "dx": 0,
       "dy": 0,
       "rotation": "60p",
-      "friction": 0.1,
+      "friction": 1,
       "color": "cyan",
-      "identifier": "default"
+      "identifier": ""
     }
+
   ]
 }

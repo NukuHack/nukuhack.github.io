@@ -39,7 +39,7 @@
 /*First the basics*/
 body {
     min-height: 100%;
-    height: 200%;
+    height: 100vh;
     color: var(--font-basic-color);
     background-color: var(--page-background-color);
     margin: 0;
