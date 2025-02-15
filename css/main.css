@@ -76,6 +76,7 @@ a {
 
 
 
+
 .navbar {
     display: flex;
     justify-content: space-between;
@@ -115,7 +116,8 @@ a {
 
 .navbar_link, .navbar_item {
     color: var(--font-basic-color);
-    text-decoration: none;
+    align-self: center;
+    text-decoration: inherit;
     font-size: 1.4rem;
     margin: 0 10px;
 }
@@ -137,20 +139,17 @@ a {
     margin-left: 10px; /* Optional spacing between link and toggle */
 }
 
-.navbar_link:hover, .navbar_item:hover {
-    text-decoration: underline;
-}
-
+/* Navbar Items */
 .navbar_items {
     transition: opacity 0.5s ease, transform 0.5s ease;
     opacity: 0;
     visibility: hidden;
-    width: 250px;
+    width: 200px;
     flex-direction: column; /* Stack items vertically in dropdown */
     background-color: var(--background-middle-color);
     position: absolute;
-    top: 100%;
-    left: 40%;
+    top: 100%; /* Position below the parent */
+    left: 40%; /* Align with the parent */
     padding: 10px;
     border-radius: 5px;
     transform: translateY(-20px); /* Start position for animation */
@@ -162,20 +161,76 @@ a {
     transform: translateY(0); /* Animate to visible position */
 }
 
+/* Navbar List Items */
 .navbar_ul {
     list-style: none;
     padding: 0;
     margin: 0;
+    display: flex; /* Use flexbox for horizontal alignment of top-level items */
+    flex-direction: column; /* Stack items vertically by default */
 }
 
 .navbar_li {
-    margin: 5px 0;
+    position: relative; /* Ensure dropdown menus are positioned relative to these items */
+    display: block; /* Ensure each item is on its own line */
+}
+.navbar_li:hover {
+    background-color: var(--background-light-color);
+    text-decoration: underline;
 }
 
 .navbar_item {
     cursor: pointer;
-    float: left;
+    float: inherit;
     width: auto;
+    margin: 5px 0; /* Add spacing between items */
+}
+
+/* Dropdown Menu */
+.dropdown {
+    position: relative; /* Ensure dropdown menu is positioned relative to this */
+}
+
+/* Dropdown Menu */
+.dropdown_menu {
+    display: none;
+    position: absolute;
+    list-style-type: none; /* Removes the bullet points from the entire list */
+    margin: 0; /* Optional: Remove default margin */
+    top: -20%;
+    left: 100%; /* Align with the parent */
+    background-color: var(--background-middle-color);
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    z-index: 101;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    opacity: 0;
+    transform: translateY(-10px);
+    width: 200px; /* Set a fixed width for better alignment */
+}
+
+.dropdown_menu.show {
+    display: block;
+    opacity: 1;
+    transform: translateY(0);
+    .navbar_li {
+        background-color: var(--background-light-color);
+        text-decoration: underline;
+    }
+}
+
+.dropdown_item {
+    color: var(--font-basic-color);
+    text-decoration: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 5px 10px; /* Add padding for better click-ability */
+}
+
+.dropdown_item:hover {
+    text-decoration: underline;
+    background-color: var(--background-light-color); /* Optional: Highlight on hover */
 }
 
 
@@ -184,7 +239,6 @@ a {
     margin-bottom: 50px;
     visibility: hidden;
 }
-
 
 
 

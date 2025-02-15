@@ -3,9 +3,9 @@ const Url = window.location.href;
 let PrefersDark = true;
 const urlImportant = Url.slice(Url.lastIndexOf('/')+1);
 const currentUrl = urlImportant.slice(0,urlImportant.indexOf("."));
-if (currentUrl=="") window.location.href="index.html";
+if (currentUrl==="") window.location.href="index.html";
 const PageHelper = ((url)=>{
-    if (url!="index") return url.slice(0,1).toUpperCase() + url.slice(1);
+    if (url!=="index") return url.slice(0,1).toUpperCase() + url.slice(1);
     else return "Main";
 });
 
@@ -34,20 +34,27 @@ function LoadBasicContent() {
                         <li class="navbar_li">
                             <p class="navbar_item" onclick="ChangePage('code')">Actual Code</p>
                         </li>
-                        <li class="navbar_li">
-                            <p class="navbar_item" onclick="ChangePage('extra')">Extra Things</p>
+                        <li class="navbar_li dropdown">
+                            <p class="navbar_item">Animations</p>
+                            <ul class="dropdown_menu">
+                                <li><p class="dropdown_item" onclick="ChangePage('animation')">Animation Page</p></li>
+                                <li><p class="dropdown_item" onclick="ChangePage('dice')">Dice Page</p></li>
+                                <li><p class="dropdown_item" onclick="ChangePage('fun3d')">3D Test Page</p></li>
+                            </ul>
                         </li>
-                        <li class="navbar_li">
-                            <p class="navbar_item" onclick="ChangePage('links')">Links & Connection</p>
+                        <li class="navbar_li dropdown">
+                            <p class="navbar_item">Random Things</p>
+                            <ul class="dropdown_menu">
+                                <li><p class="dropdown_item" onclick="ChangePage('extra')">Extra</p></li>
+                                <li><p class="dropdown_item" onclick="ChangePage('links')">Links</p></li>
+                            </ul>
                         </li>
-                        <li class="navbar_li">
-                            <p class="navbar_item" onclick="ChangePage('weather')">Weather App</p>
-                        </li>
-                        <li class="navbar_li">
-                            <p class="navbar_item animated-item" onclick="ChangePage('animation')">Animation</p>
-                        </li>
-                        <li class="navbar_li">
-                            <p class="navbar_item" onclick="ChangePage('video')">Video Display</p>
+                        <li class="navbar_li dropdown">
+                            <p class="navbar_item">Small Apps</p>
+                            <ul class="dropdown_menu">
+                                <li><p class="dropdown_item" onclick="ChangePage('weather')">Weather</p></li>
+                                <li><p class="dropdown_item" onclick="ChangePage('video')">Video</p></li>
+                            </ul>
                         </li>
                     </ul>
                 </div>
@@ -59,15 +66,21 @@ function LoadBasicContent() {
                 </div>
             </div>
         </nav>
-        <div id="navbarHelp">.</div>
+
+        <div id="navbarHelp">
+            .
+        </div>
     `;
 
     let modalContent = `
-        <div id="modal" class="modal"></div>
+        <div id="modal" class="modal">
+        </div>
     `;
 
     let footerContent = `
-        <div id="footerHelp">.</div>
+        <div id="footerHelp">
+            .
+        </div>
         <footer id="footer">
             <div class="footer_in">
                 <div class="footer_in_in">
@@ -78,13 +91,45 @@ function LoadBasicContent() {
         </footer>
     `;
 
-    document.body.insertAdjacentHTML("afterbegin", navContent);
-    document.body.insertAdjacentHTML("beforeend", modalContent);
-    document.body.insertAdjacentHTML("beforeend", footerContent);
+    body.insertAdjacentHTML("afterbegin", navContent);
+    body.insertAdjacentHTML("beforeend", modalContent);
+    body.insertAdjacentHTML("beforeend", footerContent);
 
     document.getElementById("menu_image").onerror = function () {
-        this.src = "../assets/menu_bars.png";
+        this.src = '../assets/menu_bars.png';
     };
+
+    // Add hover functionality for dropdowns
+    const dropdowns = document.querySelectorAll('.dropdown');
+
+    dropdowns.forEach(dropdown => {
+        const dropdownMenu = dropdown.querySelector('.dropdown_menu');
+
+        // Show dropdown on mouseenter
+        dropdown.addEventListener('mouseenter', () => {
+            // Hide all other dropdown menus
+            dropdowns.forEach(otherDropdown => {
+                if (otherDropdown !== dropdown) {
+                    const otherDropdownMenu = otherDropdown.querySelector('.dropdown_menu');
+                    if (otherDropdownMenu) {
+                        otherDropdownMenu.classList.remove('show');
+                    }
+                }
+            });
+
+            // Show the current dropdown menu
+            dropdownMenu.classList.add('show');
+        });
+
+        // Prevent dropdown from closing when interacting with it
+        dropdownMenu.addEventListener('mouseenter', () => {
+            dropdownMenu.classList.add('show');
+        });
+
+        dropdownMenu.addEventListener('mouseleave', () => {
+            dropdownMenu.classList.remove('show');
+        });
+    });
 }
 
 LoadBasicContent();
@@ -99,8 +144,16 @@ function ToggleNavbar() {
 
 // Close Navbar when clicking outside
 function HandleDocumentClick(event) {
-    if (!navToggle.contains(event.target)) {
+    if (!navToggle.contains(event.target)&&!navItems.contains(event.target)) {
         navItems.classList.remove('show');
+
+        const dropdowns = document.querySelectorAll('.dropdown');
+
+        dropdowns.forEach(dropdown => {
+            const dropdownMenu = dropdown.querySelector('.dropdown_menu');
+            // Show dropdown on mouseenter
+            dropdownMenu.classList.remove('show');
+        });
     }
 }
 
@@ -117,7 +170,7 @@ function ChangePage(url,isInFolder) {
 
     if (url)
         UrlHelp += `${url}.html`;
-    else if (UrlHelp.indexOf('#') == -1)
+    else if (UrlHelp.indexOf('#') === -1)
         UrlHelp += '#';
     else
         UrlHelp = window.location.href;
@@ -129,7 +182,7 @@ function ChangePage(url,isInFolder) {
 function isInsideFolder() {
     // Get the current URL
     let currentUrl = window.location.href;
-    let path="";
+    let path;
     // Extract the path part of the URL (everything after the domain)
     if (!currentUrl.includes("localhost"))
         path = new URL(currentUrl).pathname;
