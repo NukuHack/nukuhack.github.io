@@ -1,5 +1,6 @@
 const body = document.querySelector("body");
 const Url = window.location.href;
+let isPhone = false;
 let PrefersDark = true;
 const urlImportant = Url.slice(Url.lastIndexOf('/')+1);
 const currentUrl = urlImportant.slice(0,urlImportant.indexOf("."));
@@ -349,3 +350,15 @@ const LongestSubstring = ((sourceString, deLimiter) => {
 
     return maxLength;
 });
+
+(() => {
+    const isSmallScreen = window.matchMedia("(max-width: 768px)").matches;
+    const isMobileUA = /iPhone|iPad|iPod|Android|BlackBerry|IEMobile|Opera Mini|Mobile|mobile/i.test(navigator.userAgent);
+    isPhone = isSmallScreen && isMobileUA;
+
+    if (isPhone) {
+        console.log("User is likely on a mobile device.");
+    } else {
+        console.log("User is not on a mobile device.");
+    }
+})();
