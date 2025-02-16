@@ -302,37 +302,39 @@ class Ball extends GameObject {
         this.applyGravity();
         this.applyFriction();
 
-        this.handleEdgeCollision(canvas);
+        this.handleEdgeCollision();
 
     }
 
-    handleEdgeCollision(canvas) {
-        const { x, y, radius } = this;
+    handleEdgeCollision() {
         const { width, height } = canvas;
 
-        // Horizontal collision
-        this.handleEdgeHorizontalCollision(width, x, radius);
-        // Vertical collision
-        this.handleEdgeVerticalCollision(height, y, radius);
-    }
+        // Horizontal CCD
+        if (this.dx !== 0) {
+            const timeToHitLeft = (this.radius - this.x) / this.dx;
+            const timeToHitRight = (width - this.radius - this.x) / this.dx;
 
-    handleEdgeHorizontalCollision(width, x, radius) {
-        if (x - radius <= 0) {
-            this.dx = (Math.abs(this.dx) * (1 - this.friction) * bounceFactor);
-            this.x = radius; // Prevent sinking
-        } else if (x + radius >= width) {
-            this.dx = (-Math.abs(this.dx) * (1 - this.friction) * bounceFactor);
-            this.x = width - radius; // Prevent sinking
+            if (timeToHitLeft >= 0 && timeToHitLeft < 1) {
+                this.updatePosX(this.radius); // Prevent overlap
+                this.updateMovX(-Math.abs(this.dx) * (1 - this.friction) * bounceFactor); // Reverse velocity
+            } else if (timeToHitRight >= 0 && timeToHitRight < 1) {
+                this.updatePosX(width - this.radius); // Prevent overlap
+                this.updateMovX(-Math.abs(this.dx) * (1 - this.friction) * bounceFactor); // Reverse velocity
+            }
         }
-    }
 
-    handleEdgeVerticalCollision(height, y, radius) {
-        if (y - radius <= 0) {
-            this.dy = (Math.abs(this.dy) * (1 - this.friction) * bounceFactor);
-            this.y = radius; // Prevent sinking
-        } else if (y + radius >= height) {
-            this.dy = (-Math.abs(this.dy) * (1 - this.friction) * bounceFactor);
-            this.y = height - radius; // Prevent sinking
+        // Vertical CCD
+        if (this.dy !== 0) {
+            const timeToHitTop = (this.radius - this.y) / this.dy;
+            const timeToHitBottom = (height - this.radius - this.y) / this.dy;
+
+            if (timeToHitTop >= 0 && timeToHitTop < 1) {
+                this.updatePosY(this.radius); // Prevent overlap
+                this.updateMovY(-Math.abs(this.dy) * (1 - this.friction) * bounceFactor); // Reverse velocity
+            } else if (timeToHitBottom >= 0 && timeToHitBottom < 1) {
+                this.updatePosY(height - this.radius); // Prevent overlap
+                this.updateMovY(-Math.abs(this.dy) * (1 - this.friction) * bounceFactor); // Reverse velocity
+            }
         }
     }
 
