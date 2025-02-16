@@ -11,9 +11,7 @@ TABLE OF CONTENTS
 7. Animation Loop
 8. Json and shape building
 9. Collision
-10. Ball collision helper
-11. Triangle collision helper
-12. Rectangle collision helper
+10. other collision helper
 13. Other Vector stuff
 */
 
@@ -139,6 +137,14 @@ customContextMenu.addEventListener('click', (event) => {
             currentGravity = (currentGravity === gravity ? gravity * 0.5 : gravity);
             event.target.textContent = currentGravity === gravity ? "Small Gravity" : "Normal Gravity";
             break;
+        case 'toggleRealisticGravity':
+            try {
+                event.target.textContent = gravityManager.isListening ? 'Disable Realistic Gravity' : 'Enable Realistic Gravity';
+                gravityManager.isListening ? gravityManager.stop() : gravityManager.start(mainBall);
+            } catch (error) {
+                console.error("Error toggling gravity:", error);
+            }
+            break;
     }
     hideCustomContextMenu(); // Hide the menu after performing the action
 });
@@ -202,23 +208,23 @@ function drawPausedText(ctx, canvas) {
 function handleScreenEvent(event, type, ball) {
     const { clientX, clientY } = getEventCoordinates(event);
     const rect = canvas.getBoundingClientRect(); // Get the bounding rectangle of the canvas
-
-    // Normalize the mouse/touch position relative to the canvas
     const scaleX = canvas.width / rect.width; // Scale factor for width
     const scaleY = canvas.height / rect.height; // Scale factor for height
     const canvasX = (clientX - rect.left) * scaleX; // Adjusted X coordinate
     const canvasY = (clientY - rect.top) * scaleY; // Adjusted Y coordinate
 
-    // Logic for dragging and jumping
     if (type === 'touchstart' || type === 'mousedown' && event.button === 0) {
         isDragging = true;
         mouseDownTime = Date.now(); // Record the time when the mouse is pressed
+        gravityManager.setDragState(true); // Inform GravityManager that dragging has started
     } else if (isDragging && (type === 'touchmove' || type === 'mousemove')) {
         ball.setPosX(canvasX); // Update ball position with normalized coordinates
         ball.setMovX(0); // Reset velocity while dragging
     } else if (type === 'touchend' || type === 'mouseup' && event.button === 0) {
-        ball.setMovX(0); // Reset the velocity what th ball might have collected while dragged (like at a rotated surface)
+        ball.setMovX(0); // Reset velocity after dragging
         isDragging = false;
+        gravityManager.setDragState(false); // Inform GravityManager that dragging has ended
+
         // Check for jump condition on mouse/touch release
         const clickDuration = Date.now() - mouseDownTime;
         if (clickDuration < 100) {
@@ -240,46 +246,65 @@ function getEventCoordinates(event) {
         handleScreenEvent(event, eventType.toLowerCase(), mainBall);
     });
 });
+
 ['touchstart', 'touchmove', 'touchend'].forEach((eventType) => {
     canvas.addEventListener(eventType, (event) => {
         handleScreenEvent(event, eventType.toLowerCase(), mainBall);
     });
 });
 
-
-
-// TODO: make this actually work
-
-/**
- * Class to manage device orientation-based gravity for balls.
- */
+// Class to manage device orientation-based gravity for balls
 class GravityManager {
     constructor() {
         this.isSupported = !!window.DeviceOrientationEvent; // Check if API is supported
-        this.isDragging = false; // Track if the user is dragging the ball
+        this.isListening = false; // Track whether the event listener is active
+        this.isDragging = false; // Track drag state
     }
 
     /**
      * Start listening for device orientation changes.
      * @param {Ball} ball - The ball object affected by gravity.
+     * @param {number} gravityXMultiplier - Multiplier for horizontal gravity force.
+     * @param {number} gravityYMultiplier - Multiplier for vertical gravity force.
      */
-    start(ball) {
+    start(ball, gravityXMultiplier = 0.05, gravityYMultiplier = 0.05) {
         if (!this.isSupported) {
-            ModalOpen("Error","DeviceOrientation API is not supported on this device.");
+            console.error("DeviceOrientation API is not supported on this device.");
+            return;
+        }
+        if (this.isListening) {
+            console.warn("Already listening for device orientation events.");
             return;
         }
 
+        this.ball = ball;
+        this.gravityXMultiplier = gravityXMultiplier;
+        this.gravityYMultiplier = gravityYMultiplier;
+        this.isListening = true;
+
         window.addEventListener('deviceorientation', (event) => {
-            this.applyGravity(event, ball);
+            this.applyGravity(event);
         }, true);
+    }
+
+    /**
+     * Stop listening for device orientation changes.
+     */
+    stop() {
+        if (!this.isListening) {
+            console.warn("Not currently listening for device orientation events.");
+            return;
+        }
+
+        this.isListening = false;
+        window.removeEventListener('deviceorientation', this.applyGravity.bind(this), true);
     }
 
     /**
      * Apply gravity forces based on device orientation.
      * @param {Event} event - The device orientation event.
-     * @param {Ball} ball - The ball object affected by gravity.
      */
-    applyGravity(event, ball) {
+    applyGravity(event) {
         const beta = event.beta || 0; // Front-to-back tilt (-180 to 180)
         const gamma = event.gamma || 0; // Left-to-right tilt (-90 to 90)
 
@@ -288,9 +313,9 @@ class GravityManager {
         const normalizedGamma = Math.min(Math.max(gamma / 90, -1), 1);
 
         // Apply gravity forces only when the ball is not being dragged
-        if (!isDragging) {
-            ball.dx += -normalizedGamma * GRAVITY_X_MULTIPLIER; // Negative because gamma increases to the right
-            ball.dy += normalizedBeta * GRAVITY_Y_MULTIPLIER; // Positive because beta increases forward
+        if (!this.isDragging && this.ball) {
+            this.ball.dx += -normalizedGamma * this.gravityXMultiplier; // Negative because gamma increases to the right
+            this.ball.dy += normalizedBeta * this.gravityYMultiplier; // Positive because beta increases forward
         }
     }
 
@@ -298,17 +323,13 @@ class GravityManager {
      * Set the drag state of the ball.
      * @param {boolean} isDragging - Whether the ball is being dragged.
      */
+    setDragState(isDragging) {
+        this.isDragging = isDragging;
+    }
 }
 
 // Example usage:
 const gravityManager = new GravityManager();
-
-// Start applying gravity to the main ball
-const gravyStart = "gravityManager.start(mainBall);";
-
-// Optionally, you can toggle the drag state when interacting with the ball
-// For example, during mouse/touch events:
-
 
 
 
@@ -491,6 +512,12 @@ loadGameObjects('./json/gameObjects.json',canvas).then(rawData => {
 
 
 
+// ======================
+// 9. Collision
+// ======================
+
+
+
 /**
  * Handles collisions between a ball and other objects.
  */
@@ -578,6 +605,16 @@ function resolveCollision(ball, closestPoint, distanceSquared) {
     const impulse = -2 * dotProduct * bounceFactor;
     ball.updateMovement(impulse * normal.x, impulse * normal.y);
 }
+
+
+
+
+// ======================
+// 10. other collision helper
+// ======================
+
+
+
 
 /**
  * Resolves a collision between two balls.
@@ -722,8 +759,11 @@ function transformToLocalCoordinates(point, oval) {
     };
 }
 
+
+
+
 // ======================
-// Utility Functions
+// 13. Other Vector stuff
 // ======================
 
 /**
