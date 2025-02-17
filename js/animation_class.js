@@ -80,7 +80,7 @@ class GameObject {
 	 * @param {number} y - Initial y position.
 	 * @param {number} dx - Initial horizontal velocity.
 	 * @param {number} dy - Initial vertical velocity.
-	 * @param {number} friction - Friction coefficient (0 to 1).
+	 * @param {number} friction - Friction coefficient (0 to 1). - basically how much % of the velocity lost on collision (1 = all , 0.5 = 50%, 0 = none)
 	 * @param {string} color - Color of the object.
 	 * @param {string} identifier - Identifier for the object.
 	 */
@@ -141,8 +141,8 @@ class GameObject {
 	 * Applies friction to reduce velocity.
 	 */
 	applyFriction() {
-		this.dx *= 1 - this.friction;
-		this.dy *= 1 - this.friction;
+		this.dx *= (1 - this.friction);
+		this.dy *= (1 - this.friction);
 	}
 
 	/**
@@ -173,7 +173,7 @@ class GameObject {
 	 * @param {number|null} [currentXMov=null] - New horizontal velocity.
 	 * @param {number|null} [currentYMov=null] - New vertical velocity.
 	 */
-	setMovement(currentXMov = null, currentYMov = null) {
+	setMovement(currentXUpdate = null, currentYUpdate = null) {
 		if (currentXUpdate !== null) {
 			this.dx = currentXUpdate;
 			this.dy = currentYUpdate;
@@ -290,6 +290,7 @@ class Ball extends Ellipse {
 		}
 		this.radius = radius;
 		this.type = "ball";
+		this.mass = radius * radius * 0.25;
 	}
 
 	draw(ctx) {

@@ -42,15 +42,11 @@ let fps = 0; // Current FPS value
 
 // Physics constants
 const gravity = 0.1; // Gravity strength
-const bounceFactor = 0.8; // Adjust bounce factor (0.8 = 80% energy retained)
+const bounceFactor = 0.99; // Adjust bounce factor (0.8 = 80% energy retained)
 let hasFloor = true; // Whether the floor exists
 let currentGravity = gravity;
-const TOLERANCE = 1e-6;
-const MAX_ITERATIONS = 10;
-
-// Gravity constants
-const GRAVITY_X_MULTIPLIER = 0.5; // Strength of gravity in the X-axis
-const GRAVITY_Y_MULTIPLIER = 0.5; // Strength of gravity in the Y-axis
+const TOLERANCE = 1e-6; // Tolerance for numerical convergence
+const MAX_ITERATIONS = 10; // Maximum iterations for numerical solver
 const DEGREES_TO_RADIANS_MULTIPLIER = Math.PI / 180;
 
 
@@ -528,12 +524,12 @@ function handleCollision4Ball(ball, object) {
         case "rectangle":
             if (object.identifier === "floor" && !hasFloor) return;
             const rectCollision = isBallFarFromPolygon(ball, object.transformedVertices);
-            if (!rectCollision.isFar) resolveCollision(ball, rectCollision.closestPoint, rectCollision.distanceSquared);
+            if (!rectCollision.isFar) resolveCollision(ball, rectCollision.closestPoint, object, rectCollision.distanceSquared);
             break;
 
         case "triangle":
             const triCollision = isBallFarFromPolygon(ball, object.transformedVertices);
-            if (!triCollision.isFar) resolveCollision(ball, triCollision.closestPoint, triCollision.distanceSquared);
+            if (!triCollision.isFar) resolveCollision(ball, triCollision.closestPoint, object, triCollision.distanceSquared);
             break;
 
         case "ball":
@@ -586,7 +582,7 @@ function isBallFarFromPolygon(ball, polygonVertices) {
 /**
  * Resolves a collision between a ball and any shape with straight sides.
  */
-function resolveCollision(ball, closestPoint, distanceSquared) {
+function resolveCollision(ball, closestPoint, object, distanceSquared) {
     const radiusSquared = ball.radius * ball.radius;
     if (distanceSquared > radiusSquared) return;
 
@@ -602,7 +598,7 @@ function resolveCollision(ball, closestPoint, distanceSquared) {
     const dotProduct = relativeVelocityX * normal.x + relativeVelocityY * normal.y;
     if (dotProduct > 0) return;
 
-    const impulse = -2 * dotProduct * bounceFactor;
+    const impulse = -2 * dotProduct * bounceFactor * (1 - ball.friction) * (1 - object.friction);
     ball.updateMovement(impulse * normal.x, impulse * normal.y);
 }
 
@@ -649,18 +645,18 @@ function resolveBallBallCollision(ball, object) {
 
     // Calculate the impulse (considering masses as inversely proportional to radii)
     // Only ball moves, so only its mass factor matters
-    const massFactor1 = 1 / (ball.radius * ball.radius || 1); // Default to 1 if mass is undefined
-//    const massFactor2 = 1 / (object.radius * object.radius || 1); // Default to 1 if mass is undefined
-//    const totalMassFactor = massFactor1 + massFactor2;
-    const impulse = (-2 * dotProduct) / massFactor1;
+    const massFactor1 = ball.mass*10; // Default to 1 if mass is undefined
+    const massFactor2 = object.mass; // Default to 1 if mass is undefined
+    const totalMassFactor = massFactor1 + massFactor2;
+    const impulse = (-2 * dotProduct) / totalMassFactor;
 
     // Apply the impulse to ball's velocities
     const impulseX = impulse * normal.x;
     const impulseY = impulse * normal.y;
 
     ball.updateMovement(
-        impulseX * massFactor1 * ball.friction * bounceFactor,
-        impulseY * massFactor1 * ball.friction * bounceFactor
+        impulseX * massFactor1 * (1 - ball.friction) * bounceFactor * (1 - object.friction),
+        impulseY * massFactor1 * (1 - ball.friction) * bounceFactor * (1 - object.friction)
     );
     // Only ball moves, so only its velocity will be updated
 
@@ -682,45 +678,45 @@ function resolveBallBallCollision(ball, object) {
 /**
  * Resolves a collision between a ball and an oval.
  */
-function resolveBallOvalCollision(ball, oval) {
-    const closestPoint = getClosestPointOnOval(ball, oval);
+function resolveBallOvalCollision(ball, object) {
+    const closestPoint = getClosestPointOnOval(object, ball);
     const distanceSquared = getDistanceSquared(ball, closestPoint);
 
-    const localClosest = transformToLocalCoordinates(closestPoint, oval);
-    const effectiveRadius = Math.sqrt((localClosest.x / oval.radiusX) ** 2 + (localClosest.y / oval.radiusY) ** 2);
+    // Check if the ball is colliding with the oval
+    const ballRadiusSquared = ball.radius * ball.radius;
+    if (distanceSquared > ballRadiusSquared) return; // No collision
 
-    const radiusSumSquared = (ball.radius + effectiveRadius) ** 2;
-    if (distanceSquared > radiusSumSquared) return;
-
-    resolveCollision(ball, closestPoint, distanceSquared);
+    // Resolve the collision
+    resolveCollision(ball, closestPoint, object, distanceSquared);
 }
 
 /**
  * Finds the closest point on a rotated oval to a given point.
  */
-function getClosestPointOnOval(ball, oval) {
-    const dx = ball.x - oval.x;
-    const dy = ball.y - oval.y;
-    const cosTheta = Math.cos(-oval.rotation);
-    const sinTheta = Math.sin(-oval.rotation);
+function getClosestPointOnOval(object, point) {
+    const { x, y, radiusX, radiusY, rotation } = object;
 
-    const localX = dx * cosTheta - dy * sinTheta;
-    const localY = dx * sinTheta + dy * cosTheta;
+    // Step 1: Transform the point into the ellipse's local coordinate system
+    const localPoint = transformToLocalCoordinates(point, object);
 
-    const normalizedX = localX / oval.radiusX;
-    const normalizedY = localY / oval.radiusY;
+    // Step 2: Normalize the local point to lie on the ellipse
+    const t = solveEllipseProjection(localPoint.x / radiusX, localPoint.y / radiusY);
+    const closestLocalX = radiusX * t;
+    const closestLocalY = radiusY * Math.sqrt(1 - t * t);
 
-    const t = solveEllipseProjection(normalizedX, normalizedY);
-    const closestLocalX = t * oval.radiusX;
-    const closestLocalY = Math.sqrt(Math.max(0, 1 - t * t)) * oval.radiusY * Math.sign(normalizedY);
+    // Determine the correct quadrant for the closest point
+    const signX = Math.sign(localPoint.x);
+    const signY = Math.sign(localPoint.y);
+    const normalizedClosestLocalX = signX * closestLocalX;
+    const normalizedClosestLocalY = signY * closestLocalY;
 
-    const cosRot = Math.cos(oval.rotation);
-    const sinRot = Math.sin(oval.rotation);
+    // Step 3: Transform the closest point back to the global coordinate system
+    const cosRotation = Math.cos(rotation);
+    const sinRotation = Math.sin(rotation);
+    const closestX = normalizedClosestLocalX * cosRotation - normalizedClosestLocalY * sinRotation + x;
+    const closestY = normalizedClosestLocalX * sinRotation + normalizedClosestLocalY * cosRotation + y;
 
-    return {
-        x: oval.x + closestLocalX * cosRot - closestLocalY * sinRot,
-        y: oval.y + closestLocalX * sinRot + closestLocalY * cosRot
-    };
+    return { x: closestX, y: closestY };
 }
 
 /**
@@ -747,11 +743,11 @@ function solveEllipseProjection(x, y) {
 /**
  * Transforms a point into the oval's local coordinate system.
  */
-function transformToLocalCoordinates(point, oval) {
-    const dx = point.x - oval.x;
-    const dy = point.y - oval.y;
-    const cosTheta = Math.cos(-oval.rotation);
-    const sinTheta = Math.sin(-oval.rotation);
+function transformToLocalCoordinates(point, object) {
+    const dx = point.x - object.x;
+    const dy = point.y - object.y;
+    const cosTheta = Math.cos(-object.rotation);
+    const sinTheta = Math.sin(-object.rotation);
 
     return {
         x: dx * cosTheta - dy * sinTheta,

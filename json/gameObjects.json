@@ -20,7 +20,7 @@
       "dx": 0,
       "dy": 0,
       "rotation": 0,
-      "friction": 0.1,
+      "friction": 0.10,
       "color": "green",
       "identifier": "floor"
     },
@@ -33,7 +33,7 @@
       "dx": 0,
       "dy": 0,
       "rotation": 0,
-      "friction": 1,
+      "friction": 0.25,
       "color": "grey",
       "identifier": "platform"
     },
@@ -47,7 +47,7 @@
       "radius": 30,
       "dx": 2,
       "dy": 2,
-      "friction": 0.2,
+      "friction": 0.20,
       "color": "green",
       "identifier": ""
     },
@@ -60,7 +60,7 @@
       "rotation": "30p",
       "dx": 2,
       "dy": 2,
-      "friction": 0.2,
+      "friction": 0.20,
       "color": "red",
       "identifier": ""
     },
@@ -72,7 +72,7 @@
       "dx": -1,
       "dy": 0,
       "rotation": 0,
-      "friction": 0.5,
+      "friction": 0.20,
       "color": "blue",
       "identifier": ""
     },
@@ -84,7 +84,7 @@
       "dx": 1,
       "dy": 0,
       "rotation": "180p",
-      "friction": 0.5,
+      "friction": 0.20,
       "color": "black",
       "identifier": ""
     },
@@ -97,7 +97,7 @@
       "dx": 0,
       "dy": 0,
       "rotation": "60p",
-      "friction": 1,
+      "friction": 0.20,
       "color": "cyan",
       "identifier": ""
     }
