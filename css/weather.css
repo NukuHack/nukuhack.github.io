@@ -1,6 +1,8 @@
 
 
 .weather-container {
+    position: relative;
+    top: 10%;
     background-color: var(--background-dark-color);
     padding: 30px;
     border-radius: 12px;
