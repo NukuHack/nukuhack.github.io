@@ -76,6 +76,9 @@ function displayData() {
     }
 }
 
+//TODO : limit the display to like 20 things (or less) and only ever show that much
+// (and probably a next page stuff so new stuff and a lot more ...)
+
 // Extract unique languages from data
 function extractSupportedLanguages() {
     data.forEach(({ lang }) => {
