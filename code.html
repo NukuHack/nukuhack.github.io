@@ -14,9 +14,9 @@
 
     <div class="search_stuff" id="search_stuff">
 
-        <button class="dropdown-button" id="dropdown_language_button" onclick="ToggleDropdown()"></button>
-        <div class="dropdown-content" id="dropdown_language" onclick="ToggleDropdown()">
-            <button class="dropdown-item" onClick="SelectByLanguage('all')">All</button>
+        <button class="dropdown-button" id="dropdown_language_button" onclick="toggleLanguageDropdown()"></button>
+        <div class="dropdown-content" id="dropdown_language">
+            <button class="dropdown-item" onClick="filterByLanguage('all')">All</button>
         </div>
 
         <input type="text" id="search_title" placeholder="Input the Description" oninput="">

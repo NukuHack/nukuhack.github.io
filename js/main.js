@@ -318,38 +318,6 @@ function HideHtmlElement(id, time) {
     }
 }
 
-const CountB_in_A = ((sourceString, searchString) => {
-    if (!searchString) throw new Error("Search string cannot be empty");
-
-    const searchLength = searchString.length;
-    let count = 0;
-    let index = 0;
-
-    while ((index = sourceString.indexOf(searchString, index)) !== -1) {
-        count++;
-        index += searchLength; // Move the index forward by the length of searchString
-    }
-
-    return count;
-});
-
-const LongestSubstring = ((sourceString, deLimiter) => {
-    if (!deLimiter) throw new Error("Delimiter cannot be empty");
-
-    let maxLength = 0;
-    let lastPosition = -1; // Tracks the position of the last occurrence of the delimiter
-
-    for (let i = 0; i < sourceString.length; i++) {
-        if (sourceString[i] === deLimiter) {
-            if (lastPosition !== -1) {
-                maxLength = i - lastPosition - 1 > maxLength ? i - lastPosition - 1 : maxLength;
-            }
-            lastPosition = i;
-        }
-    }
-
-    return maxLength;
-});
 
 (() => {
     const isSmallScreen = window.matchMedia("(max-width: 768px)").matches;

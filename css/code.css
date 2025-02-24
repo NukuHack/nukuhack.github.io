@@ -1,46 +1,51 @@
 /* General Layout for Code Display */
 .codes {
-    margin: 10px; /* Adds spacing and centers the container */
-    width: 96%;
+    margin: 10px;
+    width: 99%;
     display: grid;
-    grid-gap: 30px;
-    place-items: center; /* Centers all grid items */
+    gap: 30px;
+    place-items: center;
     align-items: stretch;
     justify-content: center;
     grid-template-columns: repeat(auto-fill, minmax(30%, 45%));
 }
 
-
 /* Responsive Design */
 @media (max-width: 700px) {
-    .code{
+    .code {
+        width: 99%;
         transition: display 0.5s;
     }
     #codes_helper {
-        transition: display,opacity 0.5s;
+        transition: display, opacity 0.5s;
         display: block !important;
         opacity: 1;
     }
-    .code_buttons {
-        transition: display 0.5s;
+    .code_buttons, .code_help {
         display: none !important;
     }
-    .code_help {
-        transition: display 0.5s;
-        display: none !important;
+    /*
+    This looks bad if you open a page about the code .... on phone ...
+    .code_resize{
+        margin-top: 20px !important;
+        margin-bottom: 20px !important;
     }
-    .code_page{
+    */
+    .code_page {
         width: 95vw !important;
         left: 0 !important;
     }
+    .dropdown-content {
+        left: 100px !important;
+    }
 }
 @media (max-width: 1200px) {
-    .codes{
+    .codes {
         grid-template-columns: repeat(auto-fill, minmax(400px, 90%));
     }
 }
 
-#codes_helper{
+#codes_helper {
     display: none;
     width: 80%;
     margin: 5px;
@@ -51,7 +56,7 @@
 
 /* Code Block Container Styling */
 .code {
-    width: 100%;
+    width: 100% !important;
     min-width: 300px;
     max-width: 700px;
     height: 100%;
@@ -59,18 +64,18 @@
     border: 2px solid var(--border-light-color);
     border-radius: 20px;
     overflow: hidden;
-    padding: 5px 10px; /* Padding: up-down left-right */
+    padding: 10px;
     display: flex;
     flex-direction: column;
     align-items: stretch;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Adds subtle shadow for depth */
-    transition: transform 0.3s ease, background-color 0.3s ease; /* Adds smooth hover effect */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s ease, background-color 0.3s ease;
 }
 
 /* Hover Effect for Code Blocks */
 .code:hover {
     background-color: var(--background-normal-color);
-    transform: translateY(-5px); /* Subtle lift effect */
+    transform: translateY(-5px);
 }
 
 /* Focus Styling to Remove Outline */
@@ -110,13 +115,13 @@
     font-size: 80% !important;
 }
 
-
+/* Code Output Styling */
 .code_out, .code_code {
     background-color: var(--background-cold-color) !important;
     overflow: auto !important;
 }
 
-/* Styling for Action Buttons (Copy, Resize, etc.) */
+/* Action Buttons Styling */
 .code_copy, .code_resize, .code_readonly, .code_reset {
     border-radius: 4px;
     border: 1px solid var(--border-cold-color);
@@ -126,7 +131,7 @@
     align-self: center;
     color: var(--font-basic-color);
     background-color: var(--background-light-color);
-    padding: 6px 12px; /* Adds padding for better click targets */
+    padding: 6px 12px;
     cursor: pointer;
     transition: background-color 0.5s ease, color 0.5s ease, transform 1s ease;
 }
@@ -134,34 +139,27 @@
 .code_copy:hover, .code_resize:hover, .code_readonly:hover, .code_reset:hover {
     background-color: var(--background-normal-color);
     color: var(--font-cold-color);
-    transform: scale(1.05); /* Slightly enlarge the button */
+    transform: scale(1.05);
 }
 
 .code_readonly, .code_reset {
     width: 100%;
     margin: 1px;
 }
-.code_copy:focus, .code_resize:focus, .code_readonly:focus, .code_reset:focus {
-    outline: none;
-}
 
-
-
-
-
-#code_page{
+/* Fullscreen Code Page */
+#code_page {
     position: absolute;
     width: 100%;
-    height: 100vw;
+    height: 100vh;
     top: 0;
-    background-color: var(--black);
-    background-color: rgba(0, 0, 0, 0.4); /* Black w/ opacity */
+    background-color: rgba(0, 0, 0, 0.4);
     opacity: 1;
     display: none;
     z-index: 10;
 }
 
-/* Code Block Container Styling */
+/* Code Block in Fullscreen Mode */
 .code_page {
     animation: zoom 0.2s;
     opacity: 1 !important;
@@ -169,28 +167,29 @@
     top: 70px;
     left: 25%;
     width: 50%;
-    min-width: 400px !important;
+    min-width: 400px;
     height: auto;
     background-color: var(--background-middle-color);
     border: 2px solid var(--border-light-color);
     border-radius: 20px;
     overflow: hidden;
-    padding: 5px 10px; /* Padding: up-down left-right */
+    padding: 10px;
     display: flex;
     flex-direction: column;
     align-items: stretch;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Adds subtle shadow for depth */
-    transition: transform 0.3s ease, background-color 0.3s ease; /* Adds smooth hover effect */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
+/* Code Help Page */
 .code_help_page {
-    border: 1px solid var(--border-cold-color) !important;
-    background-color: var(--background-cold-color) !important;
-    border-radius: 8px !important;
-    overflow: auto !important;
-    font-size: 80% !important;
+    border: 1px solid var(--border-cold-color);
+    background-color: var(--background-cold-color);
+    border-radius: 8px;
+    overflow: auto;
+    font-size: 80%;
 }
 
+/* Buttons in Fullscreen Mode */
 .code_buttons_page {
     align-self: center;
     display: flex;
@@ -198,21 +197,14 @@
     margin: 10px auto;
 }
 
-
-
-
-
-
-
-
-
-
+/* Search Input Styling */
 .search_stuff {
     position: relative;
     align-self: stretch;
 }
 
-.dropdown-button {
+/* Dropdown Button Styling */
+.dropdown-button, #search_title {
     position: relative;
     padding: 10px 20px;
     font-size: 16px;
@@ -231,47 +223,28 @@
     border-color: var(--border-light-color);
 }
 
-#dropdown_language_button{
-    position: relative;
-    left: 0;
-}
-#search_title{
-    position: relative;
-    height: 22px;
-    width: 181px;
-    right: 0;
-    padding: 10px 20px;
-    font-size: 16px;
-    border: 1px solid var(--border-dark-color);
-    background-color: var(--background-middle-color);
-    color: var(--font-cold-color);
-    border-radius: 5px;
-    transition: background-color 0.3s;
-}
-#search_title:hover::placeholder{
-
-}
-
-#search_title:focus{
+#search_title:focus {
     outline: none !important;
 }
-#search_title::placeholder{
+
+#search_title::placeholder {
     color: var(--font-light-color);
 }
+
+/* Dropdown Content Styling */
 .dropdown-content {
     text-shadow: var(--font-dark-color) 1px 1px 1px;
     position: absolute;
-    width: 15%;
-    justify-items: stretch;
+    width: max(130px, 12%);
     top: 100%;
-    left: 33%;
+    left: 35%;
     display: grid;
     background-color: var(--background-middle-color);
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     border-radius: 7px;
     overflow: hidden;
-    opacity: 0;
     visibility: hidden;
+    opacity: 0;
     transform: translateY(-10px);
     transition: opacity 0.5s ease, transform 0.3s ease;
     z-index: 10;
@@ -279,25 +252,18 @@
 
 .dropdown-content.show {
     visibility: visible;
-    transition: opacity 0.5s ease, transform 0.5s ease;
     opacity: 1;
     transform: translateY(0);
 }
 
-.dropdown-content.hide {
-    visibility: hidden;
-    transition: opacity 0.5s ease, transform 0.5s ease;
-    opacity: 90%;
-    transform: translateY(-10px);
-}
 
+/* Dropdown Item Styling */
 .dropdown-item {
     text-shadow: var(--font-dark-color) 1px 1px 1px;
     display: block;
     border-radius: 2px;
     border: 1px solid var(--border-dark-color);
     padding: 10px 20px;
-    justify-self: stretch;
     text-decoration: none;
     color: var(--font-basic-color);
     background-color: var(--background-light-color);
@@ -308,11 +274,10 @@
     background-color: var(--background-normal-color);
 }
 
-#search_no_result{
+/* No Results Message */
+#search_no_result {
     display: none;
 }
-
-
 
 
 
