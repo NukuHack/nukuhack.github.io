@@ -3,3 +3,84 @@ canvas {
     display: block;
     background: var(--background-dark-color);
 }
+
+/* Style the container to use CSS Grid */
+#controls {
+    position: absolute;
+    bottom: 100px;
+    transform: translateX(-50%);
+    gap: 5px;
+    display: flex;
+    justify-content: center; /* Center the grid horizontally */
+}
+
+#wasd-buttons{
+    position: relative;
+    left: 100%;
+    display: grid;
+    gap: 5px;
+    grid-template-areas:
+        "x w l"  /* W in the centre */
+        "a s d";  /* A and S and D are in the first row below W */
+}
+
+#vert-buttons{
+    position: relative;
+    right: 0px;
+    display: grid;
+    gap: 5px;
+    grid-template-areas:
+        "u"
+        "d";
+}
+
+/* Add this to your CSS file */
+#controls button {
+    width: 50px;
+    height: 50px;
+    font-size: 20px;
+    border: none;
+    border-radius: 20%;
+    background-color: var(--background-light-color);
+    color: var(--font-cold-color);
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+
+/* Assign each button to its respective grid area */
+#w-button {
+    grid-area: w;
+}
+
+#a-button {
+    grid-area: a;
+}
+
+#s-button {
+    grid-area: s;
+}
+
+#d-button {
+    grid-area: d;
+}
+
+#upp-button{
+    width: 70px;
+    height: 70px;
+    grid-area: u;
+}
+
+#down-button{
+    width: 70px;
+    height: 70px;
+    grid-area: d;
+}
+
+#controls button:hover {
+    background-color: var(--background-normal-color);
+}
+
+#controls button:active {
+    background-color: var(--background-dark-color);
+}
