@@ -23,38 +23,38 @@ function LoadBasicContent() {
     let navContent = `
         <nav class="navbar" id="navbar">
             <div class="navbar_in">
-                <p class="navbar_link" onclick="ChangePage()">${PageHelper(currentUrl)} Page</p>
+                <p class="navbar_head link" onclick="ChangePage()">${PageHelper(currentUrl)} Page</p>
                 <button type="button" class="navbar_toggle" id="navbarToggle" onclick="ToggleNavbar()">
                     <img id="menu_image" src="./assets/menu_bars.png" alt="Menu" />
                 </button>
                 <div class="navbar_items" id="navbarDropdown">
                     <ul class="navbar_ul">
                         <li class="navbar_li">
-                            <p class="navbar_item" onclick="ChangePage('index')">Main Webpage</p>
+                            <p class="navbar_item link" onclick="ChangePage('index')">Main Webpage</p>
                         </li>
                         <li class="navbar_li">
-                            <p class="navbar_item" onclick="ChangePage('code')">Actual Code</p>
+                            <p class="navbar_item link" onclick="ChangePage('code')">Actual Code</p>
                         </li>
                         <li class="navbar_li dropdown">
                             <p class="navbar_item">Animations</p>
                             <ul class="dropdown_menu">
-                                <li><p class="dropdown_item" onclick="ChangePage('animation')">Animation Page</p></li>
-                                <li><p class="dropdown_item" onclick="ChangePage('dice')">Dice Page</p></li>
-                                <li><p class="dropdown_item" onclick="ChangePage('test3d')">3D Test Page</p></li>
+                                <li class="dropdown_li"><p class="dropdown_item link" onclick="ChangePage('animation')">Animation Page</p></li>
+                                <li class="dropdown_li"><p class="dropdown_item link" onclick="ChangePage('dice')">Dice Page</p></li>
+                                <li class="dropdown_li"><p class="dropdown_item link" onclick="ChangePage('test3d')">3D Test Page</p></li>
                             </ul>
                         </li>
                         <li class="navbar_li dropdown">
                             <p class="navbar_item">Random Things</p>
                             <ul class="dropdown_menu">
-                                <li><p class="dropdown_item" onclick="ChangePage('extra')">Extra</p></li>
-                                <li><p class="dropdown_item" onclick="ChangePage('links')">Links</p></li>
+                                <li class="dropdown_li"><p class="dropdown_item link" onclick="ChangePage('extra')">Extra</p></li>
+                                <li class="dropdown_li"><p class="dropdown_item link" onclick="ChangePage('links')">Links</p></li>
                             </ul>
                         </li>
                         <li class="navbar_li dropdown">
                             <p class="navbar_item">Small Apps</p>
                             <ul class="dropdown_menu">
-                                <li><p class="dropdown_item" onclick="ChangePage('weather')">Weather</p></li>
-                                <li><p class="dropdown_item" onclick="ChangePage('video')">Video</p></li>
+                                <li class="dropdown_li"><p class="dropdown_item link" onclick="ChangePage('weather')">Weather</p></li>
+                                <li class="dropdown_li"><p class="dropdown_item link" onclick="ChangePage('video')">Video</p></li>
                             </ul>
                         </li>
                     </ul>

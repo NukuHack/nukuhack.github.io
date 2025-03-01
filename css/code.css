@@ -8,40 +8,23 @@
     align-items: stretch;
     justify-content: center;
     grid-template-columns: repeat(auto-fill, minmax(30%, 45%));
+
+    @media (max-width: 1200px) {
+        grid-template-columns: repeat(auto-fill, minmax(400px, 90%));
+    }
 }
+
 
 /* Responsive Design */
 @media (max-width: 700px) {
-    .code {
-        width: 99%;
-        transition: display 0.5s;
-    }
     #codes_helper {
-        transition: display, opacity 0.5s;
-        display: block !important;
+        transition: opacity 0.5s;
+        display: block;
         opacity: 1;
     }
-    .code_buttons, .code_help {
-        display: none !important;
-    }
-    /*
-    This looks bad if you open a page about the code .... on phone ...
-    .code_resize{
-        margin-top: 20px !important;
-        margin-bottom: 20px !important;
-    }
-    */
-    .code_page {
-        width: 95vw !important;
-        left: 0 !important;
-    }
+
     .dropdown-content {
-        left: 100px !important;
-    }
-}
-@media (max-width: 1200px) {
-    .codes {
-        grid-template-columns: repeat(auto-fill, minmax(400px, 90%));
+        left: 100px;
     }
 }
 
@@ -56,7 +39,7 @@
 
 /* Code Block Container Styling */
 .code {
-    width: 100% !important;
+    width: 100%;
     min-width: 300px;
     max-width: 700px;
     height: 100%;
@@ -70,7 +53,12 @@
     align-items: stretch;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     transition: transform 0.3s ease, background-color 0.3s ease;
+    @media (max-width: 700px) {
+            width: 90%;
+            transition: display 0.5s;
+    }
 }
+
 
 /* Hover Effect for Code Blocks */
 .code:hover {
@@ -79,19 +67,19 @@
 }
 
 /* Focus Styling to Remove Outline */
-.code_code:focus, .code_out:focus {
-    outline: none !important;
+.code_code:focus,
+.code_out:focus {
+    outline: none;
 }
 
 /* Code Display Styling */
 .code_code {
-    outline: none !important;
-    text-shadow: black 1px 1px 1px !important;
     height: max-content;
 }
 
 /* Language and Description Text Styling */
-.code_lang, .code_desc {
+.code_lang,
+.code_desc {
     color: var(--font-cold-color);
     text-shadow: var(--font-cold-color) 1px 1px 1px;
     margin-bottom: 4px;
@@ -104,25 +92,36 @@
     display: flex;
     gap: 5px;
     margin: 10px auto;
+    @media (max-width: 700px) {
+
+        display: none;
+    }
 }
 
 /* Code Help Section */
 .code_help {
-    border: 1px solid var(--border-cold-color) !important;
-    background-color: var(--background-cold-color) !important;
-    border-radius: 8px !important;
-    overflow: hidden !important;
-    font-size: 80% !important;
+    border: 1px solid var(--border-cold-color);
+    overflow: hidden;
+    font-size: 80%;
+    @media (max-width: 700px) {
+        display: none;
+    }
 }
 
 /* Code Output Styling */
-.code_out, .code_code {
-    background-color: var(--background-cold-color) !important;
-    overflow: auto !important;
+.code_out,
+.code_code {
+    background-color: var(--background-cold-color);
+    text-shadow: black 1px 1px 1px!important;
+    overflow: auto;
+    margin: 0 !important;
 }
 
 /* Action Buttons Styling */
-.code_copy, .code_resize, .code_readonly, .code_reset {
+.code_copy,
+.code_resize,
+.code_readonly,
+.code_reset {
     border-radius: 4px;
     border: 1px solid var(--border-cold-color);
     font-size: 80%;
@@ -136,13 +135,17 @@
     transition: background-color 0.5s ease, color 0.5s ease, transform 1s ease;
 }
 
-.code_copy:hover, .code_resize:hover, .code_readonly:hover, .code_reset:hover {
+.code_copy:hover,
+.code_resize:hover,
+.code_readonly:hover,
+.code_reset:hover {
     background-color: var(--background-normal-color);
     color: var(--font-cold-color);
     transform: scale(1.05);
 }
 
-.code_readonly, .code_reset {
+.code_readonly,
+.code_reset {
     width: 100%;
     margin: 1px;
 }
@@ -162,13 +165,13 @@
 /* Code Block in Fullscreen Mode */
 .code_page {
     animation: zoom 0.2s;
-    opacity: 1 !important;
+    opacity: 1;
     position: absolute;
     top: 70px;
     left: 25%;
     width: 50%;
     min-width: 400px;
-    height: auto;
+    height: 78vh;
     background-color: var(--background-middle-color);
     border: 2px solid var(--border-light-color);
     border-radius: 20px;
@@ -178,15 +181,25 @@
     flex-direction: column;
     align-items: stretch;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    @media (max-width: 700px) {
+
+        left: 1px;
+        width: 95%;
+    }
 }
 
 /* Code Help Page */
 .code_help_page {
     border: 1px solid var(--border-cold-color);
-    background-color: var(--background-cold-color);
-    border-radius: 8px;
+    display: block;
+    justify-self: center;
+    margin: auto;
+    width: 90%;
     overflow: auto;
     font-size: 80%;
+    @media (max-width: 700px) {
+        width: 95%;
+    }
 }
 
 /* Buttons in Fullscreen Mode */
@@ -204,7 +217,8 @@
 }
 
 /* Dropdown Button Styling */
-.dropdown-button, #search_title {
+.dropdown-button,
+#search_title {
     position: relative;
     padding: 10px 20px;
     font-size: 16px;
@@ -218,13 +232,14 @@
     transition: background-color 0.3s;
 }
 
-.dropdown-button:hover, #search_title:hover {
+.dropdown-button:hover,
+#search_title:hover {
     background-color: var(--background-middle-color);
     border-color: var(--border-light-color);
 }
 
 #search_title:focus {
-    outline: none !important;
+    outline: none;
 }
 
 #search_title::placeholder {
@@ -255,7 +270,6 @@
     opacity: 1;
     transform: translateY(0);
 }
-
 
 /* Dropdown Item Styling */
 .dropdown-item {
@@ -308,4 +322,9 @@
 .line-numbers-rows{
     color: #222222 !important;
     border-right: 1px solid snow !important;
+}
+
+
+code[class*=language-], pre[class*=language-]{
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
 }

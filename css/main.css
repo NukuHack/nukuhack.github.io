@@ -75,164 +75,212 @@ a {
 
 
 
-
+.link:hover {
+        text-decoration: underline;
+}
+/* Navbar Container */
 .navbar {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    background-color: var(--background-dark-color); /* Navbar background */
+    background-color: var(--background-dark-color);
     padding: 10px;
-    left: 0;
-    color: var(--font-basic-color);
     position: fixed;
     top: 0;
+    left: 0;
     width: 100%;
-    z-index: 100; /* Ensure it stays above content */
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Optional: Shadow for visibility */
+    z-index: 2;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
+/* Navbar Inner Container */
 .navbar_in {
-    position: relative;
-    transition: margin-left 0.5s ease;
-    margin-left: 5%;
-    width: 80%; /* Align near the center */
     display: flex;
-    align-items: center; /* Ensure vertical alignment */
-    justify-content: center;
-    @media (min-width: 800px) {
-        transition: margin-left 0.5s ease;
-        margin-left: 10%;
-    }
-    @media (min-width: 1000px) {
-        transition: margin-left 0.5s ease;
-        margin-left: 15%;
-    }
-    @media (min-width: 1300px) {
-        transition: margin-left 0.5s ease;
-        margin-left: 17%;
-    }
+    align-items: center;
+    justify-content: space-between; /* Distribute items between the left, center, and right */
+    width: 98%;
+    margin: 0 auto; /* Ensure the container is centered within the navbar */
 }
 
-.navbar_link, .navbar_item {
-    color: var(--font-basic-color);
-    align-self: center;
-    text-decoration: inherit;
+/* Navbar Title (Centered) */
+.navbar_head {
+    padding: 5px;
+    border-radius: 20px;
     font-size: 1.4rem;
-    margin: 0 10px;
-}
-
-.navbar_link {
-    display: inline-block;
-    text-align: center;
+    color: var(--font-basic-color);
+    text-decoration: none;
     cursor: pointer;
+    text-align: center;
+    margin: 0 10px 0 45% ; /* Center the title */
+
+    @media (max-width: 1000px){
+        margin: 0 10px 0 40% ; /* Center the title */
+    }
+    @media (max-width: 600px){
+        margin: 0 10px 0 15% ; /* Center the title */
+    }
 }
 
+/* Navbar Toggle Button */
 .navbar_toggle {
-    display: flex; /* Align items horizontally */
+    display: flex;
+    align-items: center;
+    justify-content: center;
     background: none;
     border: none;
     cursor: pointer;
-    justify-content: center;
-    align-items: center; /* Center the image inside */
     padding: 5px;
-    margin-left: 10px; /* Optional spacing between link and toggle */
+    margin-right: 20px; /* Add some spacing from the dark mode toggler */
 }
 
-/* Navbar Items */
+
+
+/* Navbar Items (Positioned Near Center but Slightly Right) */
 .navbar_items {
-    transition: opacity 0.5s ease, transform 0.5s ease;
     opacity: 0;
     visibility: hidden;
-    width: 200px;
-    flex-direction: column; /* Stack items vertically in dropdown */
-    background-color: var(--background-middle-color);
     position: absolute;
-    top: 100%; /* Position below the parent */
-    left: 40%; /* Align with the parent */
+    top: 100%;
+    left: 40%;
+    border: 1px solid var(--border-light-color);
+    transform: translateX(-50%) translateY(-20px); /* Adjust vertical alignment */
+    background-color: var(--background-middle-color);
     padding: 10px;
-    border-radius: 5px;
-    transform: translateY(-20px); /* Start position for animation */
+    width: 190px;
+    border-radius: 20px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+    z-index: 3;
+    margin-left: 50px; /* Move it slightly to the right of the center */
+
+    @media (max-width: 800px) {
+        left: 30%;
+    }
+    @media (max-width: 520px) {
+        left: 20%;
+    }
+    @media (max-width: 450px) {
+        left: 15%;
+    }
+    @media (max-width: 420px) {
+        left: 15%;
+        .dropdown_menu{
+            left: 90%;
+        }
+    }
 }
 
 .navbar_items.show {
     opacity: 1;
     visibility: visible;
-    transform: translateY(0); /* Animate to visible position */
+    transform: translateX(-50%) translateY(0);
 }
 
-/* Navbar List Items */
+/* Navbar List */
 .navbar_ul {
     list-style: none;
     padding: 0;
     margin: 0;
-    display: flex; /* Use flexbox for horizontal alignment of top-level items */
-    flex-direction: column; /* Stack items vertically by default */
+    display: flex;
+    flex-direction: column;
 }
 
-.navbar_li {
-    position: relative; /* Ensure dropdown menus are positioned relative to these items */
-    display: block; /* Ensure each item is on its own line */
+.navbar_li:not(:last-child)::after {
+        content: '';
+        display: block;
+        height: 4px;
 }
+/* General Hover Effect for Navbar Items */
 .navbar_li:hover {
     background-color: var(--background-light-color);
-    text-decoration: underline;
+    transition: background-color 0.3s ease;
 }
+
+
+/* Ensure Navbar Items Have Consistent Styling */
+.navbar_li {
+    border: 1px solid var(--border-light-color);
+    position: relative;
+    display: block;
+    padding: 5px 10px;
+    cursor: pointer;
+    border-radius: 5px; /* Default border radius */
+    transition: background-color 0.3s ease; /* Smooth transition for hover effect */
+}
+
+/* Rounded Corners for First and Last Items */
+.navbar_li:first-child {
+    border-radius: 20px 20px 5px 5px;
+}
+.navbar_li:last-child {
+    border-radius: 5px 5px 20px 20px;
+}
+
+
 
 .navbar_item {
-    cursor: pointer;
-    float: inherit;
-    width: auto;
-    margin: 5px 0; /* Add spacing between items */
-}
-
-/* Dropdown Menu */
-.dropdown {
-    position: relative; /* Ensure dropdown menu is positioned relative to this */
+    width: 100%;
+    height: 100%;
+    font-size: 1.4rem;
+    color: var(--font-basic-color);
+    text-decoration: none;
 }
 
 /* Dropdown Menu */
 .dropdown_menu {
     display: none;
     position: absolute;
-    list-style-type: none; /* Removes the bullet points from the entire list */
-    margin: 0; /* Optional: Remove default margin */
-    top: -20%;
-    left: 100%; /* Align with the parent */
-    background-color: var(--background-middle-color);
+    width: 170px;
+    top: 0;
+    left: 105%;
+    list-style: none;
+    margin: 0;
     padding: 10px;
-    border-radius: 5px;
+    border: 1px solid var(--border-light-color);
+    background-color: var(--background-middle-color);
+    border-radius: 20px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    z-index: 101;
-    transition: opacity 0.3s ease, transform 0.3s ease;
+    transition: opacity 0.5s ease, transform 0.5s ease;
     opacity: 0;
-    transform: translateY(-10px);
-    width: 200px; /* Set a fixed width for better alignment */
+    transform: translateY(-20px);
+    z-index: 3;
 }
 
 .dropdown_menu.show {
     display: block;
     opacity: 1;
     transform: translateY(0);
-    .navbar_li {
-        background-color: var(--background-light-color);
-        text-decoration: underline;
-    }
 }
 
 .dropdown_item {
+    font-size: 1.2rem;
     color: var(--font-basic-color);
     text-decoration: none;
-    font-size: 1.2rem;
+}
+
+
+
+/* Dropdown Menu Items Hover Effect */
+.dropdown_li:hover {
+    background-color: var(--background-light-color);
+    transition: background-color 0.3s ease;
+}
+
+/* Dropdown Menu Items */
+.dropdown_li {
     cursor: pointer;
-    padding: 5px 10px; /* Add padding for better click-ability */
+    padding: 5px 10px;
+    border: 1px solid var(--border-light-color);
+    border-radius: 5px; /* Default border radius */
+    transition: background-color 0.3s ease; /* Smooth transition for hover effect */
 }
 
-.dropdown_item:hover {
-    text-decoration: underline;
-    background-color: var(--background-light-color); /* Optional: Highlight on hover */
+/* Rounded Corners for First and Last Dropdown Items */
+.dropdown_li:first-child {
+    border-radius: 20px 20px 5px 5px;
 }
-
-
+.dropdown_li:last-child {
+    border-radius: 5px 5px 20px 20px;
+}
 
 #navbarHelp {
     margin-bottom: 50px;
@@ -247,10 +295,10 @@ a {
 
 /* Dark mode toggler */
 .darkmode-slider {
-    margin-left: 10%;
     display: flex;
-    justify-content: flex-end;
     align-items: center;
+    margin-left: auto; /* Push it to the right */
+    margin-right: 20px;
     padding: 10px;
 }
 
