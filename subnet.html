@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link href="./assets/favicon.png" rel="shortcut icon" type="image/x-icon" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subnet Calculator</title>
+    <link rel="stylesheet" type="text/css" href="./css/main.css">
+    <link rel="stylesheet" type="text/css" href="./css/subnet.css">
+</head>
+<body>
+
+    <h1>Advanced Subnet Calculator</h1>
+    
+    <div class="tabs">
+        <div class="tab active" onclick="switchTab('subnet-calc')">Subnet Calculator</div>
+        <div class="tab" onclick="switchTab('host-calc')">Host Calculator</div>
+        <div class="tab" onclick="switchTab('power-calc')">Power of 2 Calculator</div>
+    </div>
+    
+    <div id="subnet-calc" class="tab-content active">
+        <div class="input-group">
+            <label for="ip">IP Address:</label>
+            <input type="text" id="ip" placeholder="e.g., 192.168.1.1">
+        </div>
+        
+        <div class="input-group">
+            <label for="subnet">Subnet Mask:</label>
+            <input type="text" id="subnet" placeholder="e.g., 255.255.255.0 or /24">
+        </div>
+        
+        <button onclick="calculateSubnet()">Calculate</button>
+    </div>
+    
+    <div id="host-calc" class="tab-content">
+        <div class="input-group">
+            <label for="host-ip">Network IP Address:</label>
+            <input type="text" id="host-ip" placeholder="e.g., 192.168.1.0">
+        </div>
+        
+        <div class="input-group">
+            <label for="host-subnet">Subnet Mask (optional):</label>
+            <input type="text" id="host-subnet" placeholder="e.g., 255.255.255.0 or /24">
+        </div>
+        
+        <div class="host-requirements-container">
+            <div class="host-requirements-header">
+                <label>Host Requirements:</label>
+                <button class="toggle-host-inputs" onclick="toggleHostInputs()">ˇ</button>
+            </div>
+            <div id="host-inputs">
+                <div class="host-input-container" id="host-input-1">
+                    <input type="number" class="host-input" placeholder="Number of hosts needed (e.g., 100)" min="1">
+                    <button class="add-host-btn" onclick="addHostInput()">+</button>
+                </div>
+            </div>
+        </div>
+        
+        <button onclick="calculateForHosts()">Calculate Subnets</button>
+    </div>
+    
+    <div id="power-calc" class="tab-content">
+        <div class="input-group">
+            <label for="host-count">Number of Hosts Needed:</label>
+            <input type="number" id="host-count" placeholder="e.g., 100" min="1">
+        </div>
+        
+        <button onclick="calculatePowerOfTwo()">Calculate</button>
+    </div>
+    
+    <div id="error" class="error"></div>
+    
+    <div id="results" class="results" style="display: none;">
+        <h2 id="results-title">Results</h2>
+        <div id="results-content"></div>
+    </div>
+
+<script src="https://cdn.jsdelivr.net/npm/darkreader@4.9.34/darkreader.min.js"></script>
+<script src="./js/main.js"></script>
+<script src="./js/subnet.js"></script>
+</body>
+</html>

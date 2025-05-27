@@ -53,8 +53,9 @@ function LoadBasicContent() {
                         <li class="navbar_li dropdown">
                             <p class="navbar_item">Small Apps</p>
                             <ul class="dropdown_menu">
-                                <li class="dropdown_li"><p class="dropdown_item link" onclick="ChangePage('weather')">Weather</p></li>
                                 <li class="dropdown_li"><p class="dropdown_item link" onclick="ChangePage('video')">Video</p></li>
+                                <li class="dropdown_li"><p class="dropdown_item link" onclick="ChangePage('weather')">Weather</p></li>
+                                <li class="dropdown_li"><p class="dropdown_item link" onclick="ChangePage('subnet')">Subnet</p></li>
                             </ul>
                         </li>
                     </ul>
