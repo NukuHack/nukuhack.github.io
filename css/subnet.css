@@ -1,112 +1,151 @@
-/* Subnet Calculator - Custom Styling */
-.subnet-calculator {
-    width: 90%;
-    max-width: 900px;
-    margin: 80px auto 100px;
-    padding: 20px;
-    background-color: var(--background-darkest-color);
-    border-radius: 15px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+/* Subnet Calculator - Enhanced Styling with Better Specificity */
+body{
+    margin: 30px auto;
+    padding: 25px;
+    background-color: var(--background-light-color);
     color: var(--font-cold-color);
 }
 
-.input-group {
-    margin-bottom: 20px;
+.head-name {
+    text-align: center;
+    margin: 20px 0 30px;
+    color: var(--font-basic-color);
+    font-size: 2rem;
 }
 
-label {
+.input-group {
+    margin-bottom: 25px;
+}
+
+.tab-content label {
     display: block;
-    margin-bottom: 8px;
+    margin-bottom: 10px;
     font-weight: bold;
     color: var(--font-basic-color);
+    font-size: 1rem;
 }
 
-input {
-    padding: 10px;
+.tab-content input {
+    padding: 12px 15px;
     width: 100%;
     box-sizing: border-box;
     background-color: var(--background-middle-color);
-    border: 1px solid var(--border-medium-color);
-    border-radius: 5px;
+    border: 2px solid var(--border-medium-color);
+    border-radius: 8px;
     color: var(--font-basic-color);
+    font-size: 1rem;
+    transition: all 0.2s ease;
 }
 
-input:focus {
+.tab-content input:focus {
     outline: none;
-    border-color: var(--border-cold-color);
-    box-shadow: 0 0 5px rgba(204, 204, 204, 0.5);
+    border-color: var(--border-light-color);
+    box-shadow: 0 0 0 3px rgba(204, 204, 204, 0.3);
 }
 
-button {
-    padding: 10px 20px;
+.button-group {
+    display: flex;
+    gap: 10px;
+    margin: 30px 0;
+    flex-wrap: wrap;
+}
+
+.tab-content button {
+    padding: 12px 24px;
     background-color: var(--background-normal-color);
     color: var(--font-basic-color);
-    border: 1px solid var(--border-medium-color);
+    border: 2px solid var(--border-medium-color);
     cursor: pointer;
-    margin-right: 10px;
-    border-radius: 5px;
-    transition: all 0.3s ease;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    font-weight: 600;
+    font-size: 1rem;
 }
 
-button:hover {
+.tab-content button:hover {
     background-color: var(--background-light-color);
     color: var(--font-dark-color);
+    transform: translateY(-2px);
 }
 
-button.primary {
+.tab-content button.primary {
     background-color: var(--background-middle-color);
     color: var(--font-basic-color);
     border-color: var(--border-light-color);
 }
 
-button.primary:hover {
+.tab-content button.primary:hover {
     background-color: var(--background-light-color);
     color: var(--font-dark-color);
 }
 
-button.danger {
+.tab-content button.danger {
     background-color: var(--background-dark-color);
     color: var(--font-error-color);
     border-color: var(--font-error-color);
 }
 
-button.danger:hover {
+.tab-content button.danger:hover {
     background-color: var(--font-error-color);
     color: var(--font-basic-color);
 }
 
 .results {
-    margin-top: 25px;
-    padding: 20px;
+    margin-top: 30px;
+    padding: 25px;
     background-color: var(--background-dark-color);
-    border-radius: 10px;
-    border: 1px solid var(--border-medium-color);
+    border-radius: 12px;
+    border: 2px solid var(--border-medium-color);
+}
+
+.results h2 {
+    margin-top: 0;
+    color: var(--font-basic-color);
+    padding-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
 .error {
     color: var(--font-error-color);
-    margin-top: 10px;
-    padding: 10px;
+    margin: 20px 0;
+    padding: 15px;
     background-color: var(--background-darkest-color);
-    border-radius: 5px;
-    border-left: 3px solid var(--font-error-color);
+    border-radius: 8px;
+    border-left: 4px solid var(--font-error-color);
+    font-weight: 500;
+}
+
+.tab-content {
+    display: none;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.tab-content.active {
+    display: block;
+    opacity: 1;
+    transform: translateY(0);
 }
 
 .tabs {
     display: flex;
-    margin-bottom: 20px;
-    border-bottom: 1px solid var(--border-medium-color);
+    margin-bottom: 0;
+    border-bottom: 2px solid var(--border-medium-color);
+    gap: 5px;
 }
 
 .tab {
-    padding: 10px 20px;
+    padding: 12px 20px;
     background-color: var(--background-darkest-color);
     cursor: pointer;
-    margin-right: 5px;
-    border-radius: 5px 5px 0 0;
-    border: 1px solid transparent;
+    border-radius: 8px 8px 0 0;
+    border: 2px solid transparent;
     border-bottom: none;
-    transition: all 0.3s ease;
+    transition: all 0.2s ease;
+    font-weight: 500;
 }
 
 .tab:hover {
@@ -120,50 +159,63 @@ button.danger:hover {
     border-bottom-color: var(--background-dark-color);
 }
 
-.tab-content {
-    display: none;
-}
-
-.tab-content.active {
-    display: block;
-}
-
 .host-input-container {
     margin-bottom: 15px;
     display: flex;
     align-items: center;
+    gap: 10px;
 }
 
 .host-input {
     flex-grow: 1;
-    margin-right: 10px;
+    margin-right: 0;
+}
+
+.add-host-btn, 
+.remove-host-btn {
+    padding: 10px;
+    min-width: 40px;
+    flex-grow: 0;
 }
 
 .subnet-result {
-    margin-bottom: 20px;
-    padding: 15px;
-    background-color: var(--background-middle-color);
+    margin: 5px;
+    padding: 20px;
     border-radius: 10px;
-    border-left: 4px solid var(--border-light-color);
+    border: 3px solid var(--border-light-color);
+    transition: background-color 0.2s ease;
+}
+.subnet-result:hover {
+    background-color: var(--background-light-color);
+}
+
+.subnet-result h3 {
+    margin-top: 0;
+    color: var(--font-basic-color);
 }
 
 .subnet-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 15px;
+    gap: 20px;
 }
 
 .subnet-compact {
-    padding: 15px;
+    padding: 20px;
     background-color: var(--background-dark-color);
     border-radius: 10px;
-    margin-bottom: 15px;
-    border: 1px solid var(--border-medium-color);
+    margin-bottom: 20px;
+    border: 2px solid var(--border-medium-color);
+    transition: transform 0.2s ease;
+}
+
+.subnet-compact:hover {
+    transform: translateY(-3px);
 }
 
 .subnet-header {
     font-weight: bold;
-    margin-bottom: 8px;
+    margin-bottom: 12px;
     color: var(--font-basic-color);
     font-size: 1.1em;
 }
@@ -171,12 +223,18 @@ button.danger:hover {
 .subnet-details {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 8px;
-    font-size: 0.9em;
+    gap: 10px;
+    font-size: 0.95em;
 }
 
 .subnet-details div {
-    padding: 3px 0;
+    padding: 5px 0;
+}
+
+.network-summary{
+    font-size: 0.95em;
+    background-color: var(--background-light-color);
+    border-radius: 10px;
 }
 
 .subnet-details span:first-child {
@@ -184,71 +242,98 @@ button.danger:hover {
     color: var(--font-basic-color);
 }
 
-.full-network {
-    background-color: var(--background-darkest-color);
-    padding: 15px;
-    border-radius: 10px;
-    margin-bottom: 15px;
-    font-weight: bold;
-    border: 1px solid var(--border-medium-color);
-}
-
+.full-network, 
 .remaining-ips {
     background-color: var(--background-darkest-color);
-    padding: 15px;
+    padding: 20px;
     border-radius: 10px;
-    margin-bottom: 15px;
-    border: 1px solid var(--border-medium-color);
+    margin-bottom: 20px;
+    font-weight: bold;
+    border: 2px solid var(--border-medium-color);
 }
 
 .remaining-ips.negative {
     background-color: var(--background-darkest-color);
     color: var(--font-error-color);
     font-weight: bold;
-    border-left: 4px solid var(--font-error-color);
+    border-left: 5px solid var(--font-error-color);
 }
 
 .toggle-host-inputs {
     background: none;
     border: none;
     color: var(--font-light-color);
-    font-size: 1.2em;
     cursor: pointer;
-    padding: 0 5px;
-    margin-left: 5px;
-    vertical-align: middle;
-}
-
-.toggle-host-inputs:hover {
-    color: var(--font-basic-color);
-}
-
-.host-requirements-container {
-    margin-bottom: 20px;
+    padding: 0;
+    margin-left: 10px;
+    transition: transform 0.2s ease;
+    font-size: 1.2em;
+    line-height: 1;
 }
 
 .host-requirements-header {
     display: flex;
     align-items: center;
-    margin-bottom: 10px;
+    margin-bottom: 15px;
 }
 
 .binary-mask {
     font-family: monospace;
     letter-spacing: 2px;
-    margin: 10px 0;
-    padding: 10px;
+    margin: 15px 0;
+    padding: 3px;
     background-color: var(--background-darkest-color);
-    border-radius: 5px;
+    border-radius: 8px;
     overflow-x: auto;
+    border: 1px solid var(--border-medium-color);
+}
+
+.compact-toggle {
+    color: var(--font-basic-color);
+    border: 1px solid var(--border-light-color);
+    border-radius: 10px;
+    background: none;
+    color: var(--font-light-color);
+    cursor: pointer;
+    padding: 10px;
+    margin-left: 10px;
+    transition: transform 0.2s ease;
+    font-size: 1em;
+    line-height: 1;
+}
+
+.subnet-table {
+    overflow-x: auto;
+    margin-bottom: 20px;
+}
+
+.subnet-table table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.subnet-table th,
+.subnet-table td {
+    padding: 8px 12px;
+    text-align: left;
+    border-bottom: 1px solid var(--border-medium-color);
+}
+
+.subnet-table tr:hover {
+    background-color: var(--background-middle-color);
 }
 
 /* Responsive adjustments */
-@media (max-width: 768px) {
-    .subnet-calculator {
+@media (max-width: 800px) {
+    body{
         width: 95%;
-        margin: 70px auto 90px;
-        padding: 15px;
+        margin: 20px auto;
+        padding: 20px;
+    }
+    
+    .head-name {
+        font-size: 1.8rem;
+        margin: 15px 0 25px;
     }
     
     .subnet-grid {
@@ -260,29 +345,44 @@ button.danger:hover {
     }
     
     .tab {
-        margin-bottom: 5px;
+        flex: 1;
+        text-align: center;
+        padding: 10px 5px;
+        font-size: 0.9rem;
+    }
+    
+    .button-group {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .subnet-table th,
+    .subnet-table td {
+        padding: 6px 8px;
+        font-size: 0.9rem;
     }
 }
 
-@media (max-width: 480px) {
-    .subnet-calculator {
-        margin: 60px auto 80px;
+@media (max-width: 500px) {
+    body{
         padding: 10px;
     }
     
-    .host-input-container {
-        flex-direction: column;
-        align-items: stretch;
+    .head-name {
+        font-size: 1.6rem;
     }
     
-    .host-input {
-        margin-right: 0;
-        margin-bottom: 10px;
+    .add-host-btn, 
+    .remove-host-btn {
+        width: 50%;
     }
     
-    button {
-        width: 100%;
-        margin-bottom: 10px;
-        margin-right: 0;
+    .subnet-table {
+        font-size: 0.8rem;
+    }
+    
+    .subnet-table th,
+    .subnet-table td {
+        padding: 4px 6px;
     }
 }

@@ -1,9 +1,13 @@
 let hostInputCount = 1;
 let hostInputsVisible = true;
-let currentTab = 'subnet-calc';
+let currentTab = null; // Changed from 'subnet-calc' to null
+
+const errorElement = document.getElementById('error');
 
 function switchTab(tabId) {
-    // Hide all tab contents and deactivate all tabs
+    // If clicking the same tab that's already active, do nothing
+    if (currentTab === tabId) return;
+    
     document.querySelectorAll('.tab-content').forEach(content => {
         content.classList.remove('active');
     });
@@ -13,7 +17,6 @@ function switchTab(tabId) {
     
     // Activate selected tab and content
     document.getElementById(tabId).classList.add('active');
-    event.currentTarget.classList.add('active');
     currentTab = tabId;
     
     // Clear results when switching tabs
@@ -21,7 +24,8 @@ function switchTab(tabId) {
 }
 
 function clearResults() {
-    document.getElementById('error').textContent = '';
+    errorElement.textContent = '';
+    errorElement.style.display = 'none';
     document.getElementById('results').style.display = 'none';
     document.getElementById('results-content').innerHTML = '';
 }
@@ -65,12 +69,6 @@ function removeHostInput(id) {
     }
 }
 
-function showResults(title, content) {
-    document.getElementById('results-title').textContent = title;
-    document.getElementById('results-content').innerHTML = content;
-    document.getElementById('results').style.display = 'block';
-}
-
 function calculatePowerOfTwo() {
     clearResults();
     
@@ -86,6 +84,9 @@ function calculatePowerOfTwo() {
         const hostCount = parseInt(hostCountInput);
         if (isNaN(hostCount) || hostCount <= 0) {
             throw new Error('Please enter a positive number');
+        }
+        if (hostCount > 4294967296) {
+            throw new Error('Please enter a number smaller than 2^32');
         }
         
         // Calculate the smallest power of 2 >= hostCount + 2
@@ -121,7 +122,7 @@ function calculatePowerOfTwo() {
         showResults('Power of 2 Calculation Results', resultHtml);
         
     } catch (error) {
-        document.getElementById('error').textContent = error.message;
+        showError(error.message);
     }
 }
 
@@ -157,184 +158,295 @@ function calculateSubnet() {
         showResults('Subnet Calculation Results', resultHtml);
         
     } catch (error) {
-        document.getElementById('error').textContent = error.message;
+        showError(error.message);
+    }
+}
+// Add this variable at the top with your other global variables
+let compactDisplay = false;
+
+// Modify the showResults function to include the toggle button
+function showResults(title, content) {
+    document.getElementById('results-title').textContent = title;
+    document.getElementById('results-content').innerHTML = content;
+    document.getElementById('results').style.display = 'block';
+    
+    // Add toggle button if we're on the host-calc tab and results are visible
+    if (currentTab === 'host-calc') {
+        const resultsHeader = document.getElementById('results-title');
+        resultsHeader.innerHTML = `
+            ${title}
+            <button id="toggle-display" class="compact-toggle">
+                ${compactDisplay ? 'Sparse' : 'Compact'}
+            </button>
+        `;
+        
+        // Add event listener to the toggle button
+        document.getElementById('toggle-display').addEventListener('click', function() {
+            compactDisplay = !compactDisplay;
+            // Re-run the calculation to regenerate the display
+            calculateForHosts();
+        });
     }
 }
 
+// Updated calculateForHosts function with fixes
 function calculateForHosts() {
     clearResults();
     
-    // Get input values
+    // Get input values with better validation
     const ipAddress = document.getElementById('host-ip').value.trim();
     const subnetMaskInput = document.getElementById('host-subnet').value.trim();
-    const hostInputs = document.querySelectorAll('.host-input');
+    const hostInputElements = document.querySelectorAll('.host-input');
     
     try {
-        // Validate IP address
-        if (!isValidIp(ipAddress)) {
-            throw new Error('Invalid IP address format');
-        }
+        // Validate IP address more thoroughly
+        if (!ipAddress) throw new Error('Please enter a network IP address');
+        if (!isValidIp(ipAddress)) throw new Error('Invalid IP address format');
         
-        // Get and validate host requirements
+        // Collect and validate host requirements
         const hostRequirements = [];
-        hostInputs.forEach(input => {
-            const value = parseInt(input.value.trim());
-            if (!isNaN(value) && value > 0) {
-                hostRequirements.push(value);
+        hostInputElements.forEach((input, index) => {
+            const value = input.value.trim();
+            if (!value) {
+                if (index === 0) throw new Error('Please enter at least one host requirement');
+                return; // Skip empty inputs after the first one
             }
+            
+            const numValue = parseInt(value);
+            if (isNaN(numValue)) throw new Error(`Invalid number in host requirement: ${value}`);
+            if (numValue <= 0) throw new Error(`Host requirement must be positive: ${value}`);
+            if (numValue > 16777214) throw new Error(`Host requirement too large (max 16777214): ${value}`);
+            
+            hostRequirements.push(numValue);
         });
-        
-        if (hostRequirements.length === 0) {
-            throw new Error('Please enter at least one valid host requirement');
-        }
         
         // Sort requirements from largest to smallest
         hostRequirements.sort((a, b) => b - a);
         
-        // Calculate total required hosts (with network and broadcast addresses)
-        const totalRequired = hostRequirements.reduce((sum, hosts) => sum + hosts + 2, 0);
-        
-        // If subnet mask is provided, validate it fits all requirements
-        let parentSubnetMask = null;
+        // Handle subnet mask if provided
+        let parentNetwork = null;
+        let parentMask = null;
         let parentCidr = null;
-        let totalAvailable = null;
         
         if (subnetMaskInput) {
-            parentSubnetMask = subnetMaskInput.startsWith('/') ? 
-                cidrToMask(parseInt(subnetMaskInput.substring(1))) : 
-                subnetMaskInput;
+            parentCidr = subnetMaskInput.startsWith('/') 
+                ? parseInt(subnetMaskInput.substring(1))
+                : maskToCidr(subnetMaskInput);
             
-            if (!isValidIp(parentSubnetMask) || !isValidSubnetMask(parentSubnetMask)) {
-                throw new Error('Invalid subnet mask format');
-            }
+            if (isNaN(parentCidr)) throw new Error('Invalid subnet mask format');
             
-            parentCidr = countOneBits(ipToBytes(parentSubnetMask));
-            const parentHostBits = 32 - parentCidr;
-            totalAvailable = Math.pow(2, parentHostBits);
-            
-            if (totalRequired > totalAvailable) {
-                throw new Error(`Subnet mask /${parentCidr} only provides ${totalAvailable} addresses, but ${totalRequired} are needed`);
-            }
+            parentMask = cidrToMask(parentCidr);
+            parentNetwork = calculateNetworkAddress(ipAddress, parentMask);
         }
         
-        // Calculate subnets for each requirement
+        // Calculate subnets
         let currentNetwork = ipToBytes(ipAddress);
-        let resultsHtml = '';
         let allSubnets = [];
         let totalAllocated = 0;
         
         for (const hosts of hostRequirements) {
-            // Calculate the smallest subnet that can accommodate the required hosts
-            const hostBits = Math.ceil(Math.log2(hosts + 2)); // +2 for network and broadcast
+            // Calculate required subnet size
+            const requiredSize = hosts + 2; // +2 for network and broadcast
+            const hostBits = Math.max(1, Math.ceil(Math.log2(requiredSize)));
             const cidr = 32 - hostBits;
             
-            if (cidr < 0) {
-                throw new Error(`Required number of hosts (${hosts}) is too large for any subnet`);
-            }
-            
-            // If we have a parent subnet, ensure we don't exceed it
+            // Validate against parent network if exists
             if (parentCidr !== null && cidr < parentCidr) {
                 throw new Error(`Cannot create subnet larger than parent (/${parentCidr})`);
             }
             
             const subnetMask = cidrToMask(cidr);
-            const maskBytes = ipToBytes(subnetMask);
+            const subnetSize = Math.pow(2, hostBits);
             
             // Calculate network address
-            const networkBytes = [];
-            for (let i = 0; i < 4; i++) {
-                networkBytes.push(currentNetwork[i] & maskBytes[i]);
-            }
-            
+            const networkBytes = calculateNetworkAddressBytes(currentNetwork, ipToBytes(subnetMask));
             const networkAddress = bytesToIp(networkBytes);
             
             // Calculate broadcast address
-            const broadcastBytes = [];
-            for (let i = 0; i < 4; i++) {
-                broadcastBytes.push(currentNetwork[i] | (255 ^ maskBytes[i]));
-            }
+            const broadcastBytes = calculateBroadcastAddressBytes(networkBytes, ipToBytes(subnetMask));
+            const broadcastAddress = bytesToIp(broadcastBytes);
             
-            // Calculate next network address
-            const nextNetwork = [...broadcastBytes];
-            for (let i = 3; i >= 0; i--) {
-                if (nextNetwork[i] === 255) {
-                    nextNetwork[i] = 0;
-                    if (i > 0) nextNetwork[i-1]++;
-                } else {
-                    nextNetwork[i]++;
-                    break;
-                }
-            }
-            
-            // Add subnet info
-            const subnetSize = Math.pow(2, 32 - cidr);
-            totalAllocated += subnetSize;
-            
+            // Store subnet information
             allSubnets.push({
                 network: networkAddress,
                 mask: subnetMask,
                 cidr: cidr,
                 hosts: hosts,
                 totalHosts: subnetSize - 2,
-                firstHost: bytesToIp([networkBytes[0], networkBytes[1], networkBytes[2], networkBytes[3] + 1]),
-                lastHost: bytesToIp([broadcastBytes[0], broadcastBytes[1], broadcastBytes[2], broadcastBytes[3] - 1]),
-                broadcast: bytesToIp(broadcastBytes)
+                firstHost: getFirstHostAddress(networkBytes),
+                lastHost: getLastHostAddress(broadcastBytes),
+                broadcast: broadcastAddress,
+                size: subnetSize
             });
             
-            // Set current network to next network for next iteration
-            currentNetwork = nextNetwork;
+            // Calculate next network address
+            currentNetwork = getNextNetworkAddress(broadcastBytes);
+            totalAllocated += subnetSize;
             
-            // Validate we haven't exceeded the address space
+            // Validate we haven't exceeded address space
             if (currentNetwork[0] > 255) {
                 throw new Error('Not enough address space to accommodate all host requirements');
             }
         }
         
-        // Display results header with summary
-        let headerHtml = '';
-        if (parentSubnetMask) {
-            const remaining = totalAvailable - totalAllocated;
+        // Create results display
+        let resultsHtml = '';
+        
+        // Show parent network summary if exists
+        if (parentMask) {
+            const parentSize = Math.pow(2, 32 - parentCidr);
+            const remaining = parentSize - totalAllocated;
             
-            if (remaining === 0) {
-                headerHtml = `<div class="full-network">This allocation fully saturates the network (no remaining IPs)</div>`;
-            } else if (remaining < 0) {
-                headerHtml = `<div class="remaining-ips negative">Remaining IPs in network: ${remaining} (${Math.round(remaining/totalAvailable*100)}% of total) - WARNING: Network overallocated!</div>`;
+            resultsHtml += `<div class="network-summary">`;
+            resultsHtml += `<p><strong>Parent Network:</strong> ${parentNetwork}/${parentCidr}</p>`;
+            resultsHtml += `<p><strong>Total Allocated:</strong> ${totalAllocated} addresses (${Math.round(totalAllocated/parentSize*100)}%)</p>`;
+            
+            if (remaining < 0) {
+                resultsHtml += `<p class="error"><strong>Warning:</strong> Network overallocated by ${-remaining} addresses</p>`;
             } else {
-                headerHtml = `<div class="remaining-ips">Remaining IPs in network: ${remaining} (${Math.round(remaining/totalAvailable*100)}% of total)</div>`;
+                resultsHtml += `<p><strong>Remaining Addresses:</strong> ${remaining} (${Math.round(remaining/parentSize*100)}%)</p>`;
             }
+            
+            resultsHtml += `</div>`;
         }
         
-        // Display results in compact grid format if more than 3 subnets
-        if (allSubnets.length > 3) {
-            resultsHtml = '<div class="subnet-grid">';
-            allSubnets.forEach(subnet => {
-                resultsHtml += `
-                    <div class="subnet-compact">
-                        <div class="subnet-header">Subnet for ${subnet.hosts} hosts (/${subnet.cidr})</div>
-                        <div class="subnet-details">
-                            <div>Network:</div><div>${subnet.network}</div>
-                            <div>First Host:</div><div>${subnet.firstHost}</div>
-                            <div>Last Host:</div><div>${subnet.lastHost}</div>
-                            <div>Broadcast:</div><div>${subnet.broadcast}</div>
-                            <div>Total Hosts:</div><div>${subnet.totalHosts}</div>
-                            <div>Subnet Mask:</div><div>${subnet.mask}</div>
-                        </div>
-                    </div>
-                `;
-            });
-            resultsHtml += '</div>';
+        // Add subnet results
+        if (compactDisplay) {
+            resultsHtml += createCompactSubnetTable(allSubnets);
         } else {
-            // Display in full format for 1-3 subnets
             allSubnets.forEach(subnet => {
-                resultsHtml += createSubnetResultHtml(subnet.network, subnet.mask, subnet.hosts);
+                resultsHtml += createDetailedSubnetHtml(subnet);
             });
         }
         
-        showResults('Host Allocation Results', headerHtml + resultsHtml);
+        showResults('Host Allocation Results', resultsHtml);
         
     } catch (error) {
-        document.getElementById('error').textContent = error.message;
+        showError(error.message);
     }
+}
+
+// Add this helper function to convert mask to CIDR
+function maskToCidr(mask) {
+    if (!isValidIp(mask) || !isValidSubnetMask(mask)) {
+        return NaN;
+    }
+    return countOneBits(ipToBytes(mask));
+}
+
+// Fix the network address calculation
+function calculateNetworkAddressBytes(ipBytes, maskBytes) {
+    const networkBytes = [];
+    for (let i = 0; i < 4; i++) {
+        networkBytes.push(ipBytes[i] & maskBytes[i]);
+    }
+    return networkBytes;
+}
+
+// Fix the broadcast address calculation
+function calculateBroadcastAddressBytes(networkBytes, maskBytes) {
+    const broadcastBytes = [];
+    for (let i = 0; i < 4; i++) {
+        broadcastBytes.push(networkBytes[i] | (~maskBytes[i] & 0xFF));
+    }
+    return broadcastBytes;
+}
+
+// Helper functions for subnet calculations
+function calculateNetworkAddressBytes(ipBytes, maskBytes) {
+    return ipBytes.map((byte, i) => byte & maskBytes[i]);
+}
+
+function calculateBroadcastAddressBytes(networkBytes, maskBytes) {
+    return networkBytes.map((byte, i) => byte | (255 ^ maskBytes[i]));
+}
+
+function getFirstHostAddress(networkBytes) {
+    const firstHost = [...networkBytes];
+    firstHost[3] += 1;
+    return bytesToIp(firstHost);
+}
+
+function getLastHostAddress(broadcastBytes) {
+    const lastHost = [...broadcastBytes];
+    lastHost[3] -= 1;
+    return bytesToIp(lastHost);
+}
+
+function getNextNetworkAddress(broadcastBytes) {
+    const nextNetwork = [...broadcastBytes];
+    for (let i = 3; i >= 0; i--) {
+        if (nextNetwork[i] === 255) {
+            nextNetwork[i] = 0;
+            if (i > 0) nextNetwork[i-1]++;
+        } else {
+            nextNetwork[i]++;
+            break;
+        }
+    }
+    return nextNetwork;
+}
+function calculateNetworkAddress(ipAddress, subnetMask) {
+    const ipBytes = ipToBytes(ipAddress);
+    const maskBytes = ipToBytes(subnetMask);
+    const networkBytes = [];
+    
+    for (let i = 0; i < 4; i++) {
+        networkBytes.push(ipBytes[i] & maskBytes[i]);
+    }
+    
+    return bytesToIp(networkBytes);
+}
+
+function createCompactSubnetTable(subnets) {
+    return `
+        <div class="subnet-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>For Hosts</th>
+                        <th>Network</th>
+                        <th>First Host</th>
+                        <th>Last Host</th>
+                        <th>Broadcast</th>
+                        <th>Mask</th>
+                        <th>CIDR</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${subnets.map(subnet => `
+                        <tr>
+                            <td>${subnet.hosts}</td>
+                            <td>${subnet.network}/${subnet.cidr}</td>
+                            <td>${subnet.firstHost}</td>
+                            <td>${subnet.lastHost}</td>
+                            <td>${subnet.broadcast}</td>
+                            <td>${subnet.mask}</td>
+                            <td>/${subnet.cidr}</td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+            </table>
+        </div>
+    `;
+}
+
+function createDetailedSubnetHtml(subnet) {
+    return `
+        <div class="subnet-result">
+            <h3>Subnet for ${subnet.hosts} hosts (/${subnet.cidr})</h3>
+            <p><strong>Network Address:</strong> ${subnet.network}/${subnet.cidr}</p>
+            <p><strong>Usable Host Range:</strong> ${subnet.firstHost} - ${subnet.lastHost}</p>
+            <p><strong>Broadcast Address:</strong> ${subnet.broadcast}</p>
+            <p><strong>Total Hosts:</strong> ${subnet.totalHosts} (${subnet.size} total addresses)</p>
+            <p><strong>Subnet Mask:</strong> ${subnet.mask}</p>
+        </div>
+    `;
+}
+
+function showError(message) {
+    errorElement.textContent = message;
+    errorElement.style.display = 'block';
 }
 
 function createSubnetResultHtml(networkAddress, subnetMask, requiredHosts = null) {
@@ -447,6 +559,9 @@ function countZeroBits(bytes) {
 
 // Quality of Life Improvements
 document.addEventListener('DOMContentLoaded', function() {
+    // Activate the first tab by default
+    switchTab('subnet-calc');
+
     // Add example values on click for better UX
     document.getElementById('ip').addEventListener('focus', function() {
         if (!this.value) this.value = '192.168.1.1';
