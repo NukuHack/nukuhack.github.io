@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link href="./assets/favicon.png" rel="shortcut icon" type="image/x-icon" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stupid Webpage</title>
+    <link rel="stylesheet" type="text/css" href="./css/main.css">
+    <link rel="stylesheet" type="text/css" href="./css/urltable.css">
+</head>
+<body>
+    <div id="navbarHelp"></div>
+
+    <!-- Main Content -->
+    <div class="page-content">
+
+        <div class="upload-section" id="uploadSection">
+            <button class="load-btn" id="loadFileBtn">
+                <svg width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
+                    <path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/>
+                </svg>
+                Load TXT File
+            </button>
+            <input type="file" id="fileInput" accept=".txt" style="display:none;">
+            <div class="file-info">Selected: <span id="fileName" class="file-name-val">None</span></div>
+        </div>
+
+        <div class="group-section" id="groupSection" style="display:none;">
+            <div class="group-controls">
+                <input type="text" id="newGroupInput" class="group-input" placeholder="New group name..." maxlength="50">
+                <button id="addGroupBtn" class="add-group-btn">Add Group</button>
+                <div class="group-filter">
+                    <select id="groupFilter" class="filter-select">
+                        <option value="all">All Links</option>
+                        <option value="ungrouped">No Groups</option>
+                    </select>
+                    <button id="clearFilterBtn" class="action-btn clear-btn">Clear Filter</button>
+                </div>
+            </div>
+            <div class="group-tags" id="groupTagsContainer"></div>
+        </div>
+
+        <div id="statusMessage" class="status-msg" style="display:none;"></div>
+
+        <div id="statsContainer" class="stats-bar" style="display:none;">
+            <div class="stat-item">
+                <div class="stat-value" id="statTotal">0</div>
+                <div class="stat-label">Total Lines</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="statValid">0</div>
+                <div class="stat-label">Valid Entries</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="statSkipped">0</div>
+                <div class="stat-label">Skipped</div>
+            </div>
+        </div>
+
+        <div class="table-wrap">
+            <table id="dataTable">
+                <thead>
+                    <tr>
+                        <th width="40%">Extra Data</th>
+                        <th width="42%">URL</th>
+                        <th width="12%">Groups</th>
+                        <th width="6%">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody"></tbody>
+            </table>
+        </div>
+
+    </div>
+
+    <!-- Footer -->
+    <div id="footerHelp"></div>
+    <footer>
+        <div class="footer_in">
+            <div class="footer_in_in">
+                <h6>URL Data Table Loader &mdash; load, edit and group your URL lists</h6>
+                <h6>Ctrl+S to save &bull; Ctrl+E to add entry &bull; Ctrl+G to focus group input</h6>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Add-to-group modal -->
+    <div class="modal" id="groupModal">
+        <div class="modal-content">
+            <h3 id="groupModalTitle" style="margin-bottom:15px;">Add to Group</h3>
+            <div id="groupModalBody"></div>
+            <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:15px;">
+                <button class="modal-button" id="groupModalCancel">Cancel</button>
+                <button class="modal-button" id="groupModalConfirm" style="background:var(--background-normal-color);">Add</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/darkreader@4.9.34/darkreader.min.js"></script>
+    <script src="./js/main.js"></script>
+    <script src="./js/urltable.js"></script>
+</body>
+</html>
