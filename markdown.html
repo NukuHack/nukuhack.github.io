@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link href="./assets/favicon.png" rel="shortcut icon" type="image/x-icon" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stupid Webpage</title>
+    <link rel="stylesheet" type="text/css" href="./css/main.css">
+<style>
+/* All markdown app styles scoped under .md-app to avoid overriding global/navbar styles */
+
+.md-app *,
+.md-app *::before,
+.md-app *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+.md-app {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    background: var(--background-darkest-color);
+    color: var(--font-basic-color);
+    padding: 1rem;
+    min-height: 100vh;
+    min-width: 80vw;
+}
+
+.md-app .wrap {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    padding: 1rem 0;
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+.md-app .panel {
+    border: 0.5px solid var(--border-medium-color);
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.md-app .panel-head {
+    padding: 8px 12px;
+    border-bottom: 0.5px solid var(--border-medium-color);
+    font-size: 11px;
+    color: var(--font-light-color);
+    font-family: 'Fira Code', monospace;
+    letter-spacing: 1px;
+    background: var(--background-dark-color);
+}
+
+.md-app textarea {
+    width: 100%;
+    height: 360px;
+    background: var(--background-middle-color);
+    color: var(--font-basic-color);
+    border: none;
+    padding: 12px;
+    font-family: 'Fira Code', monospace;
+    font-size: 13px;
+    resize: none;
+    outline: none;
+    line-height: 1.6;
+    display: block;
+}
+
+.md-app #preview {
+    height: 360px;
+    overflow-y: auto;
+    padding: 12px;
+    background: var(--background-middle-color);
+    color: var(--font-basic-color);
+    line-height: 1.6;
+}
+
+.md-app .stats {
+    display: flex;
+    gap: 20px;
+    padding: 10px 12px;
+    border-top: 0.5px solid var(--border-medium-color);
+    background: var(--background-dark-color);
+    align-items: center;
+    font-size: 12px;
+    color: var(--font-light-color);
+    font-family: 'Fira Code', monospace;
+    max-width: 1100px;
+    margin: 0 auto;
+    border-radius: 0 0 12px 12px;
+    border: 0.5px solid var(--border-medium-color);
+    border-top: none;
+}
+
+.md-app .stat-val {
+    color: var(--font-cold-color);
+    font-weight: 500;
+}
+
+.md-app code {
+    background: var(--background-dark-color);
+    color: var(--font-cold-color);
+    padding: 1px 5px;
+    border-radius: 4px;
+    font-family: 'Fira Code', monospace;
+    font-size: 12px;
+}
+</style>
+</head>
+<body>
+<!-- Wrap the entire markdown app in .md-app so styles don't leak out -->
+<div class="md-app">
+  <div class="wrap">
+    <div class="panel">
+      <div class="panel-head">INPUT</div>
+      <textarea id="inp"># Hello world
+
+This is a **bold** and *italic* example.
+
+- Item one
+- Item two
+  - Nested
+
+`inline code` and a literal \n newline escape.
+
+```js
+const x = "hello\nworld";
+```</textarea>
+    </div>
+    <div class="panel">
+      <div class="panel-head">PREVIEW</div>
+      <div id="preview"></div>
+    </div>
+  </div>
+  <div class="stats">
+    <span>Actual breaks: <span class="stat-val" id="sb">0</span></span>
+    <span>Literal \n: <span class="stat-val" id="sn">0</span></span>
+  </div>
+</div>
+
+    <script src="https://cdn.jsdelivr.net/npm/darkreader@4.9.34/darkreader.min.js"></script>
+    <script src="./js/main.js"></script>
+    <script src="./js/markdown.js"></script>
+</body>
+</html>
