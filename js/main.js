@@ -1,335 +1,255 @@
 const body = document.querySelector("body");
-const Url = window.location.href;
-let isPhone = false;
+
+/**
+ * Detect depth from root by checking if pathname contains /pages/.
+ * Works for both  /index.html  and  /pages/foo.html
+ */
+const _pathParts = window.location.pathname.split('/').filter(Boolean);
+const _inPagesFolder = _pathParts.includes('pages');
+const _depth = _inPagesFolder ? 1 : 0;
+
+/** Prefix to reach the site root from wherever we are */
+const ROOT = _depth > 0 ? '../'.repeat(_depth) : './';
+
+/** Resolve any root-relative path (e.g. "assets/img.png") to an absolute URL */
+function asset(relativePath) {
+    const clean = relativePath.replace(/^\.?\//, '');
+    return ROOT + clean;
+}
+
+/** Navigate to any named page, or to root if no name given */
+function ChangePage(name) {
+    if (!name || name === 'index') {
+        window.location.href = ROOT + 'index.html';
+        return;
+    }
+    window.location.href = ROOT + 'pages/' + name + '.html';
+}
+
+// ─── CURRENT PAGE METADATA ───────────────────────────────────────────────────
+
+const _filename = window.location.pathname.split('/').pop();        // "foo.html" or ""
+const currentUrl = (_filename.replace(/\.html?$/, '') || 'index'); // "foo" or "index"
+
+const PageHelper = (url) =>
+    url === 'index' ? 'Main' : url.slice(0, 1).toUpperCase() + url.slice(1);
+
+// ─── STORAGE HELPERS ─────────────────────────────────────────────────────────
+
 let PrefersDark = true;
-const urlImportant = Url.slice(Url.lastIndexOf('/')+1);
-const currentUrl = urlImportant.slice(0,urlImportant.indexOf("."));
-if (currentUrl==="") window.location.href="index.html";
-const PageHelper = ((url)=>{
-    if (url!=="index") return url.slice(0,1).toUpperCase() + url.slice(1);
-    else return "Main";
-});
-
-/*
-let url = window.location.href;
-url = url.slice(url.lastIndexOf("/") + 1);
-// only needed if you use it with an editor like webstorm (like me)
-if (url.indexOf("?") != -1) url = url.slice(0, url.indexOf("?"));
-
-console.log("current page url: ", url);
-console.log("basic url: ", window.location.href);
-*/
-function LoadBasicContent() {
-    let navContent = `
-        <nav class="navbar" id="navbar">
-            <div class="navbar_in">
-                <p class="navbar_head link" onclick="ChangePage()">${PageHelper(currentUrl)} Page</p>
-                <button type="button" class="navbar_toggle" id="navbarToggle" onclick="ToggleNavbar()">
-                    <img id="menu_image" src="./assets/menu_bars.png" alt="Menu" />
-                </button>
-                <div class="navbar_items" id="navbarDropdown">
-                    <ul class="navbar_ul">
-                        <li class="navbar_li">
-                            <p class="navbar_item link" onclick="ChangePage('index')">Main Webpage</p>
-                        </li>
-                        <li class="navbar_li">
-                            <p class="navbar_item link" onclick="ChangePage('code')">Actual Code</p>
-                        </li>
-                        <li class="navbar_li dropdown">
-                            <p class="navbar_item">Animations</p>
-                            <ul class="dropdown_menu">
-                                <li class="dropdown_li"><p class="dropdown_item link" onclick="ChangePage('animation')">Animation Page</p></li>
-                                <li class="dropdown_li"><p class="dropdown_item link" onclick="ChangePage('dice')">Dice Page</p></li>
-                                <li class="dropdown_li"><p class="dropdown_item link" onclick="ChangePage('test3d')">3D Test Page</p></li>
-                            </ul>
-                        </li>
-                        <li class="navbar_li dropdown">
-                            <p class="navbar_item">Random Things</p>
-                            <ul class="dropdown_menu">
-                                <li class="dropdown_li"><p class="dropdown_item link" onclick="ChangePage('extra')">Extra</p></li>
-                                <li class="dropdown_li"><p class="dropdown_item link" onclick="ChangePage('links')">Links</p></li>
-                                <li class="dropdown_li"><p class="dropdown_item link" onclick="ChangePage('urltable')">UrlTable</p></li>
-                            </ul>
-                        </li>
-                        <li class="navbar_li dropdown">
-                            <p class="navbar_item">Small Apps</p>
-                            <ul class="dropdown_menu">
-                                <li class="dropdown_li"><p class="dropdown_item link" onclick="ChangePage('video')">Video</p></li>
-                                <li class="dropdown_li"><p class="dropdown_item link" onclick="ChangePage('markdown')">Markdown</p></li>
-                                <li class="dropdown_li"><p class="dropdown_item link" onclick="ChangePage('weather')">Weather</p></li>
-                                <li class="dropdown_li"><p class="dropdown_item link" onclick="ChangePage('subnet')">Subnet</p></li>
-                            </ul>
-                        </li>
-                    </ul>
-                </div>
-                <div class="darkmode-slider">
-                    <label class="switch">
-                        <input type="checkbox" id="darkModeToggle" onchange="ToggleDarkMode()">
-                        <span class="slider"></span>
-                    </label>
-                </div>
-            </div>
-        </nav>
-
-        <div id="navbarHelp">
-            .
-        </div>
-    `;
-
-    let modalContent = `
-        <div id="modal" class="modal">
-        </div>
-    `;
-
-    let footerContent = `
-        <div id="footerHelp">
-            .
-        </div>
-        <footer id="footer">
-            <div class="footer_in">
-                <div class="footer_in_in">
-                    <h5>Stupid webpage</h5>
-                    <h6>Made by NukuHack ©2024</h6>
-                </div>
-            </div>
-        </footer>
-    `;
-
-    body.insertAdjacentHTML("afterbegin", navContent);
-    body.insertAdjacentHTML("beforeend", modalContent);
-    body.insertAdjacentHTML("beforeend", footerContent);
-
-    document.getElementById("menu_image").onerror = function () {
-        this.src = '../assets/menu_bars.png';
-    };
-
-    // Add hover functionality for dropdowns
-    const dropdowns = document.querySelectorAll('.dropdown');
-
-    dropdowns.forEach(dropdown => {
-        const dropdownMenu = dropdown.querySelector('.dropdown_menu');
-
-        // Show dropdown on mouseenter
-        dropdown.addEventListener('mouseenter', () => {
-            // Hide all other dropdown menus
-            dropdowns.forEach(otherDropdown => {
-                if (otherDropdown !== dropdown) {
-                    const otherDropdownMenu = otherDropdown.querySelector('.dropdown_menu');
-                    if (otherDropdownMenu) {
-                        otherDropdownMenu.classList.remove('show');
-                    }
-                }
-            });
-
-            // Show the current dropdown menu
-            dropdownMenu.classList.add('show');
-        });
-
-        // Prevent dropdown from closing when interacting with it
-        dropdownMenu.addEventListener('mouseenter', () => {
-            dropdownMenu.classList.add('show');
-        });
-
-        dropdownMenu.addEventListener('mouseleave', () => {
-            dropdownMenu.classList.remove('show');
-        });
-    });
-}
-
-LoadBasicContent();
-
-const navItems = document.getElementById("navbarDropdown");
-const navToggle = document.getElementById("navbarToggle");
-
-// Toggle Navbar
-function ToggleNavbar() {
-    navItems.classList.toggle('show');
-}
-
-// Close Navbar when clicking outside
-function HandleDocumentClick(event) {
-    if (!navToggle.contains(event.target)&&!navItems.contains(event.target)) {
-        navItems.classList.remove('show');
-
-        const dropdowns = document.querySelectorAll('.dropdown');
-
-        dropdowns.forEach(dropdown => {
-            const dropdownMenu = dropdown.querySelector('.dropdown_menu');
-            // Show dropdown on mouseenter
-            dropdownMenu.classList.remove('show');
-        });
-    }
-}
-
-document.addEventListener('click', HandleDocumentClick);
-
-
-
-
-function ChangePage(url,isInFolder) {
-    let UrlHelp;
-    isInFolder=isInsideFolder();
-    if (isInFolder) UrlHelp="../";
-    else UrlHelp="";
-
-    if (url)
-        UrlHelp += `${url}.html`;
-    else if (UrlHelp.indexOf('#') === -1)
-        UrlHelp += '#';
-    else
-        UrlHelp = window.location.href;
-    // here the url can only be set after the last /
-    // so I don't actually need to check for anything
-    console.log(UrlHelp);
-    window.location.href = UrlHelp;
-}
-function isInsideFolder() {
-    // Get the current URL
-    let currentUrl = window.location.href;
-    let path;
-    // Extract the path part of the URL (everything after the domain)
-    if (!currentUrl.includes("localhost"))
-        path = new URL(currentUrl).pathname;
-    else
-        path = currentUrl.slice("http://localhost:63342/".length)
-
-    // Check if the path contains more than one segment (i.e., contains a folder)
-    // For example, "/resources/index" has two segments: "resources" and "index"
-    console.log(path);
-    let stuff = path.split('/');
-    if (stuff[0].includes("localhost"))
-        // for testing in localhost ... yeah ....
-        return stuff.length > 4;
-    else
-        return stuff.length > 2;
-
-}
-
-function RemoveCss(item, type) {
-    let CssT = item.style.cssText;
-    let TypePlace = CssT.indexOf(`${type}`);
-    // counting the length between the start and the start of the type
-    let TypeStart = CssT.slice(0, TypePlace).length;
-    item.style.cssText = CssT.replace(CssT.slice(TypePlace, TypeStart + CssT.slice(TypePlace).indexOf(';')), '');
-}
-
-function ModalOpen(title, text, error) {
-    let ModalHelp = `
-        <div class="modal-content" id="modal_content">
-            <h4 class="modal_title">${title}</h4>
-            <p class="modal_text">${text}</p>
-            ${!error ? "" : `<p class="modal-error">${error}</p>`}
-            <div class="modal-footer">
-                <button onClick="ModalClose()" class="modal-button">Ok</button>
-            </div>
-        </div>
-    `;
-    modalBox.innerHTML = ModalHelp;
-
-
-    let ModalContent = document.getElementById("modal_content");
-
-    // Add an event listener to handle outside clicks
-    setTimeout(() => {
-        document.addEventListener('click', handleOutsideModalClick);
-    }, 1000)
-
-    function handleOutsideModalClick(event) {
-        if (!ModalContent.contains(event.target)) {
-            ModalClose();
-            document.removeEventListener('click', handleOutsideModalClick);
-        }
-        event.stopPropagation();
-    }
-
-    modalBox.style.display = "block";
-}
-
-
-function ModalClose() {
-    modalBox.style.display = "none";
-}
-
-function DarkModeLoad() {
-    PrefersDark = GetFromLocalStorage("PrefersDark");
-    if (PrefersDark===undefined){
-        PrefersDark= window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-        SaveToLocalStorage("PrefersDark", PrefersDark);
-    }
-
-    if (!PrefersDark) {
-        DarkReader.disable();
-        document.getElementById("darkModeToggle").checked = false;
-    } else {
-        DarkReader.enable();
-        document.getElementById("darkModeToggle").checked = true;
-    }
-}
-
-// Set initial Dark Mode state
-DarkModeLoad();
-
-// Dark Mode Toggle Function
-function ToggleDarkMode() {
-    if (DarkReader.isEnabled()) {
-        DarkReader.disable()
-        PrefersDark = false;
-        SaveToLocalStorage("PrefersDark", PrefersDark);
-    } else {
-        DarkReader.enable();
-        PrefersDark = true;
-        SaveToLocalStorage("PrefersDark", PrefersDark);
-    }
-}
+let isPhone = false;
 
 function SaveToLocalStorage(key, value) {
-    try {
-        localStorage.setItem(key, JSON.stringify(value));
-    } catch (error) {
-        console.error('Error saving to localStorage:', error);
-    }
+    try { localStorage.setItem(key, JSON.stringify(value)); }
+    catch (e) { console.error('Error saving to localStorage:', e); }
 }
 
 function GetFromLocalStorage(key) {
     try {
         const value = localStorage.getItem(key);
-        return value ? JSON.parse(value) : undefined;
-    } catch (error) {
-        console.error('Error retrieving from localStorage:', error);
+        return value !== null ? JSON.parse(value) : undefined;
+    } catch (e) { console.error('Error reading localStorage:', e); }
+}
+
+// ─── INJECT SHARED HTML ──────────────────────────────────────────────────────
+
+function LoadBasicContent() {
+    const navContent = `
+<nav class="navbar" id="navbar">
+    <div class="navbar_in">
+        <p class="navbar_head link" onclick="ChangePage()">${PageHelper(currentUrl)} Page</p>
+        <button type="button" class="navbar_toggle" id="navbarToggle" onclick="ToggleNavbar()">
+            <img id="menu_image" src="${asset('assets/menu_bars.png')}" alt="Menu" />
+        </button>
+        <div class="navbar_items" id="navbarDropdown">
+            <ul class="navbar_ul">
+                <li class="navbar_li">
+                    <p class="navbar_item link" onclick="ChangePage('index')">Main Webpage</p>
+                </li>
+                <li class="navbar_li">
+                    <p class="navbar_item link" onclick="ChangePage('code')">Actual Code</p>
+                </li>
+                <li class="navbar_li dropdown">
+                    <p class="navbar_item">Animations</p>
+                    <ul class="dropdown_menu">
+                        <li class="dropdown_li"><p class="dropdown_item link" onclick="ChangePage('animation')">Animation Page</p></li>
+                        <li class="dropdown_li"><p class="dropdown_item link" onclick="ChangePage('dice')">Dice Page</p></li>
+                        <li class="dropdown_li"><p class="dropdown_item link" onclick="ChangePage('test3d')">3D Test Page</p></li>
+                    </ul>
+                </li>
+                <li class="navbar_li dropdown">
+                    <p class="navbar_item">Random Things</p>
+                    <ul class="dropdown_menu">
+                        <li class="dropdown_li"><p class="dropdown_item link" onclick="ChangePage('extra')">Extra</p></li>
+                        <li class="dropdown_li"><p class="dropdown_item link" onclick="ChangePage('links')">Links</p></li>
+                        <li class="dropdown_li"><p class="dropdown_item link" onclick="ChangePage('urltable')">UrlTable</p></li>
+                    </ul>
+                </li>
+                <li class="navbar_li dropdown">
+                    <p class="navbar_item">Small Apps</p>
+                    <ul class="dropdown_menu">
+                        <li class="dropdown_li"><p class="dropdown_item link" onclick="ChangePage('video')">Video</p></li>
+                        <li class="dropdown_li"><p class="dropdown_item link" onclick="ChangePage('markdown')">Markdown</p></li>
+                        <li class="dropdown_li"><p class="dropdown_item link" onclick="ChangePage('weather')">Weather</p></li>
+                        <li class="dropdown_li"><p class="dropdown_item link" onclick="ChangePage('subnet')">Subnet</p></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+        <div class="darkmode-slider">
+            <label class="switch">
+                <input type="checkbox" id="darkModeToggle" onchange="ToggleDarkMode()">
+                <span class="slider"></span>
+            </label>
+        </div>
+    </div>
+</nav>
+<div id="navbarHelp">.</div>`;
+
+    const modalContent = `<div id="modal" class="modal"></div>`;
+
+    const footerContent = `
+<div id="footerHelp">.</div>
+<footer id="footer">
+    <div class="footer_in">
+        <div class="footer_in_in">
+            <h5>Stupid webpage</h5>
+            <h6>Made by NukuHack ©2024</h6>
+        </div>
+    </div>
+</footer>`;
+
+    body.insertAdjacentHTML('afterbegin', navContent);
+    body.insertAdjacentHTML('beforeend', modalContent);
+    body.insertAdjacentHTML('beforeend', footerContent);
+
+    // Safety-net fallback (asset() should already be correct)
+    document.getElementById('menu_image').onerror = function () {
+        this.onerror = null;
+        this.src = asset('assets/menu_bars.png');
+    };
+
+    // Hover-open dropdowns
+    const dropdowns = document.querySelectorAll('.dropdown');
+    dropdowns.forEach(dropdown => {
+        const menu = dropdown.querySelector('.dropdown_menu');
+        dropdown.addEventListener('mouseenter', () => {
+            dropdowns.forEach(d => {
+                if (d !== dropdown) d.querySelector('.dropdown_menu')?.classList.remove('show');
+            });
+            menu.classList.add('show');
+        });
+        menu.addEventListener('mouseenter', () => menu.classList.add('show'));
+        menu.addEventListener('mouseleave', () => menu.classList.remove('show'));
+    });
+}
+
+LoadBasicContent();
+
+// ─── NAVBAR TOGGLE ────────────────────────────────────────────────────────────
+
+const navItems  = document.getElementById('navbarDropdown');
+const navToggle = document.getElementById('navbarToggle');
+const modalBox  = document.getElementById('modal');
+
+function ToggleNavbar() {
+    navItems.classList.toggle('show');
+}
+
+document.addEventListener('click', (event) => {
+    if (!navToggle.contains(event.target) && !navItems.contains(event.target)) {
+        navItems.classList.remove('show');
+        document.querySelectorAll('.dropdown_menu').forEach(m => m.classList.remove('show'));
+    }
+});
+
+// ─── MODAL ────────────────────────────────────────────────────────────────────
+
+function ModalOpen(title, text = 'Unexpected error occurred!', error) {
+    modalBox.innerHTML = `
+        <div class="modal-content" id="modal_content">
+            <h4 class="modal_title">${title}</h4>
+            <p class="modal_text">${text}</p>
+            ${error ? `<p class="modal-error">${error}</p>` : ''}
+            <div class="modal-footer">
+                <button onclick="ModalClose()" class="modal-button">Ok</button>
+            </div>
+        </div>`;
+
+    const content = document.getElementById('modal_content');
+    setTimeout(() => {
+        function outsideClick(e) {
+            if (!content.contains(e.target)) {
+                ModalClose();
+                document.removeEventListener('click', outsideClick);
+            }
+            e.stopPropagation();
+        }
+        document.addEventListener('click', outsideClick);
+    }, 1000);
+
+    modalBox.style.display = 'block';
+}
+
+function ModalClose() {
+    modalBox.style.display = 'none';
+}
+
+// ─── DARK MODE ────────────────────────────────────────────────────────────────
+
+function DarkModeLoad() {
+    PrefersDark = GetFromLocalStorage('PrefersDark');
+    if (PrefersDark === undefined) {
+        PrefersDark = window.matchMedia?.('(prefers-color-scheme: dark)').matches ?? true;
+        SaveToLocalStorage('PrefersDark', PrefersDark);
+    }
+    if (!PrefersDark) {
+        DarkReader.disable();
+        document.getElementById('darkModeToggle').checked = false;
+    } else {
+        DarkReader.enable();
+        document.getElementById('darkModeToggle').checked = true;
     }
 }
 
-function ScrollToTop() {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+DarkModeLoad();
+
+function ToggleDarkMode() {
+    if (DarkReader.isEnabled()) {
+        DarkReader.disable();
+        PrefersDark = false;
+    } else {
+        DarkReader.enable();
+        PrefersDark = true;
+    }
+    SaveToLocalStorage('PrefersDark', PrefersDark);
 }
 
-function ScrollToBottom() {
-    window.scrollTo({ top: 10000, behavior: 'smooth' });
+// ─── UTILITIES ────────────────────────────────────────────────────────────────
+
+function RemoveCss(item, type = 'display') {
+    const css = item.style.cssText;
+    const idx = css.indexOf(type);
+    if (idx === -1) return;
+    const end = css.indexOf(';', idx);
+    item.style.cssText = css.slice(0, idx) + (end !== -1 ? css.slice(end + 1) : '');
 }
-
-
-
 
 function HideHtmlElement(id, time) {
-    const element = document.getElementById(id);
-    if (time)
-        setTimeout(() => {
-            element.style.cssText += "display: none !important;";
-        }, time)
-    else {
-        element.style.cssText += "display: none !important;";
-    }
+    const el = document.getElementById(id);
+    if (!el) return;
+    const hide = () => el.style.cssText += 'display: none !important;';
+    time ? setTimeout(hide, time) : hide();
 }
 
+function ScrollToTop()    { window.scrollTo({ top: 0,     behavior: 'smooth' }); }
+function ScrollToBottom() { window.scrollTo({ top: 10000, behavior: 'smooth' }); }
+
+// ─── DEVICE DETECTION ─────────────────────────────────────────────────────────
 
 (() => {
-    const isSmallScreen = window.matchMedia("(max-width: 768px)").matches;
+    const isSmallScreen = window.matchMedia('(max-width: 768px)').matches;
     const isMobileUA = /iPhone|iPad|iPod|Android|BlackBerry|IEMobile|Opera Mini|Mobile|mobile/i.test(navigator.userAgent);
     isPhone = isSmallScreen && isMobileUA;
-
-    if (isPhone) {
-        console.log("User is likely on a mobile device.");
-    } else {
-        console.log("User is not on a mobile device.");
-    }
+    console.log(isPhone ? 'Mobile device detected.' : 'Desktop device detected.');
 })();

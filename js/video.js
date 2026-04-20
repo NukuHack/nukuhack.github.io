@@ -1,6 +1,39 @@
 console.log('Hello World - just testing stuff');
 
-// https://github.com/search?q=https%3A%2F%2Fwww.pornhub.com%2Fembed%2F+language%3AHTML&type=code
+// Define all image variables from ../assets/ folder
+const IMAGES = {
+    volume: '../assets/volume-icon.png',
+    doubleLeft: '../assets/double-left-arrow.png',
+    doubleRight: '../assets/double-right-arrow.png',
+    singleRight: '../assets/single-right-arrow.png',
+    singleLeft: '../assets/single-left-arrow.png',
+    speed: '../assets/speed-icon.png',
+    loop: '../assets/loop-icon.png',
+    unloop: '../assets/unloop-icon.png',
+    play: '../assets/play-icon.png',
+    pause: '../assets/pause-icon.png',
+    fullscreen: '../assets/fullscreen-icon.png',
+    minimize: '../assets/minimize-icon.png'
+};
+
+// Load images into their respective elements
+function loadImages() {
+    document.getElementById('playImage').src = IMAGES.play;
+    document.getElementById('singleLeftImage').src = IMAGES.singleLeft;
+    document.getElementById('doubleLeftImage').src = IMAGES.doubleLeft;
+    document.getElementById('doubleRightImage').src = IMAGES.doubleRight;
+    document.getElementById('singleRightImage').src = IMAGES.singleRight;
+    document.getElementById('loopImage').src = IMAGES.loop;
+    document.getElementById('speedImage').src = IMAGES.speed;
+    document.getElementById('volumeImage').src = IMAGES.volume;
+    document.getElementById('fullscreenImage').src = IMAGES.fullscreen;
+}
+
+// Initialize images when DOM is loaded
+document.addEventListener('DOMContentLoaded', loadImages);
+
+// Make images available globally for use in video.js
+window.VIDEO_IMAGES = IMAGES;
 
 
 const overlay = document.getElementById('overlay');

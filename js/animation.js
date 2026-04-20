@@ -490,7 +490,7 @@ async function loadGameObjects(place) {
 
 
 // Call the function to load objects
-loadGameObjects('./json/gameObjects.json',canvas).then(rawData => {
+loadGameObjects('../json/gameObjects.json',canvas).then(rawData => {
     if (rawData) {
         gameObjectManager = rawData;
         //console.log("Game Object Manager:", gameObjectManager);

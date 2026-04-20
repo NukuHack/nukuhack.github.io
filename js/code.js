@@ -1,6 +1,5 @@
 // DOM Elements
 const codeOutput = document.getElementById('codes');
-const modalBox = document.getElementById('modal');
 const codePageDiv = document.getElementById('code_page');
 const searchInput = document.getElementById('search_stuff');
 const languageDropdown = document.getElementById('dropdown_language');
@@ -16,6 +15,8 @@ const languageMapping = {
     javascript: "JavaScript",
     python: "Python",
     css: "CSS",
+    java: "Java",
+    rust: "Rust",
 };
 
 let data; // Main data storage
@@ -44,7 +45,7 @@ function fetchData(source) {
         });
 }
 
-fetchData('./json/data.json');
+fetchData('../json/data.json');
 
 // Initialize application
 function initializeApplication() {

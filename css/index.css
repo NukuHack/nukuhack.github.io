@@ -133,11 +133,17 @@
 }
 
 
+.cube-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 80px;      /* replaces the 12x <br> at the top */
+    padding-bottom: 60px;   /* replaces the 4x <br> after the cube */
+}
+
 .animate_button {
-    top: 40%;
-    position: absolute;
-    align-self: center;
-    width: auto;
+    /* remove position: absolute and top: 40% — the flex parent handles placement now */
+    position: static;
     border-radius: 5px;
     border: 1px solid var(--border-light-color);
     font-size: 90%;

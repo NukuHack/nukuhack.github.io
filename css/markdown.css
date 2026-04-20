@@ -1,12 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <link href="./assets/favicon.png" rel="shortcut icon" type="image/x-icon" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stupid Webpage</title>
-    <link rel="stylesheet" type="text/css" href="./css/main.css">
-<style>
+
 /* All markdown app styles scoped under .md-app to avoid overriding global/navbar styles */
 
 .md-app *,
@@ -105,41 +97,3 @@
     font-family: 'Fira Code', monospace;
     font-size: 12px;
 }
-</style>
-</head>
-<body>
-<!-- Wrap the entire markdown app in .md-app so styles don't leak out -->
-<div class="md-app">
-  <div class="wrap">
-    <div class="panel">
-      <div class="panel-head">INPUT</div>
-      <textarea id="inp"># Hello world
-
-This is a **bold** and *italic* example.
-
-- Item one
-- Item two
-  - Nested
-
-`inline code` and a literal \n newline escape.
-
-```js
-const x = "hello\nworld";
-```</textarea>
-    </div>
-    <div class="panel">
-      <div class="panel-head">PREVIEW</div>
-      <div id="preview"></div>
-    </div>
-  </div>
-  <div class="stats">
-    <span>Actual breaks: <span class="stat-val" id="sb">0</span></span>
-    <span>Literal \n: <span class="stat-val" id="sn">0</span></span>
-  </div>
-</div>
-
-    <script src="https://cdn.jsdelivr.net/npm/darkreader@4.9.34/darkreader.min.js"></script>
-    <script src="./js/main.js"></script>
-    <script src="./js/markdown.js"></script>
-</body>
-</html>
