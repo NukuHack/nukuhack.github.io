@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link href="../assets/favicon.png" rel="shortcut icon" type="image/x-icon" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stupid Webpage</title>
+    <link rel="stylesheet" type="text/css" href="../css/main.css">
+    <link rel="stylesheet" type="text/css" href="../css/search.css">
+</head>
+<body>
+    <!-- Navbar will be inserted here by main.js -->
+    
+    <div class="search-container">
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="Enter your search..." autofocus>
+            <button id="clearBtn" class="search-btn">X</button>
+        </div>
+        
+        <div id="status">
+            <span id="statusText"></span>
+            <span id="loadingIndicator" class="loading">⟳ Loading...</span>
+        </div>
+        
+        <div id="results">
+            <div class="placeholder">✨ Type a search query and press Enter</div>
+        </div>
+    </div>
+    
+    <!-- Footer will be inserted here by main.js -->
+    
+    <script src="https://cdn.jsdelivr.net/npm/darkreader@4.9.34/darkreader.min.js"></script>
+    <script type="text/javascript" src="../js/main.js"></script>
+    <script type="text/javascript" src="../js/search.js"></script>
+</body>
+</html>

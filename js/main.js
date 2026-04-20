@@ -83,6 +83,8 @@ function LoadBasicContent() {
                         <li class="dropdown_li"><p class="dropdown_item link" onclick="ChangePage('extra')">Extra</p></li>
                         <li class="dropdown_li"><p class="dropdown_item link" onclick="ChangePage('links')">Links</p></li>
                         <li class="dropdown_li"><p class="dropdown_item link" onclick="ChangePage('urltable')">UrlTable</p></li>
+                        <li class="dropdown_li"><p class="dropdown_item link" onclick="ChangePage('search')">Browser</p></li>
+                        <li class="dropdown_li"><p class="dropdown_item link" onclick="ChangePage('page')">PageView</p></li>
                     </ul>
                 </li>
                 <li class="navbar_li dropdown">

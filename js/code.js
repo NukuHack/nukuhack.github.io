@@ -217,15 +217,13 @@ function generateCodeHelpPage({ id, lang, desc, code }) {
     CodeHTML += `Description: ${desc}`;
     CodeHTML += `</div>`;
 
-    CodeHTML += `<input type="button" class="code_resize" id="code_resize_${id}_page" 
-        value="Close this page" onClick="closeCodePage()">`;
+    CodeHTML += `<input type="button" class="code_resize" id="code_resize_${id}_page" value="Close this page" onClick="closeCodePage()">`;
     CodeHTML += `<p class="code_buttons_page">`;
     CodeHTML += `<input type="button" class="code_readonly" id="code_readonly_${id}_page" onclick="toggleEditable('${id}'+'_page')" value="Toggle Editable">`;
     CodeHTML += `<input type="button" class="code_reset" id="code_reset_${id}_page" onclick="resetCode('${id}'+'_page')" value="Reset the code">`;
     CodeHTML += `</p>`;
     CodeHTML += `<div class="code_help_page" id="code_help_${id}_page">`;
-    CodeHTML +=
-        `<pre class="line-numbers code_out" style="height: ${leng}px"><code class="language-${lang} code_code" id="code_code_${id}_page">${code}</code></pre>`;
+    CodeHTML += `<pre class="line-numbers code_out" style="height: ${leng}px"><code class="language-${lang} code_code" id="code_code_${id}_page">${code}</code></pre>`;
     CodeHTML += `</div>`;
     CodeHTML += `<button onclick="copyCode('${id}'+'_page')" class="code_copy">Copy Code</button>`;
     CodeHTML += `</div>`;

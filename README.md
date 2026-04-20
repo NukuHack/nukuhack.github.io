@@ -2,7 +2,6 @@
 
 My personal webpage, accessible through multiple domains:
 
-- **http://nukuhack.szakdoga.net**: Only accessible in Hungary and not actively maintained.
 - **https://nukuhack.netlify.app**: The preferred domain due to its ease of setup and regular updates.
 - **https://nukuhack.github.io**: Automatically generated and updated, though it is not a primary focus.
 

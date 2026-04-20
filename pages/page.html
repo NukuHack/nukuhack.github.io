@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link href="../assets/favicon.png" rel="shortcut icon" type="image/x-icon" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stupid Webpage</title>
+    <link rel="stylesheet" type="text/css" href="../css/main.css">
+    <link rel="stylesheet" type="text/css" href="../css/page.css">
+</head>
+<body>
+    <div class="toolbar">
+        <div class="url-input-wrapper">
+            <input type="text" class="url-input" id="urlInput" placeholder="Enter URL (e.g., https://example.com)" value="https://example.com">
+            <button class="btn btn-primary" id="refreshBtn"><span>🔄</span> Refresh</button>
+        </div>
+        
+        <div class="view-options">
+            <button class="view-btn active" data-view="rendered">📄 Rendered</button>
+            <button class="view-btn" data-view="source">📝 Source</button>
+            <button class="view-btn" data-view="error" style="display:none;">❌ Error</button>
+        </div>
+        <div class="status-bar">
+            <span id="statusText">Ready</span>
+            <span id="loadTime"></span>
+        </div>
+    </div>
+
+    <div class="viewer-container">
+        <div class="loading-overlay hidden" id="loadingOverlay">
+            <div class="spinner"></div>
+            <div id="loadingText">Loading page...</div>
+        </div>
+        
+        <iframe id="renderedView" class="viewer" sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-modals"></iframe>
+        <pre class="source-view hidden" id="sourceView"><code class="language-html code_code"></code></pre>
+        <iframe id="processedView" class="viewer hidden" sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-modals"></iframe>
+        <div id="errorView" class="error-panel hidden"></div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/darkreader@4.9.34/darkreader.min.js"></script>
+    <script type="text/javascript" src="../js/main.js"></script>
+    <script type="text/javascript" src="../js/page.js"></script>
+</body>
+</html>
