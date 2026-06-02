@@ -1,32 +1,50 @@
 document.addEventListener('DOMContentLoaded', () => {
     // ── DOM refs ──────────────────────────────────────────────────────────────
-    const fileInput          = document.getElementById('fileInput');
-    const loadFileBtn        = document.getElementById('loadFileBtn');
-    const fileName           = document.getElementById('fileName');
-    const tableBody          = document.getElementById('tableBody');
-    const statusMessage      = document.getElementById('statusMessage');
-    const statsContainer     = document.getElementById('statsContainer');
-    const statTotal          = document.getElementById('statTotal');
-    const statValid          = document.getElementById('statValid');
-    const statSkipped        = document.getElementById('statSkipped');
-    const groupSection       = document.getElementById('groupSection');
-    const newGroupInput      = document.getElementById('newGroupInput');
-    const addGroupBtn        = document.getElementById('addGroupBtn');
-    const groupFilter        = document.getElementById('groupFilter');
-    const clearFilterBtn     = document.getElementById('clearFilterBtn');
+    const fileInput = document.getElementById('fileInput');
+    const loadFileBtn = document.getElementById('loadFileBtn');
+    const fileName = document.getElementById('fileName');
+    const tableBody = document.getElementById('tableBody');
+    const statusMessage = document.getElementById('statusMessage');
+    const statsContainer = document.getElementById('statsContainer');
+    const statTotal = document.getElementById('statTotal');
+    const statValid = document.getElementById('statValid');
+    const statSkipped = document.getElementById('statSkipped');
+    const groupSection = document.getElementById('groupSection');
+    const filterSection = document.getElementById('filterSection');
+    const newGroupInput = document.getElementById('newGroupInput');
+    const addGroupBtn = document.getElementById('addGroupBtn');
+    const groupFilter = document.getElementById('groupFilter');
+    const clearFilterBtn = document.getElementById('clearFilterBtn');
     const groupTagsContainer = document.getElementById('groupTagsContainer');
-    const groupModal         = document.getElementById('groupModal');
-    const groupModalBody     = document.getElementById('groupModalBody');
-    const groupModalCancel   = document.getElementById('groupModalCancel');
-    const groupModalConfirm  = document.getElementById('groupModalConfirm');
+    const groupModal = document.getElementById('groupModal');
+    const groupModalBody = document.getElementById('groupModalBody');
+    const groupModalCancel = document.getElementById('groupModalCancel');
+    const groupModalConfirm = document.getElementById('groupModalConfirm');
+    const searchInput = document.getElementById('searchInput');
+    const saveFileBtn = document.getElementById('saveFileBtn');
+    const addEntryBtn = document.getElementById('addEntryBtn');
+    const techToggle = document.getElementById('techToggle');
+    const techBody = document.getElementById('techBody');
 
     // ── State ─────────────────────────────────────────────────────────────────
-    let allData       = [];
-    let allGroups     = new Set();
-    let isModified    = false;
+    let allData = [];
+    let allGroups = new Set();
+    let isModified = false;
     let currentFilter = 'all';
+    let currentSearch = '';
     let currentFileName = null;
     let pendingGroupItemId = null;
+
+    function markModified() {
+        isModified = true; markModified();
+        const saveBtn = document.getElementById('saveFileBtn');
+        if (saveBtn) saveBtn.classList.add('has-changes');
+    }
+    function markSaved() {
+        isModified = false;
+        const saveBtn = document.getElementById('saveFileBtn');
+        if (saveBtn) saveBtn.classList.remove('has-changes');
+    }
 
     // ── Unsaved changes guard ─────────────────────────────────────────────────
     window.addEventListener('beforeunload', (e) => {
@@ -36,19 +54,34 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // ── Load button wiring ────────────────────────────────────────────────────
+    const loadSection = document.getElementById('loadSection');
+    const techLoadRow = document.getElementById('techLoadRow');
+    const loadFileBtnTech = document.getElementById('loadFileBtnTech');
+
+    function triggerFileLoad() { fileInput.click(); }
+    loadFileBtn.addEventListener('click', triggerFileLoad);
+    if (loadFileBtnTech) loadFileBtnTech.addEventListener('click', triggerFileLoad);
+
+    function markFileLoaded() {
+        // Hide the prominent load section, show compact one inside tech
+        if (loadSection) loadSection.style.display = 'none';
+        if (techLoadRow) techLoadRow.style.display = 'block';
+    }
+
     // ── File loading ──────────────────────────────────────────────────────────
-    loadFileBtn.addEventListener('click', () => fileInput.click());
 
     fileInput.addEventListener('change', (event) => {
         const file = event.target.files[0];
         if (!file) return;
 
-        currentFileName  = file.name;
+        markFileLoaded();
+        currentFileName = file.name;
         fileName.textContent = file.name;
-        tableBody.innerHTML  = '';
+        tableBody.innerHTML = '';
         clearStatus();
         statsContainer.style.display = 'none';
-        groupSection.style.display   = 'none';
+        groupSection.style.display = 'none';
         showStatus('Loading and parsing file…', 'loading');
         isModified = false;
         allGroups.clear();
@@ -56,8 +89,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const reader = new FileReader();
         reader.onload = (e) => {
+            let data;
             try {
-                const lines = e.target.result.split('\n');
+                data = e.target.result;
+                try {
+                    data = decompress(data);
+                } catch (err) {
+                    console.error('decomp error (hopefully not compressed):', err);
+                }
+            } catch (err) {
+                console.error('Read error:', err);
+                showStatus(`Error reading file: ${err.message}`, 'error');
+            }
+            try {
+                const lines = data.split('\n');
                 allData = [];
                 let validCount = 0, skippedCount = 0;
 
@@ -65,8 +110,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     line = line.trim();
                     if (!line) { skippedCount++; return; }
 
-                    const parts     = line.split(';');
-                    const url       = parts[0].trim();
+                    const parts = line.split(';');
+                    const url = parts[0].trim();
                     const extraData = parts[1] ? parts[1].trim() : 'No Data Found';
 
                     let groups = [];
@@ -87,7 +132,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 if (allData.length > 0) {
                     displayData(allData);
+                    autoSave();
                     groupSection.style.display = 'block';
+                    filterSection.style.display = 'block';
                     updateGroupTags();
                     updateGroupFilter();
                     showStatus(`Loaded ${allData.length} item(s) successfully.`, 'success');
@@ -106,8 +153,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ── Stats ─────────────────────────────────────────────────────────────────
     function updateStats(total, valid, skipped) {
-        statTotal.textContent   = total;
-        statValid.textContent   = valid;
+        statTotal.textContent = total;
+        statValid.textContent = valid;
         statSkipped.textContent = skipped;
         statsContainer.style.display = 'flex';
     }
@@ -116,13 +163,19 @@ document.addEventListener('DOMContentLoaded', () => {
     function updateGroupTags() {
         groupTagsContainer.innerHTML = '';
         allGroups.forEach(group => {
+            const count = allData.filter(d => d.groups.includes(group)).length;
             const tag = document.createElement('span');
-            tag.className    = 'group-tag';
+            tag.className = 'group-tag';
             tag.dataset.group = group;
-            tag.innerHTML = `${group}<button class="remove-group" title="Remove from all">&times;</button>`;
+            tag.innerHTML = `<span class="group-tag-name">${group}</span><span class="group-tag-count">${count}</span><button class="remove-group" title="Remove group from all">&times;</button>`;
 
             tag.addEventListener('click', (e) => {
-                if (!e.target.classList.contains('remove-group')) filterByGroup(group);
+                if (!e.target.classList.contains('remove-group')) {
+                    const already = currentFilter === group;
+                    groupFilter.value = already ? 'all' : group;
+                    currentFilter = already ? 'all' : group;
+                    applyFilter();
+                }
             });
             tag.querySelector('.remove-group').addEventListener('click', (e) => {
                 e.stopPropagation();
@@ -157,6 +210,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function displayData(data) {
         tableBody.innerHTML = '';
         const filtered = applyFilterToData(data);
+        updateRowCountHeader(filtered.length);
 
         filtered.forEach(item => {
             const row = document.createElement('tr');
@@ -164,28 +218,28 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Extra Data cell
             const extraCell = document.createElement('td');
-            extraCell.className   = 'extra-data-cell';
-            extraCell.textContent = item.extraData || '(no extra data)';
+            extraCell.className = 'extra-data-cell';
+            extraCell.innerHTML = highlight(item.extraData || '(no extra data)', currentSearch);
 
             // URL cell
             const urlCell = document.createElement('td');
             urlCell.className = 'url-cell';
 
             if (item.validUrl) {
-                const link    = document.createElement('a');
-                link.href     = item.url;
+                const link = document.createElement('a');
+                link.href = item.url;
                 link.className = 'full-cell-link';
-                link.textContent = item.url;
-                link.target   = '_blank';
-                link.rel      = 'noopener noreferrer';
+                link.innerHTML = highlight(item.url, currentSearch);
+                link.target = '_blank';
+                link.rel = 'noopener noreferrer';
                 urlCell.appendChild(link);
-                urlCell.style.padding  = '0';
+                urlCell.style.padding = '0';
                 urlCell.style.position = 'relative';
             } else {
                 const span = document.createElement('span');
-                span.className   = 'url-invalid';
+                span.className = 'url-invalid';
                 span.textContent = item.url;
-                span.title       = 'This may not be a valid URL';
+                span.title = 'This may not be a valid URL';
                 urlCell.appendChild(span);
             }
 
@@ -199,7 +253,7 @@ document.addEventListener('DOMContentLoaded', () => {
             actionCell.style.textAlign = 'center';
             actionCell.style.whiteSpace = 'nowrap';
 
-            const editBtn   = makeActionBtn(editIcon(), 'Edit entry',   () => toggleEditMode(row, item));
+            const editBtn = makeActionBtn(editIcon(), 'Edit entry', () => toggleEditMode(row, item));
             editBtn.classList.add('edit-btn');
 
             const deleteBtn = makeActionBtn(trashIcon(), 'Delete entry', () => deleteLine(row, item.id));
@@ -218,11 +272,23 @@ document.addEventListener('DOMContentLoaded', () => {
         addAddLineRow();
     }
 
+    function updateRowCountHeader(count) {
+        const th = document.querySelector('#dataTable thead th:first-child');
+        if (!th) return;
+        let badge = th.querySelector('.th-count');
+        if (!badge) {
+            badge = document.createElement('span');
+            badge.className = 'th-count';
+            th.appendChild(badge);
+        }
+        badge.textContent = `(${count})`;
+    }
+
     function makeActionBtn(svgHtml, title, onClick) {
         const btn = document.createElement('button');
-        btn.className = 'action-btn';
+        btn.className = 'table-action-btn';
         btn.innerHTML = svgHtml;
-        btn.title     = title;
+        btn.title = title;
         btn.addEventListener('click', onClick);
         return btn;
     }
@@ -244,15 +310,15 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         } else {
             const empty = document.createElement('span');
-            empty.className   = 'no-groups';
+            empty.className = 'no-groups';
             empty.textContent = 'No groups';
             cell.appendChild(empty);
         }
 
         const addBtn = document.createElement('button');
-        addBtn.className   = 'add-group-to-line';
+        addBtn.className = 'add-group-to-line';
         addBtn.textContent = '+ Add';
-        addBtn.title       = 'Add to group';
+        addBtn.title = 'Add to group';
         addBtn.addEventListener('click', () => openGroupModal(item.id));
         cell.appendChild(addBtn);
     }
@@ -270,31 +336,31 @@ document.addEventListener('DOMContentLoaded', () => {
         if (available.length === 0) {
             // Offer to create new group directly
             const newInput = document.createElement('input');
-            newInput.type        = 'text';
-            newInput.className   = 'group-input';
+            newInput.type = 'text';
+            newInput.className = 'group-input';
             newInput.placeholder = 'No groups yet — type a new name…';
-            newInput.maxLength   = 50;
+            newInput.maxLength = 50;
             newInput.style.width = '100%';
-            newInput.id          = 'modalNewGroupInput';
+            newInput.id = 'modalNewGroupInput';
             groupModalBody.appendChild(newInput);
         } else {
             const sel = document.createElement('select');
             sel.className = 'filter-select';
             sel.style.width = '100%';
-            sel.id    = 'modalGroupSelect';
+            sel.id = 'modalGroupSelect';
             sel.innerHTML = '<option value="">Select a group…</option>';
             available.forEach(g => { sel.innerHTML += `<option value="${g}">${g}</option>`; });
             sel.innerHTML += '<option value="__new__">+ Create new group…</option>';
 
             const newInput = document.createElement('input');
-            newInput.type        = 'text';
-            newInput.className   = 'group-input';
+            newInput.type = 'text';
+            newInput.className = 'group-input';
             newInput.placeholder = 'New group name…';
-            newInput.maxLength   = 50;
+            newInput.maxLength = 50;
             newInput.style.width = '100%';
             newInput.style.display = 'none';
             newInput.style.marginTop = '10px';
-            newInput.id          = 'modalNewGroupInput';
+            newInput.id = 'modalNewGroupInput';
 
             sel.addEventListener('change', () => {
                 newInput.style.display = sel.value === '__new__' ? 'block' : 'none';
@@ -326,9 +392,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const item = allData.find(d => d.id === pendingGroupItemId);
         if (!item) { closeGroupModal(); return; }
 
-        const sel      = document.getElementById('modalGroupSelect');
+        const sel = document.getElementById('modalGroupSelect');
         const newInput = document.getElementById('modalNewGroupInput');
-        let groupName  = '';
+        let groupName = '';
 
         if (sel && sel.value === '__new__') {
             groupName = newInput ? newInput.value.trim() : '';
@@ -349,7 +415,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!item.groups.includes(groupName)) {
             allGroups.add(groupName);
             item.groups.push(groupName);
-            isModified = true;
+            isModified = true; markModified();
             autoSave();
             updateGroupTags();
             updateGroupFilter();
@@ -365,7 +431,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!item) return;
 
         item.groups = item.groups.filter(g => g !== groupName);
-        isModified = true;
+        isModified = true; markModified();
         autoSave();
 
         if (!allData.some(d => d.groups.includes(groupName))) {
@@ -381,7 +447,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!confirm(`Remove group "${groupName}" from all items?`)) return;
         allData.forEach(item => { item.groups = item.groups.filter(g => g !== groupName); });
         allGroups.delete(groupName);
-        isModified = true;
+        isModified = true; markModified();
         autoSave();
         updateGroupTags();
         updateGroupFilter();
@@ -392,7 +458,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // ── Filtering ─────────────────────────────────────────────────────────────
     function filterByGroup(groupName) {
         groupFilter.value = groupName;
-        currentFilter     = groupName;
+        currentFilter = groupName;
         applyFilter();
     }
 
@@ -405,15 +471,40 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function applyFilterToData(data) {
-        if (currentFilter === 'all')       return data;
-        if (currentFilter === 'ungrouped') return data.filter(d => d.groups.length === 0);
-        return data.filter(d => d.groups.includes(currentFilter));
+        let filtered = data;
+        if (currentFilter !== 'all') {
+            if (currentFilter === 'ungrouped') {
+                filtered = filtered.filter(d => d.groups.length === 0);
+            } else {
+                filtered = filtered.filter(d => d.groups.includes(currentFilter));
+            }
+        }
+        if (currentSearch) {
+            filtered = filtered.filter(d =>
+                d.url.toLowerCase().includes(currentSearch) ||
+                d.extraData.toLowerCase().includes(currentSearch)
+            );
+        }
+        return filtered;
+    }
+
+    function highlight(text, term) {
+        if (!term) return escapeHtml(text);
+        const escaped = escapeHtml(text);
+        const escapedTerm = term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        return escaped.replace(new RegExp(`(${escapedTerm})`, 'gi'), '<mark class="search-hl">$1</mark>');
+    }
+
+    function escapeHtml(str) {
+        return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
     }
 
     groupFilter.addEventListener('change', applyFilter);
     clearFilterBtn.addEventListener('click', () => {
         groupFilter.value = 'all';
-        currentFilter     = 'all';
+        searchInput.value = "";
+        currentFilter = 'all';
+        currentSearch = "";
         applyFilter();
         showStatus('Filter cleared.', 'success');
     });
@@ -437,87 +528,167 @@ document.addEventListener('DOMContentLoaded', () => {
     newGroupInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') addGroupBtn.click(); });
 
     // ── Edit / Delete / Add line ──────────────────────────────────────────────
-    function toggleEditMode(row, item) {
+    function toggleEditMode(row, item, isNew = false) {
         const isEditing = row.classList.contains('editing');
 
         if (isEditing) {
-            const extraIn = row.querySelector('.extra-data-input');
-            const urlIn   = row.querySelector('.url-input');
+            saveEditRow(row, item);
+        } else {
+            startEditRow(row, item, isNew);
+        }
+    }
 
-            const newExtra = extraIn.value.trim() || 'No Data Found';
-            const newUrl   = urlIn.value.trim();
+    function saveEditRow(row, item) {
+        const extraIn = row.querySelector('.extra-data-input');
+        const urlIn = row.querySelector('.url-input');
 
-            let validUrl = false;
-            try { new URL(newUrl); validUrl = true; } catch { /* invalid */ }
+        const newExtra = extraIn.value.trim() || 'No Data Found';
+        const newUrl = urlIn.value.trim();
 
-            if (newExtra !== item.extraData || newUrl !== item.url) {
-                item.extraData = newExtra;
-                item.url       = newUrl;
-                item.validUrl  = validUrl;
-                isModified     = true;
-                autoSave();
-            }
+        let validUrl = false;
+        try { new URL(newUrl); validUrl = true; } catch { /* invalid */ }
 
+        if (newExtra !== item.extraData || newUrl !== item.url) {
+            item.extraData = newExtra;
+            item.url = newUrl;
+            item.validUrl = validUrl;
+            isModified = true;
+            markModified();
+            autoSave();
+        }
+
+        const extraCell = row.querySelector('.extra-data-cell');
+        const urlCell = row.querySelector('.url-cell');
+        const groupCell = row.querySelector('.group-cell');
+
+        extraCell.textContent = newExtra;
+        urlCell.innerHTML = '';
+        urlCell.style.padding = '';
+
+        if (validUrl) {
+            const link = document.createElement('a');
+            link.href = newUrl;
+            link.className = 'full-cell-link';
+            link.textContent = newUrl;
+            link.target = '_blank';
+            link.rel = 'noopener noreferrer';
+            urlCell.appendChild(link);
+            urlCell.style.padding = '0';
+            urlCell.style.position = 'relative';
+        } else {
+            const span = document.createElement('span');
+            span.className = 'url-invalid';
+            span.textContent = newUrl;
+            span.title = 'This may not be a valid URL';
+            urlCell.appendChild(span);
+        }
+
+        updateGroupCell(groupCell, item);
+        row.querySelector('.edit-btn').innerHTML = editIcon();
+        row.classList.remove('editing');
+        // remove hint cell if present
+        const hintCell = row.querySelector('.edit-hint-td');
+        if (hintCell) hintCell.remove();
+        showStatus('Changes saved.', 'success');
+    }
+
+    function revertEditRow(row, item, isNew) {
+        if (isNew) {
+            // delete the row entirely
+            allData = allData.filter(d => d.id !== item.id);
+            row.remove();
+            updateStats(allData.length, allData.length, 0);
+            updateGroupFilter();
+            autoSave();
+            showStatus('New entry discarded.', 'empty');
+            addAddLineRow();
+        } else {
+            // restore original values
             const extraCell = row.querySelector('.extra-data-cell');
-            const urlCell   = row.querySelector('.url-cell');
+            const urlCell = row.querySelector('.url-cell');
             const groupCell = row.querySelector('.group-cell');
 
-            extraCell.textContent = newExtra;
+            extraCell.textContent = item.extraData;
             urlCell.innerHTML = '';
             urlCell.style.padding = '';
 
-            if (validUrl) {
-                const link       = document.createElement('a');
-                link.href        = newUrl;
-                link.className   = 'full-cell-link';
-                link.textContent = newUrl;
-                link.target      = '_blank';
-                link.rel         = 'noopener noreferrer';
+            if (item.validUrl) {
+                const link = document.createElement('a');
+                link.href = item.url;
+                link.className = 'full-cell-link';
+                link.textContent = item.url;
+                link.target = '_blank';
+                link.rel = 'noopener noreferrer';
                 urlCell.appendChild(link);
-                urlCell.style.padding  = '0';
+                urlCell.style.padding = '0';
                 urlCell.style.position = 'relative';
             } else {
-                const span       = document.createElement('span');
-                span.className   = 'url-invalid';
-                span.textContent = newUrl;
-                span.title       = 'This may not be a valid URL';
+                const span = document.createElement('span');
+                span.className = 'url-invalid';
+                span.textContent = item.url;
                 urlCell.appendChild(span);
             }
 
             updateGroupCell(groupCell, item);
             row.querySelector('.edit-btn').innerHTML = editIcon();
             row.classList.remove('editing');
-            showStatus('Changes saved.', 'success');
-
-        } else {
-            const extraCell = row.querySelector('.extra-data-cell');
-            const urlCell   = row.querySelector('.url-cell');
-
-            const extraIn   = document.createElement('input');
-            extraIn.type      = 'text';
-            extraIn.className = 'extra-data-input';
-            extraIn.value     = extraCell.textContent;
-
-            const currentUrl = urlCell.querySelector('a') ? urlCell.querySelector('a').href : urlCell.querySelector('span')?.textContent || '';
-            const urlIn      = document.createElement('input');
-            urlIn.type        = 'text';
-            urlIn.className   = 'url-input';
-            urlIn.value       = currentUrl;
-
-            extraCell.innerHTML = '';
-            extraCell.appendChild(extraIn);
-
-            urlCell.innerHTML      = '';
-            urlCell.style.padding  = '';
-            urlCell.style.position = '';
-            urlCell.appendChild(urlIn);
-
-            row.querySelector('.edit-btn').innerHTML = saveIcon();
-            row.classList.add('editing');
-            showStatus('Editing — click the save button to confirm.', 'loading');
-            extraIn.focus();
+            const hintCell = row.querySelector('.edit-hint-td');
+            if (hintCell) hintCell.remove();
+            showStatus('Edit cancelled.', 'empty');
         }
     }
+
+    function startEditRow(row, item, isNew = false) {
+        const extraCell = row.querySelector('.extra-data-cell');
+        const urlCell = row.querySelector('.url-cell');
+
+        const extraIn = document.createElement('input');
+        extraIn.type = 'text';
+        extraIn.className = 'extra-data-input';
+        extraIn.value = item.extraData;
+
+        const currentUrl = urlCell.querySelector('a') ? urlCell.querySelector('a').href : urlCell.querySelector('span')?.textContent || '';
+        const urlIn = document.createElement('input');
+        urlIn.type = 'text';
+        urlIn.className = 'url-input';
+        urlIn.value = currentUrl;
+
+        // Enter to save, Esc to revert
+        function handleEditKey(e) {
+            if (e.key === 'Enter') { e.preventDefault(); saveEditRow(row, item); }
+            if (e.key === 'Escape') { e.preventDefault(); revertEditRow(row, item, isNew); }
+        }
+        extraIn.addEventListener('keydown', handleEditKey);
+        urlIn.addEventListener('keydown', handleEditKey);
+
+        extraCell.innerHTML = '';
+        extraCell.appendChild(extraIn);
+
+        urlCell.innerHTML = '';
+        urlCell.style.padding = '';
+        urlCell.style.position = '';
+        urlCell.appendChild(urlIn);
+
+        row.querySelector('.edit-btn').innerHTML = saveIcon();
+        row.classList.add('editing');
+        // store isNew on row for ESC handler
+        row.dataset.isNew = isNew ? '1' : '0';
+
+        showStatus('Editing — Enter to save, Esc to cancel.', 'loading');
+        extraIn.focus();
+        extraIn.select();
+    }
+
+    // double-click on description cell to enter edit
+    tableBody.addEventListener('dblclick', (e) => {
+        const td = e.target.closest('td.extra-data-cell');
+        if (!td) return;
+        const row = td.closest('tr');
+        if (!row || row.classList.contains('editing') || row.id === 'addLineBottomRow') return;
+        const itemId = parseFloat(row.dataset.id);
+        const item = allData.find(d => d.id === itemId);
+        if (item) startEditRow(row, item, false);
+    });
 
     function deleteLine(row, id) {
         if (!confirm('Delete this entry?')) return;
@@ -525,27 +696,25 @@ document.addEventListener('DOMContentLoaded', () => {
         row.remove();
         updateStats(allData.length, allData.length, 0);
         updateGroupFilter();
-        isModified = true;
+        isModified = true; markModified();
+        markModified();
         autoSave();
         showStatus('Entry deleted.', 'success');
         addAddLineRow();
     }
 
     function addNewLine() {
-        const newId   = Date.now() + Math.random();
+        const newId = Date.now() + Math.random();
         const newItem = { id: newId, url: 'https://example.com', extraData: 'New entry', groups: [], validUrl: true, lineNumber: allData.length + 1 };
         allData.push(newItem);
-        isModified = true;
         displayData(allData);
         updateStats(allData.length, allData.length, 0);
-        showStatus('New entry added. Click the edit button to modify.', 'success');
-        autoSave();
 
         setTimeout(() => {
             const newRow = document.querySelector(`tr[data-id="${newId}"]`);
             if (newRow) {
                 newRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                toggleEditMode(newRow, newItem);
+                startEditRow(newRow, newItem, true);
             }
         }, 80);
     }
@@ -582,13 +751,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function autoSave() {
         try {
-            localStorage.setItem('urlDataAutoSave',      buildFileContent());
-            localStorage.setItem('urlDataFileName',      currentFileName || 'url-data.txt');
-            localStorage.setItem('urlDataLastModified',  new Date().toISOString());
+            const raw = buildFileContent();
+            let stored = raw;
+            let isCompressed = false;
+            try {
+                stored = compress(raw);
+                isCompressed = true;
+            } catch (compressErr) {
+                console.warn('Compression failed, storing plain text:', compressErr);
+            }
+            localStorage.setItem('urlDataAutoSave', stored);
+            localStorage.setItem('urlDataAutoSaveCompressed', isCompressed ? '1' : '0');
+            localStorage.setItem('urlDataFileName', currentFileName || 'url-data.txt');
+            localStorage.setItem('urlDataLastModified', new Date().toISOString());
         } catch (e) { console.warn('Auto-save failed:', e); return; }
 
         const toast = document.createElement('div');
-        toast.className   = 'autosave-toast';
+        toast.className = 'autosave-toast';
         toast.textContent = 'Auto-saved';
         document.body.appendChild(toast);
         setTimeout(() => toast.parentNode?.removeChild(toast), 1400);
@@ -597,10 +776,18 @@ document.addEventListener('DOMContentLoaded', () => {
     function saveToFile() {
         if (allData.length === 0) { showStatus('No data to save.', 'error'); return; }
 
-        const blob = new Blob([buildFileContent()], { type: 'text/plain' });
-        const url  = URL.createObjectURL(blob);
-        const a    = document.createElement('a');
-        a.href     = url;
+        let data = buildFileContent();
+        if (true) { // if compress mode is on
+            try {
+                data = compress(data);
+            } catch (error) {
+                console.log(" compress error: "+error)
+            }
+        }
+        const blob = new Blob([data], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
         a.download = currentFileName || 'url-data-modified.txt';
         document.body.appendChild(a);
         a.click();
@@ -608,6 +795,7 @@ document.addEventListener('DOMContentLoaded', () => {
         URL.revokeObjectURL(url);
 
         isModified = false;
+        markSaved();
         try {
             localStorage.removeItem('urlDataAutoSave');
             localStorage.removeItem('urlDataFileName');
@@ -619,14 +807,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ── Status ────────────────────────────────────────────────────────────────
     function showStatus(message, type) {
-        statusMessage.textContent = message;
-        statusMessage.className   = `status-msg ${type}`;
-        statusMessage.style.display = 'block';
+        statusMessage.innerHTML = '';
+        const text = document.createElement('span');
+        text.textContent = message;
+        statusMessage.appendChild(text);
+        const dismiss = document.createElement('button');
+        dismiss.className = 'status-dismiss';
+        dismiss.innerHTML = '&times;';
+        dismiss.title = 'Dismiss';
+        dismiss.addEventListener('click', clearStatus);
+        statusMessage.appendChild(dismiss);
+        statusMessage.className = `status-msg ${type}`;
+        statusMessage.style.display = 'flex';
     }
 
     function clearStatus() {
         statusMessage.textContent = '';
-        statusMessage.className   = 'status-msg';
+        statusMessage.className = 'status-msg';
         statusMessage.style.display = 'none';
     }
 
@@ -635,14 +832,30 @@ document.addEventListener('DOMContentLoaded', () => {
         if ((e.ctrlKey || e.metaKey) && e.key === 's') { e.preventDefault(); saveToFile(); }
         if ((e.ctrlKey || e.metaKey) && e.key === 'e') { e.preventDefault(); addNewLine(); }
         if ((e.ctrlKey || e.metaKey) && e.key === 'g') { e.preventDefault(); newGroupInput.focus(); }
-        if ((e.ctrlKey || e.metaKey) && e.key === 'f') { e.preventDefault(); groupFilter.focus(); }
+        if ((e.ctrlKey || e.metaKey) && e.key === 'f') { e.preventDefault(); searchInput.focus(); }
         if (e.key === 'Escape' && currentFilter !== 'all') {
             e.preventDefault();
             groupFilter.value = 'all';
-            currentFilter     = 'all';
+            currentFilter = 'all';
             applyFilter();
             showStatus('Filter cleared.', 'success');
         }
+    });
+
+    // ── Tech collapsible panel ────────────────────────────────────────────────
+    techToggle.addEventListener('click', () => {
+        const open = techBody.classList.toggle('open');
+        techToggle.setAttribute('aria-expanded', open);
+    });
+
+    // ── Sidebar Save / Add buttons ────────────────────────────────────────────
+    saveFileBtn.addEventListener('click', saveToFile);
+    addEntryBtn.addEventListener('click', addNewLine);
+
+    // ── Search ────────────────────────────────────────────────────────────────
+    searchInput.addEventListener('input', () => {
+        currentSearch = searchInput.value.trim().toLowerCase();
+        displayData(allData);
     });
 
     // ── SVG helpers ───────────────────────────────────────────────────────────
@@ -656,13 +869,108 @@ document.addEventListener('DOMContentLoaded', () => {
         return `<svg width="14" height="14" fill="currentColor" viewBox="0 0 16 16"><path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/><path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/></svg>`;
     }
 
+    // ── Cache clear & auto-load toggle ───────────────────────────────────────
+    const AUTO_LOAD_KEY = 'urlDataAutoLoad';
+
+    const autoLoadToggle = document.getElementById('autoLoadToggle');
+    autoLoadToggle.checked = localStorage.getItem(AUTO_LOAD_KEY) !== '0';
+    autoLoadToggle.addEventListener('change', () => {
+        localStorage.setItem(AUTO_LOAD_KEY, autoLoadToggle.checked ? '1' : '0');
+        showStatus(autoLoadToggle.checked
+            ? 'Auto-load enabled — saved data will be restored on next page load.'
+            : 'Auto-load disabled — page will start fresh on next load.', 'success');
+    });
+
+    document.getElementById('clearCacheBtn').addEventListener('click', () => {
+        const hasCache = localStorage.getItem('urlDataAutoSave');
+        if (!hasCache) { showStatus('No cached data to clear.', 'empty'); return; }
+        if (!confirm('Clear the locally cached data? This cannot be undone.')) return;
+        localStorage.removeItem('urlDataAutoSave');
+        localStorage.removeItem('urlDataAutoSaveCompressed');
+        localStorage.removeItem('urlDataFileName');
+        localStorage.removeItem('urlDataLastModified');
+        showStatus('Cache cleared.', 'success');
+    });
+
+    // ── Auto-save restore ─────────────────────────────────────────────────────
+    function restoreAutoSave() {
+        try {
+            const packed = localStorage.getItem('urlDataAutoSave');
+            if (!packed) return false;
+
+            const wasCompressed = localStorage.getItem('urlDataAutoSaveCompressed') !== '0';
+            let restored = packed;
+            if (wasCompressed) {
+                try {
+                    restored = decompress(packed);
+                } catch (decompressErr) {
+                    console.warn('Decompression failed, trying as plain text:', decompressErr);
+                    restored = packed;   // fallback: treat stored value as raw text
+                }
+            }
+            const savedFileName = localStorage.getItem('urlDataFileName') || 'url-data.txt';
+            const savedDate = localStorage.getItem('urlDataLastModified');
+
+            currentFileName = savedFileName;
+            fileName.textContent = savedFileName;
+            tableBody.innerHTML = '';
+            allGroups.clear();
+
+            const lines = restored.split('\n');
+            allData = [];
+            let validCount = 0, skippedCount = 0;
+
+            lines.forEach((line, i) => {
+                line = line.trim();
+                if (!line) { skippedCount++; return; }
+
+                const parts = line.split(';');
+                const url = parts[0].trim();
+                const extraData = parts[1] ? parts[1].trim() : 'No Data Found';
+
+                let groups = [];
+                const groupMatch = line.match(/\{(.*)\}/);
+                if (groupMatch) {
+                    groups = groupMatch[1].split(';').map(g => g.trim()).filter(g => g.length > 0);
+                    groups.forEach(g => allGroups.add(g));
+                }
+
+                let validUrl = false;
+                try { new URL(url); validUrl = true; } catch { /* invalid */ }
+
+                allData.push({ url, extraData, groups, validUrl, lineNumber: i + 1, id: Date.now() + Math.random() });
+                validCount++;
+            });
+
+            if (allData.length === 0) return false;
+
+            updateStats(lines.length, validCount, skippedCount);
+            displayData(allData);
+            groupSection.style.display = 'block';
+            filterSection.style.display = 'block';
+            updateGroupTags();
+            updateGroupFilter();
+
+            const dateStr = savedDate ? ` (saved ${new Date(savedDate).toLocaleTimeString()})` : '';
+            showStatus(`Auto-save restored: ${allData.length} item(s)${dateStr}`, 'success');
+            markFileLoaded();
+            return true;
+        } catch (e) {
+            console.warn('Auto-save restore failed:', e);
+            return false;
+        }
+    }
+
     // ── Sample data on first load ─────────────────────────────────────────────
     (function loadSampleData() {
+        const autoLoadEnabled = localStorage.getItem(AUTO_LOAD_KEY) !== '0';
+        if (autoLoadEnabled && restoreAutoSave()) return;   // prefer auto-save if toggle is on
+
         const sample = [
-            { url: 'https://www.wikipedia.org/', extraData: 'Online encyclopedia',    groups: ['Reference', 'Education'],  validUrl: true,  id: 1 },
-            { url: 'https://github.com/',         extraData: 'Version control',        groups: ['Development', 'Tools'],    validUrl: true,  id: 2 },
-            { url: 'https://stackoverflow.com/',  extraData: 'Q&A for programmers',    groups: ['Development', 'Reference'],validUrl: true,  id: 3 },
-            { url: 'invalid-without-protocol',    extraData: 'Missing http://',         groups: [],                          validUrl: false, id: 4 }
+            { url: 'https://www.wikipedia.org/', extraData: 'Online encyclopedia', groups: ['Reference', 'Education'], validUrl: true, id: 1 },
+            { url: 'https://github.com/', extraData: 'Version control', groups: ['Development', 'Tools'], validUrl: true, id: 2 },
+            { url: 'https://stackoverflow.com/', extraData: 'Q&A for programmers', groups: ['Development', 'Reference'], validUrl: true, id: 3 },
+            { url: 'invalid-without-protocol', extraData: 'Missing http://', groups: [], validUrl: false, id: 4 }
         ];
 
         allData = sample;
@@ -670,10 +978,11 @@ document.addEventListener('DOMContentLoaded', () => {
         displayData(sample);
         updateStats(4, 4, 0);
         groupSection.style.display = 'block';
+        filterSection.style.display = 'block';
         updateGroupTags();
         updateGroupFilter();
         showStatus('Sample data loaded — load your own TXT file to begin.', 'empty');
         fileName.textContent = 'sample-data.txt (example)';
-        currentFileName      = 'sample-data.txt';
+        currentFileName = 'sample-data.txt';
     })();
 });
