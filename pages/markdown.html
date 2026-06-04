@@ -9,12 +9,11 @@
     <link rel="stylesheet" type="text/css" href="../css/markdown.css">
 </head>
 <body>
-<!-- Wrap the entire markdown app in .md-app so styles don't leak out -->
-<div class="md-app">
-  <div class="wrap">
-    <div class="panel">
-      <div class="panel-head">INPUT</div>
-      <textarea id="inp"># Hello world
+  <div class="md-app">
+    <div class="wrap">
+      <div class="panel">
+        <div class="panel-head">INPUT</div>
+        <textarea id="inp"># Hello world
 
 This is a **bold** and *italic* example.
 
@@ -26,21 +25,21 @@ This is a **bold** and *italic* example.
 
 ```js
 const x = "hello\nworld";
-```</textarea>
+  ```</textarea>
+      </div>
+      <div class="panel">
+        <div class="panel-head">PREVIEW</div>
+        <div id="preview"></div>
+      </div>
     </div>
-    <div class="panel">
-      <div class="panel-head">PREVIEW</div>
-      <div id="preview"></div>
+    <div class="stats">
+      <span>Actual breaks: <span class="stat-val" id="sb">0</span></span>
+      <span>Literal \n: <span class="stat-val" id="sn">0</span></span>
     </div>
   </div>
-  <div class="stats">
-    <span>Actual breaks: <span class="stat-val" id="sb">0</span></span>
-    <span>Literal \n: <span class="stat-val" id="sn">0</span></span>
-  </div>
-</div>
 
-    <script src="https://cdn.jsdelivr.net/npm/darkreader@4.9.34/darkreader.min.js"></script>
-    <script src="../js/main.js"></script>
-    <script src="../js/markdown.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/darkreader@4.9.34/darkreader.min.js"></script>
+  <script src="../js/main.js"></script>
+  <script src="../js/markdown.js"></script>
 </body>
 </html>

@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <link href="../assets/favicon.png" rel="shortcut icon" type="image/x-icon" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stupid Webpage</title>
+  <link rel="stylesheet" type="text/css" href="../css/main.css">
+  <link rel="stylesheet" type="text/css" href="../css/navigator.css">
+</head>
+<body>
+<div class="app">
+
+  <!-- ── TOOLBAR ── -->
+  <div class="toolbar">
+    <button class="nav-btn" id="backBtn" title="Back" disabled>&#8592;</button>
+    <button class="nav-btn" id="fwdBtn"  title="Forward" disabled>&#8594;</button>
+    <button class="nav-btn" id="reloadBtn" title="Reload">&#8635;</button>
+
+    <div class="bar-wrap">
+      <span class="mode-badge" id="modeBadge">URL</span>
+      <input id="addressInput" type="text" placeholder="Enter URL or search query…" autocomplete="off" spellcheck="false">
+      <button class="go-btn" id="goBtn" title="Go">&#10140;</button>
+    </div>
+
+    <div class="tabs">
+      <button class="tab active" data-tab="rendered">Rendered</button>
+      <button class="tab"        data-tab="source">Source</button>
+    </div>
+  </div>
+
+  <!-- ── CONTENT ── -->
+  <div class="content">
+
+    <!-- loading overlay -->
+    <div class="overlay off" id="overlay">
+      <div class="big-spin"></div>
+      <div class="overlay-msg" id="overlayMsg">Loading…</div>
+    </div>
+
+    <!-- RENDERED (iframe) -->
+    <div class="pane visible" id="renderedPane">
+      <iframe id="viewer"
+        sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-modals allow-top-navigation-by-user-activation"
+        src="about:blank"></iframe>
+    </div>
+
+    <!-- SOURCE -->
+    <div class="pane" id="sourcePane">
+      <pre id="sourceCode"></pre>
+    </div>
+
+    <!-- SEARCH RESULTS -->
+    <div class="pane" id="searchPane">
+      <div class="placeholder" id="searchPlaceholder">
+        <div class="icon">&#128269;</div>
+        <div>Type a search query in the address bar and press Enter</div>
+      </div>
+      <div class="search-status" id="searchStatus" style="display:none;">
+        <div class="spin" id="searchSpin"></div>
+        <span id="searchMsg"></span>
+      </div>
+      <div id="searchResults"></div>
+    </div>
+
+  </div>
+
+  <!-- ── STATUS BAR ── -->
+  <div class="statusbar">
+    <div class="dot" id="sbDot"></div>
+    <span id="sbMsg">Ready</span>
+    <span id="sbTime"></span>
+  </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/darkreader@4.9.34/darkreader.min.js"></script>
+<script type="text/javascript" src="../js/main.js"></script>
+<script type="text/javascript" src="../js/navigator.js"></script>
+</body>
+</html>
