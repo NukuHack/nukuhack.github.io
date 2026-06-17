@@ -12,7 +12,11 @@
   <div class="md-app">
     <div class="wrap">
       <div class="panel">
-        <div class="panel-head">INPUT</div>
+        <div class="panel-head">
+          INPUT
+          <input type="file" id="fileInput" accept=".txt,.md,.markdown" style="display:none;">
+          <button id="uploadBtn" style="margin-left:10px;padding:2px 8px;font-size:12px;cursor:pointer;">📁 Upload File</button>
+        </div>
         <textarea id="inp"># Hello world
 
 This is a **bold** and *italic* example.

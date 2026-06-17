@@ -1,21 +1,39 @@
-
-/* All markdown app styles scoped under .md-app to avoid overriding global/navbar styles */
+/* Only reset elements that need it, not everything */
+.md-app {
+    box-sizing: border-box;
+}
 
 .md-app *,
 .md-app *::before,
 .md-app *::after {
-    box-sizing: border-box;
+    box-sizing: inherit;
+}
+
+/* Remove margin/padding only from the structural elements, 
+   not from the preview content */
+.md-app,
+.md-app body,
+.md-app .wrap,
+.md-app .panel,
+.md-app .panel-head,
+.md-app textarea,
+.md-app #preview,
+.md-app .stats {
     margin: 0;
     padding: 0;
 }
 
+/* Rest of your CSS stays the same */
 .md-app {
     font-family: 'Segoe UI', system-ui, sans-serif;
     background: var(--background-darkest-color);
     color: var(--font-basic-color);
     padding: 1rem;
-    min-height: 100vh;
-    min-width: 80vw;
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
 }
 
 .md-app .wrap {
@@ -23,14 +41,20 @@
     grid-template-columns: 1fr 1fr;
     gap: 12px;
     padding: 1rem 0;
-    max-width: 1100px;
+    max-width: calc(100vw - 2rem);
     margin: 0 auto;
+    flex: 1;
+    min-height: 0;
 }
 
 .md-app .panel {
     border: 0.5px solid var(--border-medium-color);
     border-radius: 12px;
     overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    min-height: 0;
 }
 
 .md-app .panel-head {
@@ -41,11 +65,14 @@
     font-family: 'Fira Code', monospace;
     letter-spacing: 1px;
     background: var(--background-dark-color);
+    flex-shrink: 0;
 }
 
 .md-app textarea {
     width: 100%;
-    height: 360px;
+    flex: 1;
+    min-height: 0;
+    max-height: 70vh;
     background: var(--background-middle-color);
     color: var(--font-basic-color);
     border: none;
@@ -56,15 +83,95 @@
     outline: none;
     line-height: 1.6;
     display: block;
+    box-sizing: border-box;
+    overflow-y: auto;
+    overflow-x: auto;
+    white-space: pre-wrap;
+    word-wrap: break-word;
 }
 
 .md-app #preview {
-    height: 360px;
+    flex: 1;
+    min-height: 0;
+    max-height: 70vh;
     overflow-y: auto;
+    overflow-x: hidden;
     padding: 12px;
     background: var(--background-middle-color);
     color: var(--font-basic-color);
     line-height: 1.6;
+    box-sizing: border-box;
+    word-wrap: break-word;
+    text-align: left;
+}
+
+/* Make sure all content inside preview is left-aligned */
+.md-app #preview * {
+    text-align: left;
+}
+
+/* Preview content styling */
+.md-app #preview p {
+    margin: 5px 0;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+
+.md-app #preview h1,
+.md-app #preview h2,
+.md-app #preview h3,
+.md-app #preview h4,
+.md-app #preview h5,
+.md-app #preview h6 {
+    margin: 8px 0 4px;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+
+.md-app #preview ul,
+.md-app #preview ol {
+    padding-left: 20px;
+    margin: 5px 0;
+}
+
+.md-app #preview li {
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+
+.md-app #preview blockquote {
+    margin: 8px 0;
+    padding: 4px 12px;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+
+.md-app #preview pre {
+    margin: 8px 0;
+    padding: 10px;
+    text-align: left;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+
+.md-app #preview hr {
+    margin: 12px 0;
+}
+
+.md-app #preview table {
+    margin: 8px 0;
+}
+
+.md-app #preview td,
+.md-app #preview th {
+    text-align: left;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+
+.md-app #preview img {
+    max-width: 100%;
 }
 
 .md-app .stats {
@@ -77,11 +184,12 @@
     font-size: 12px;
     color: var(--font-light-color);
     font-family: 'Fira Code', monospace;
-    max-width: 1100px;
+    max-width: calc(100vw - 2rem);
     margin: 0 auto;
     border-radius: 0 0 12px 12px;
     border: 0.5px solid var(--border-medium-color);
     border-top: none;
+    flex-shrink: 0;
 }
 
 .md-app .stat-val {
@@ -89,6 +197,7 @@
     font-weight: 500;
 }
 
+/* Default code style (can be overridden by inline styles from markdown renderer) */
 .md-app code {
     background: var(--background-dark-color);
     color: var(--font-cold-color);
@@ -96,4 +205,6 @@
     border-radius: 4px;
     font-family: 'Fira Code', monospace;
     font-size: 12px;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
 }
