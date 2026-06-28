@@ -1,0 +1,16 @@
+[package]
+name    = "compressor"
+version = "0.2.0"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib"]   # cdylib = C-compatible dynamic lib → required for WASM
+
+[dependencies]
+wasm-bindgen = "0.2"      # exposes #[wasm_bindgen] macro + JS glue generation
+getrandom    = { version = "0.2", features = ["js"] }  # WASM-safe random bytes
+js-sys       = "0.3"      # JS builtins: Date, Object, Reflect
+
+[profile.release]
+opt-level = "z"           # optimise for size (smallest .wasm)
+lto       = true          # link-time optimisation — shrinks further

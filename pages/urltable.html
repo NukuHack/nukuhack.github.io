@@ -174,9 +174,36 @@
         </div>
     </div>
 
+    <!-- 1. V1 -->
+    <script src="../js/compress.js"></script>
+    <script>window.decompressV1 = decompress;</script>
+
+    <!-- 2. expose a promise that resolves once WASM + wrappers are ready -->
+    <script>
+        window.decompReady = new Promise(resolve => window._decompReadyResolve = resolve);
+    </script>
+    <script type="module">
+        import init, { compress as wasmCompress, decompress as wasmDecompress }
+            from '../wasm/compressor/pkg/compressor.js';
+        await init();
+
+        window.compress = (text, encode = 'a', doCompress = true) =>
+            wasmCompress(text, encode, doCompress);
+
+        window.decompress = (compressed) => {
+            compressed = window.migrate(compressed); // re-encode to V2 in-memory
+
+            return wasmDecompress(compressed).text;
+        };
+
+        window._decompReadyResolve();
+    </script>
+
+    <!-- 3. Migration helpers (isOld / migrate) -->
+    <script src="../wasm/compressor/migrate.js"></script>
+
     <script src="https://cdn.jsdelivr.net/npm/darkreader@4.9.34/darkreader.min.js"></script>
     <script src="../js/main.js"></script>
-    <script src="../js/compress.js"></script>
     <script src="../js/urltable.js"></script>
 </body>
 </html>

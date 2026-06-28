@@ -36,7 +36,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let pendingGroupItemId = null;
 
     function markModified() {
-        isModified = true; markModified();
+        isModified = true;
         const saveBtn = document.getElementById('saveFileBtn');
         if (saveBtn) saveBtn.classList.add('has-changes');
     }
@@ -893,7 +893,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // ── Auto-save restore ─────────────────────────────────────────────────────
-    function restoreAutoSave() {
+    async function restoreAutoSave() {
         try {
             const packed = localStorage.getItem('urlDataAutoSave');
             if (!packed) return false;
@@ -902,6 +902,7 @@ document.addEventListener('DOMContentLoaded', () => {
             let restored = packed;
             if (wasCompressed) {
                 try {
+                    await window.decompReady;          // ← wait for WASM
                     restored = decompress(packed);
                 } catch (decompressErr) {
                     console.warn('Decompression failed, trying as plain text:', decompressErr);
