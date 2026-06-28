@@ -35,6 +35,21 @@ for dir in */; do
             DURATION=$((END_TIME - START_TIME))
             echo "----------------------------------------"
             echo -e "${GREEN}✅ Success:${NC} $dir ${GREEN}(${DURATION}s)${NC}"
+            
+            # Create .gitignore in the pkg folder
+            PKG_DIR="${dir}pkg"
+            if [ -d "$PKG_DIR" ]; then
+                echo -e "${BLUE}📝 Creating .gitignore in pkg folder...${NC}"
+                cat > "${PKG_DIR}/.gitignore" << 'EOF'
+*
+!*.js
+!*.wasm
+EOF
+                echo -e "${GREEN}✅ .gitignore created at ${PKG_DIR}/.gitignore${NC}"
+            else
+                echo -e "${YELLOW}⚠️  pkg directory not found at ${PKG_DIR}${NC}"
+            fi
+            
             SUCCESS_COUNT=$((SUCCESS_COUNT + 1))
         else
             echo "----------------------------------------"
