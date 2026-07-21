@@ -180,23 +180,20 @@
 
     <!-- 2. expose a promise that resolves once WASM + wrappers are ready -->
     <script>
-        window.decompReady = new Promise(resolve => window._decompReadyResolve = resolve);
+        window.decompReady = new Promise(resolve => window._decompReady = resolve);
     </script>
     <script type="module">
-        import init, { compress as wasmCompress, decompress as wasmDecompress }
-            from '../wasm/compressor/pkg/compressor.js';
-        await init();
+        const { default: getWasm } = await import("/wasm/wasm.js");
+        const wasm = await getWasm('Compression')
+            .then(async (m) => { await m.default(); return m; });
 
-        window.compress = (text, encode = 'a', doCompress = true) =>
-            wasmCompress(text, encode, doCompress);
+        window.compress = (txt, encode = 'a', doComp = true) =>
+            wasm.compress(txt, encode, doComp);
 
-        window.decompress = (compressed) => {
-            compressed = window.migrate(compressed); // re-encode to V2 in-memory
+        window.decompress = (comp) =>
+            wasm.decompress(window.migrate(comp)).text;
 
-            return wasmDecompress(compressed).text;
-        };
-
-        window._decompReadyResolve();
+        window._decompReady();
     </script>
 
     <!-- 3. Migration helpers (isOld / migrate) -->
