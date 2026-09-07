@@ -328,6 +328,19 @@ fn count_non_overlapping(text: &str, phrase: &str) -> usize {
     count
 }
 
+// A candidate phrase's priority in the greedy dictionary search below. Ordered so a
+// `BinaryHeap<HeapEntry>` behaves as a max-heap on `net`, with ties broken by the smaller
+// `idx` (i.e. earlier in the sorted candidate list) so the result is reproducible.
+struct HeapEntry { net: i64, idx: usize }
+impl PartialEq for HeapEntry { fn eq(&self, o: &Self) -> bool { self.net == o.net && self.idx == o.idx } }
+impl Eq for HeapEntry {}
+impl PartialOrd for HeapEntry { fn partial_cmp(&self, o: &Self) -> Option<std::cmp::Ordering> { Some(self.cmp(o)) } }
+impl Ord for HeapEntry {
+    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
+        self.net.cmp(&other.net).then_with(|| other.idx.cmp(&self.idx))
+    }
+}
+
 fn build_table(text: &str, sep: char) -> (Vec<String>, std::collections::HashMap<String, usize>) {
     // tokenise on whitespace boundaries
     let mut tokens: Vec<String> = Vec::new();
@@ -359,35 +372,64 @@ fn build_table(text: &str, sep: char) -> (Vec<String>, std::collections::HashMap
         }
     }
 
-    let mut table:      Vec<String>                                    = Vec::new();
-    let mut word_to_id: std::collections::HashMap<String, usize>      = std::collections::HashMap::new();
+    // Deterministic candidate ordering. (The original HashSet iteration order used to
+    // break net-value ties was never actually deterministic across runs — it depended on
+    // Rust's randomized per-process hasher — so this also fixes that latent nondeterminism.)
+    let mut candidates: Vec<String> = phrase_set.into_iter().collect();
+    candidates.sort();
+
+    let mut table:      Vec<String>                               = Vec::new();
+    let mut word_to_id: std::collections::HashMap<String, usize>  = std::collections::HashMap::new();
     let mut remaining = text.to_string();
 
-    loop {
-        let mut best_phrase: Option<String> = None;
-        let mut best_net: i64 = 0;
+    // The brute-force version above recomputes every candidate's occurrence count against
+    // the *entire remaining text* on *every* round — O(rounds * candidates * text_len) — which
+    // is what made this pathologically slow on any text with a non-trivial number of
+    // candidate phrases. Both factors that make up a phrase's "net" score can only ever get
+    // worse as rounds proceed: `ref_len(id)` never decreases as the table grows, and a
+    // phrase's occurrence count in `remaining` never increases as replacements happen. That
+    // means a candidate's best-case net (using id = 0, i.e. the smallest possible ref_len)
+    // computed once against the original text is a valid upper bound on its true net in
+    // every future round. So: seed a max-heap with that upper bound per candidate (one pass
+    // over all candidates), then repeatedly pop the top, recompute its *real* current net,
+    // and only accept it once that real value is confirmed to be >= the next-highest
+    // (possibly still-stale) entry in the heap — otherwise reinsert it with the freshly
+    // computed value and keep going. This always finds the exact same greedy pick the
+    // brute-force loop would have found, just without redundantly rescanning candidates
+    // whose score hasn't changed.
+    let mut heap: std::collections::BinaryHeap<HeapEntry> = std::collections::BinaryHeap::with_capacity(candidates.len());
+    for (idx, phrase) in candidates.iter().enumerate() {
+        let rlen0 = ref_len(0) as i64;
+        if phrase.len() as i64 <= rlen0 { continue; }
+        let count = count_non_overlapping(&remaining, phrase) as i64;
+        if count < 2 { continue; }
+        let net = (phrase.len() as i64 - rlen0) * count - entry_overhead(phrase) as i64;
+        if net > 0 { heap.push(HeapEntry { net, idx }); }
+    }
 
-        for phrase in &phrase_set {
-            if phrase.contains(sep) { continue; }
+    while let Some(HeapEntry { net: _, idx }) = heap.pop() {
+        let phrase = &candidates[idx];
+        let id     = table.len();
+        let rlen   = ref_len(id) as i64;
+        if phrase.len() as i64 <= rlen { continue; } // permanently disqualified: rlen only grows
+        let count = count_non_overlapping(&remaining, phrase) as i64;
+        if count < 2 { continue; } // permanently disqualified: count only shrinks
+        let net = (phrase.len() as i64 - rlen) * count - entry_overhead(phrase) as i64;
+        if net <= 0 { continue; } // permanently disqualified
+
+        let confirmed = match heap.peek() {
+            Some(top) => net >= top.net,
+            None => true,
+        };
+
+        if confirmed {
             let id    = table.len();
-            let rlen  = ref_len(id) as i64;
-            if (phrase.len() as i64) <= rlen { continue; }
-            let count = count_non_overlapping(&remaining, phrase) as i64;
-            if count < 2 { continue; }
-            let net = (phrase.len() as i64 - rlen) * count - entry_overhead(phrase) as i64;
-            if net > best_net { best_net = net; best_phrase = Some(phrase.clone()); }
-        }
-
-        match best_phrase {
-            None => break,
-            Some(phrase) => {
-                let id    = table.len();
-                let token = format!("{}{}{}", sep, id, sep);
-                remaining = remaining.replace(&phrase, &token);
-                word_to_id.insert(phrase.clone(), id);
-                table.push(phrase.clone());
-                phrase_set.remove(&phrase);
-            }
+            let token = format!("{}{}{}", sep, id, sep);
+            remaining = remaining.replace(phrase.as_str(), &token);
+            word_to_id.insert(phrase.clone(), id);
+            table.push(phrase.clone());
+        } else {
+            heap.push(HeapEntry { net, idx });
         }
     }
 
@@ -397,38 +439,44 @@ fn build_table(text: &str, sep: char) -> (Vec<String>, std::collections::HashMap
 fn apply_table(text: &str, word_to_id: &std::collections::HashMap<String, usize>, sep: char) -> String {
     if word_to_id.is_empty() { return text.to_string(); }
 
-    // group phrases by first char for fast matching
-    let mut by_first: std::collections::HashMap<char, Vec<&str>> = std::collections::HashMap::new();
-    for phrase in word_to_id.keys() {
-        let fc = phrase.chars().next().unwrap();
-        by_first.entry(fc).or_default().push(phrase.as_str());
+    // Group phrases by first char for fast matching, longest-first so the greedy match
+    // below still prefers the longest phrase at each position (same behavior as before).
+    // Phrases are pre-split into Vec<char> once here so matching a candidate at position i
+    // is a direct slice comparison instead of allocating a fresh `chars[i..]` String on
+    // every candidate position — that per-position allocation made this function O(n^2) on
+    // any text where the phrase-starting characters (often common ones, like spaces) show
+    // up frequently.
+    let mut by_first: std::collections::HashMap<char, Vec<(Vec<char>, usize)>> = std::collections::HashMap::new();
+    for (phrase, &id) in word_to_id.iter() {
+        let pchars: Vec<char> = phrase.chars().collect();
+        let fc = pchars[0];
+        by_first.entry(fc).or_default().push((pchars, id));
     }
     for v in by_first.values_mut() {
-        v.sort_by(|a, b| b.len().cmp(&a.len()));
+        v.sort_by(|a, b| b.0.len().cmp(&a.0.len()));
     }
 
-    let mut out = String::new();
-    let mut i   = 0;
     let chars: Vec<char> = text.chars().collect();
+    let mut out = String::with_capacity(chars.len());
+    let mut i   = 0;
 
     while i < chars.len() {
         let ch = chars[i];
+        let mut matched = false;
         if let Some(cands) = by_first.get(&ch) {
-            let rest: String = chars[i..].iter().collect();
-            let mut matched  = false;
-            for &phrase in cands {
-                if rest.starts_with(phrase) {
-                    let id = word_to_id[phrase];
-                    out.push_str(&format!("{}{}{}", sep, id, sep));
-                    i += phrase.chars().count();
+            for (pchars, id) in cands {
+                let plen = pchars.len();
+                if i + plen <= chars.len() && &chars[i..i + plen] == pchars.as_slice() {
+                    out.push(sep);
+                    out.push_str(&id.to_string());
+                    out.push(sep);
+                    i += plen;
                     matched = true;
                     break;
                 }
             }
-            if !matched { out.push(ch); i += 1; }
-        } else {
-            out.push(ch); i += 1;
         }
+        if !matched { out.push(ch); i += 1; }
     }
     out
 }
