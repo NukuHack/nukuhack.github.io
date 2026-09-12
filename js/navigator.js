@@ -36,10 +36,20 @@ let loadAbort   = null;
 // are still correctly recognised as programmatic and never leak into history.
 let pendingIframeToken = 0;   // incremented on each programmatic load
 let ourIframeToken     = 0;   // the token value the next load event should match
+// Cache of local files loaded via the file:// picker, keyed by the fake
+// "file:///name.html" address we display. There's no real filesystem access
+// from a webpage, so Back/Forward/Reload replay this cached text instead of
+// re-fetching — re-picking the file would be a bad UX for basic navigation.
+let localFiles = {};
 
 /* ─── HELPERS ─── */
+function isFileUrl(val) {
+  return /^file:\/\/\/?/i.test(val.trim());
+}
+
 function isUrl(val) {
   const v = val.trim();
+  if (isFileUrl(v)) return true;
   if (/^https?:\/\//i.test(v)) return true;
   if (/^[a-z0-9-]+(\.[a-z]{2,})(\/|$)/i.test(v) && !v.includes(' ')) return true;
   return false;
@@ -111,12 +121,85 @@ goBtn.addEventListener('click', handleGo);
 function handleGo() {
   const val = addressInput.value.trim();
   if (!val) return;
+  if (isFileUrl(val)) {
+    pickLocalFile();
+    return;
+  }
   if (isUrl(val)) {
     const url = normalizeUrl(val);
     loadPage(url);
   } else {
     runSearch(val);
   }
+}
+
+/* ─── LOCAL FILE PICKER ───────────────────────────────────────────────────
+   Browsers block fetch()/XHR on file:// URLs from an http(s) page, so typing
+   a real path never works. Instead, "file://" opens a native picker; the
+   chosen file is read client-side and pushed through the same srcdoc +
+   NAV_REPORTER pipeline used for remote pages. Only .html/.htm for now.
+   ────────────────────────────────────────────────────────────────────────── */
+function pickLocalFile() {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = '.html,.htm,text/html';
+  input.addEventListener('change', () => {
+    const file = input.files && input.files[0];
+    if (!file) return; // user cancelled
+    if (!/\.html?$/i.test(file.name)) {
+      setStatus('Only .html files are supported', 'error');
+      addressInput.value = 'file:///';
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => loadLocalFile(file.name, String(reader.result));
+    reader.onerror = () => {
+      setStatus('Could not read file', 'error');
+      showErrorPane('Could not read file', reader.error?.message || 'Unknown error');
+    };
+    reader.readAsText(file);
+  });
+  input.click();
+}
+
+function loadLocalFile(name, src, addToHistory=true) {
+  const fakeUrl = 'file:///' + name;
+  localFiles[fakeUrl] = src;
+
+  currentSrcUrl = fakeUrl;
+  addressInput.value = fakeUrl;
+  modeBadge.textContent = 'URL';
+  modeBadge.className = 'mode-badge url-mode';
+
+  if (addToHistory) pushHistory(fakeUrl);
+
+  if (currentMode !== 'page') {
+    activeTab = 'rendered';
+    updateTabHighlight();
+  }
+  currentMode = 'page';
+  pageSource = src;
+
+  showOverlay('Loading ' + fakeUrl + '…');
+  setStatus('Loading…', 'loading');
+  const t0 = Date.now();
+
+  ourIframeToken = ++pendingIframeToken;
+
+  // No real origin to set a <base href> against — relative links/assets in
+  // the file won't resolve, but the reporter still lets us intercept clicks.
+  const injected = src.replace(/<head(\s[^>]*)?>/i, m => m + NAV_REPORTER);
+  viewer.removeAttribute('src');
+  viewer.srcdoc = injected;
+
+  sourceCode.textContent = src;
+
+  hideOverlay();
+  setStatus('Loaded: ' + fakeUrl);
+  sbTime.textContent = (Date.now() - t0) + ' ms';
+
+  if (activeTab === 'source') switchPane(sourcePane);
+  else switchPane(renderedPane);
 }
 
 /* ─── LOAD PAGE ─── */
@@ -129,6 +212,18 @@ function proxyUrl(url) {
 }
 
 async function loadPage(url, addToHistory=true) {
+  // file:// history entries (Back/Forward/Reload) have no real address to
+  // fetch — replay the cached content from when the file was originally picked.
+  if (isFileUrl(url)) {
+    if (url in localFiles) {
+      loadLocalFile(url.replace(/^file:\/\/\/?/i, ''), localFiles[url], addToHistory);
+    } else {
+      setStatus('Local file no longer available — pick it again', 'error');
+      pickLocalFile();
+    }
+    return;
+  }
+
   if (loadAbort) loadAbort.abort();
   loadAbort = new AbortController();
   const sig = loadAbort.signal;
