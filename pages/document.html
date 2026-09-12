@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+  <meta charset="UTF-8">
+  <link href="../assets/favicon.png" rel="shortcut icon" type="image/x-icon" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stupid Webpage</title>
+  <link rel="stylesheet" type="text/css" href="../css/main.css">
+  <link rel="stylesheet" type="text/css" href="../css/document.css">
+  <!-- Core deps that are small enough to load up front -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+</head>
+<body>
+
+<div id="toolbar">
+  <div class="toolbar-inner">
+    <div class="brand">📄 <span>Viewer</span></div>
+    <label class="btn" for="filePicker">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
+      </svg>
+      Open file
+    </label>
+    <input type="file" id="filePicker" />
+    <button id="saveBtn" disabled title="Save file to disk">💾 Save</button>
+    <button id="printBtn" disabled title="Print / Save as PDF">🖨 Print</button>
+    <button id="reloadBtn" title="Reset">↺ Reset</button>
+    <div class="spacer"></div>
+    <div id="fileMeta" style="display:none;">
+      <span class="badge" id="fileType">—</span>
+      <span id="fileName"></span>
+    </div>
+    <div id="status"></div>
+  </div>
+</div>
+
+<div id="dropzone">
+  <h2>📄 Drop a document to preview it</h2>
+  <p>Or click <strong>Open file</strong> above to browse your computer.</p>
+  <p class="formats">
+    <code>PDF</code> <code>DOCX</code> <code>DOC</code> <code>XLSX</code> <code>XLS</code> <code>CSV</code>
+    <code>RTF</code> <code>ODT</code> <code>ODS</code> <code>ODP</code> <code>TXT</code> <code>JSON</code>
+    <code>MD</code> <code>PNG</code> <code>JPG</code> <code>WEBP</code> <code>GIF</code> <code>BMP</code>
+    <code>SVG</code> <code>AVIF</code> <code>HEIC</code> …
+    <br><small>All processing happens in your browser. Nothing is uploaded.</small>
+  </p>
+</div>
+
+<div id="error"></div>
+<div id="viewer"></div>
+
+<div id="loading-overlay"><div class="box"><div class="spinner"></div><div id="loadingText">Loading…</div></div></div>
+
+<script src="https://cdn.jsdelivr.net/npm/darkreader@4.9.34/darkreader.min.js"></script>
+<script src="../js/document.js"></script>
+<script src="../js/main.js"></script>
+</body>
+</html>
