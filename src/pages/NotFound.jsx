@@ -3,19 +3,6 @@ import { useEffect, useState } from 'react';
 
 export default function NotFound() {
   const navigate = useNavigate();
-  const [phase, setPhase] = useState(0);
-
-  useEffect(() => {
-    // Phase 1: Show content after 500ms
-    const timer1 = setTimeout(() => setPhase(1), 500);
-    // Phase 2: Show cache clear advice after 3s
-    const timer2 = setTimeout(() => setPhase(2), 3000);
-    
-    return () => {
-      clearTimeout(timer1);
-      clearTimeout(timer2);
-    };
-  }, []);
 
   const handleClearCache = () => {
     if ('caches' in window) {
@@ -28,7 +15,7 @@ export default function NotFound() {
 
   return (
     <div className="not-found">
-      <div className="container" style={{ opacity: phase >= 1 ? 1 : 0 }}>
+      <div className="container">
         <h1>404</h1>
         
         <div className="card">
@@ -46,7 +33,7 @@ export default function NotFound() {
           </p>
         </div>
 
-        <div className="refresh-notice" style={{ opacity: phase >= 2 ? 1 : 0 }}>
+        <div className="refresh-notice">
           <p>If you believe this page should exist, try clearing your cache:</p>
           <button onClick={handleClearCache} className="cacheClear">
             Clear Cache & Reload
@@ -56,7 +43,7 @@ export default function NotFound() {
 
       <style>{`
         .not-found {
-          min-height: 100vh;
+          min-height: 90%;
           display: flex;
           flex-direction: column;
           align-items: center;
