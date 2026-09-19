@@ -852,7 +852,7 @@ body {
     font-family: 'IBM Plex Mono', monospace;
     font-size: 11px;
     border: 1px solid var(--border-cold-color);
-    z-index: 300;
+    z-index: 1300;
     opacity: 0.9;
     pointer-events: none;
     animation: toastIn 0.15s ease;
@@ -869,7 +869,7 @@ body {
     position: fixed;
     inset: 0;
     background: rgba(0,0,0,0.65);
-    z-index: 500;
+    z-index: 1200;
     align-items: center;
     justify-content: center;
     backdrop-filter: blur(2px);

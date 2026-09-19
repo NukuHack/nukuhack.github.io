@@ -123,7 +123,7 @@ transition: background .12s;
 
 #loading-overlay {
 position: fixed; inset: 0; background: rgba(0,0,0,.35);
-display: none; align-items: center; justify-content: center; z-index: 2000;
+display: none; align-items: center; justify-content: center; z-index: 1200;
 font-family: system-ui,sans-serif; color: #fff;
 }
 #loading-overlay.show { display: flex; }

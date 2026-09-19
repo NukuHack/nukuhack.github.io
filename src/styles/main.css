@@ -87,7 +87,7 @@ a {
     top: 0;
     left: 0;
     width: 100%;
-    z-index: 2;
+    z-index: 1100; /* above all page content (sticky toolbars, sidebars) */
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
@@ -372,7 +372,7 @@ footer {
     padding: 10px 20px;
     text-align: center;
     border-top: 1px solid var(--border-dark-color);
-    z-index: 101; /* Ensure it stays on top of other content */
+    z-index: 1050; /* Ensure it stays on top of other content */
 }
 
 .footer_in {
@@ -403,7 +403,7 @@ footer h5, footer h6 {
     display: none;
     position: fixed;
     color: var(--font-dark-color);
-    z-index: 102;
+    z-index: 1200;
     padding-top: 100px;
     left: 0;
     top: 0;
