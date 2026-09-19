@@ -15,7 +15,7 @@ const POLYGONS = ['square', 'triangle', 'circle', 'octagon', 'pentagon'];
 export default function Home() {
   const [cubeAnimating, setCubeAnimating] = useState(false);
   const [selectedPolygon, setSelectedPolygon] = useState('default');
-  const [animatedPolygons, setAnimatedPolygons] = useState(() => new Set());
+  const [animatedPolygons, setAnimatedPolygons] = useState(new Set());
 
   const toggleCube = () => setCubeAnimating((v) => !v);
 
@@ -42,7 +42,7 @@ export default function Home() {
       return next;
     });
   };
-
+  
   return (
     <>
       <div className="cube-section">
