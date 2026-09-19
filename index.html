@@ -1,39 +1,22 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link href="./assets/favicon.png" rel="shortcut icon" type="image/x-icon"/>
-  <title>Stupid Webpage</title>
-  <link rel="stylesheet" type="text/css" href="./css/main.css">
-  <link rel="stylesheet" type="text/css" href="./css/index.css">
-</head>
-<body>
-  <div class="cube-section">
-    <div class="cube" id="cube" onclick="AnimateCube()">
-      <div class="face front"><img src="./assets/dice_1.png" class="cube_img" alt="img_from_a_dice_side_1"></div>
-      <div class="face back"><img src="./assets/dice_6.png" class="cube_img" alt="img_from_a_dice_side_6"></div>
-      <div class="face left"><img src="./assets/dice_3.png" class="cube_img" alt="img_from_a_dice_side_3"></div>
-      <div class="face right"><img src="./assets/dice_4.png" class="cube_img" alt="img_from_a_dice_side_4"></div>
-      <div class="face top"><img src="./assets/dice_5.png" class="cube_img" alt="img_from_a_dice_side_5"></div>
-      <div class="face bottom"><img src="./assets/dice_2.png" class="cube_img" alt="img_from_a_dice_side_2"></div>
-    </div>
-    <input type="button" id="animCube" class="animate_button" onclick="AnimateCube()" value="Animate the Cube">
-  </div>
-
-  <label for="select_animation" id="select_anim_label">Select a polygon:</label>
-  <select id="select_animation" oninput="AnimatePolygon()">
-    <option value="default">Nothing</option>
-  </select>
-
-  <div class="polygon circle" id="circle" onclick="Animate('circle')"></div>
-  <div class="polygon triangle" id="triangle" onclick="Animate('triangle')"></div>
-  <div class="polygon square" id="square" onclick="Animate('square')"></div>
-  <div class="polygon octagon" id="octagon" onclick="Animate('octagon')"></div>
-  <div class="polygon pentagon" id="pentagon" onclick="Animate('pentagon')"></div>
-
-  <script src="https://cdn.jsdelivr.net/npm/darkreader@4.9.34/darkreader.min.js"></script>
-  <script src="./js/main.js"></script>
-  <script src="./js/index.js"></script>
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/png" href="/assets/favicon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Stupid Webpage</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/darkreader@4.9.34/darkreader.min.js"></script>
+    <!-- Core deps for the Document viewer that are small enough to load up front -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-csharp.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.js"></script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
 </html>
