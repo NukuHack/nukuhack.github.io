@@ -14,7 +14,7 @@ canvas {
     border: 1px solid var(--border-medium-color);
     box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
     padding: 10px;
-    z-index: 1000;
+    z-index: var(--z-page-max); /* in-page context menu, stays within page-data range */
 }
 #customContextMenu ul {
     list-style-type: none;

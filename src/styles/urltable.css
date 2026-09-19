@@ -430,12 +430,12 @@ body {
 .danger-btn {
     width: 100%;
     justify-content: center;
-    border-color: #5a1010;
-    color: #e57373;
+    border-color: var(--color-danger-border);
+    color: var(--color-danger);
     background: transparent;
 }
 
-.danger-btn:hover { background: #2a0a0a; border-color: #8a2020; }
+.danger-btn:hover { background: var(--color-danger-bg); border-color: var(--color-danger); }
 
 .tech-divider {
     height: 1px;
@@ -520,8 +520,8 @@ body {
 }
 
 .status-msg.loading  { background: var(--background-dark-color);    color: var(--font-cold-color); }
-.status-msg.error    { background: #1e0808; color: #e57373; border-color: #5a1010; }
-.status-msg.success  { background: #071510; color: #6ee7b7; border-color: #0d3a22; }
+.status-msg.error    { background: var(--color-danger-bg); color: var(--color-danger); border-color: var(--color-danger-border); }
+.status-msg.success  { background: var(--color-success-bg); color: var(--color-success); border-color: var(--color-success-border); }
 .status-msg.empty    { background: var(--background-middle-color);   color: var(--font-light-color); }
 
 /* dismiss button inside status */
@@ -676,13 +676,13 @@ body {
     outline-offset: -1px;
 }
 
-.error-row { background: #1e0808 !important; }
+.error-row { background: var(--color-danger-bg) !important; }
 
 /* Search highlight */
 .search-hl {
-    background: rgba(250, 200, 60, 0.25);
+    background: var(--color-highlight-soft);
     border-radius: 2px;
-    color: #fad23c;
+    color: var(--color-highlight);
 }
 
 /* ── Group cell badges ─────────────────────────────────── */
@@ -808,8 +808,8 @@ body {
 }
 
 .table-action-btn:hover { background: var(--background-light-color); color: var(--font-basic-color); }
-.table-action-btn.delete-btn { border-color: #4a0e0e; color: #c97070; }
-.table-action-btn.delete-btn:hover { background: #2a0808; border-color: #8a2020; color: #e57373; }
+.table-action-btn.delete-btn { border-color: var(--color-danger-border); color: var(--color-danger); }
+.table-action-btn.delete-btn:hover { background: var(--color-danger-bg); border-color: var(--color-danger); color: var(--color-danger); }
 .table-action-btn.edit-btn:hover { border-color: var(--border-cold-color); color: var(--font-cold-color); }
 
 /* ── Add entry row ─────────────────────────────────────── */
@@ -852,7 +852,7 @@ body {
     font-family: 'IBM Plex Mono', monospace;
     font-size: 11px;
     border: 1px solid var(--border-cold-color);
-    z-index: 1300;
+    z-index: var(--z-toast); /* toast, not page data */
     opacity: 0.9;
     pointer-events: none;
     animation: toastIn 0.15s ease;
@@ -869,7 +869,7 @@ body {
     position: fixed;
     inset: 0;
     background: rgba(0,0,0,0.65);
-    z-index: 1200;
+    z-index: var(--z-modal); /* global modal, always above nav/footer */
     align-items: center;
     justify-content: center;
     backdrop-filter: blur(2px);
@@ -926,7 +926,7 @@ body {
     display: inline-block;
     width: 6px;
     height: 6px;
-    background: #fad23c;
+    background: var(--color-highlight);
     border-radius: 50%;
     margin-left: 4px;
     flex-shrink: 0;

@@ -7,32 +7,98 @@
 }
 
 :root{
-    --white:white;
-    --black:black;
-    --red:red;
-    --blue:blue;
-    --green:green;
-    --dark-red:dark-red;
+    /* ============================================================
+       UNIFIED THEME
+       One palette for the whole site. Every page pulls its colors
+       from here (either directly, or through the legacy aliases
+       below) so nothing drifts into its own one-off color scheme
+       again. Dark mode is handled by DarkReader (see useDarkMode),
+       so this base palette is the site's *light* theme and should
+       stay light/readable on its own.
+       ============================================================ */
 
-    --page-background-color: slategray;
+    /* -- Brand accent (new: gives the site an actual "theme" instead
+       of pure grayscale; also what subnet/document/navigator/urltable
+       now all share instead of each having their own accent) -- */
+    --color-accent: #4c6ef5;
+    --color-accent-hover: #3b5bdb;
+    --color-accent-soft: #e7ecfe;
+    --color-accent2: #17b8a6;
+    --color-accent2-soft: #e1f7f4;
 
-    --font-basic-color: snow;
-    --font-cold-color: #cccccc;
-    --font-light-color: #888888;
-    --font-dark-color: #222222;
-    --font-error-color: var(--red);
+    /* -- Status colors (also new: shared by every page instead of
+       each page inventing its own reds/greens/yellows) -- */
+    --color-danger: #e2534f;
+    --color-danger-strong: #9c1f1f;
+    --color-danger-bg: #3a1618;
+    --color-danger-soft: #fdecec;
+    --color-danger-border: #5c2226;
+    --color-success: #3fb37f;
+    --color-success-bg: #123024;
+    --color-success-border: #1d4a35;
+    --color-highlight: #f2b705;
+    --color-highlight-soft: rgba(242, 183, 5, 0.25);
+
+    /* -- Neutral scale: one slate-blue hue used everywhere, lighter
+       overall than the old plain grayscale -- */
+    --color-bg-deepest: #262c3a;   /* darkest panels */
+    --color-bg-deep: #333b4d;      /* nav / footer / dark chrome */
+    --color-bg-raised: #434d63;    /* dropdowns, cards on dark chrome */
+    --color-bg-mid: #5c6780;       /* buttons, mid-tone fills */
+    --color-bg-soft: #7b869c;      /* light-mid fills / hover states */
+    --color-bg-pale: #d9dee6;      /* pale surfaces */
+    --color-text-on-dark: #f5f7fb; /* light text, for dark chrome */
+    --color-text-on-dark-soft: #d9dee6;
+    --color-text-muted: #9aa4b8;
+    --color-text-on-light: #262b36; /* dark text, for pale surfaces */
+
+    /* -- z-index scale --
+       Normal in-page content (page data: layout, sticky headers,
+       in-page tooltips/dropdowns, decorative elements) must stay
+       within [--z-page-min, --z-page-max]. Anything that is not
+       page data — the navbar, the footer, modals, overlays, toasts —
+       lives above --z-page-max so it is always guaranteed to sit
+       over page content without needing one-off magic numbers. -- */
+    --z-page-min: -1000;
+    --z-page: 0;
+    --z-page-max: 1000;
+    --z-chrome: 2000;          /* navbar, footer */
+    --z-chrome-dropdown: 2100; /* menus that fly out of the navbar */
+    --z-modal-backdrop: 3000;  /* full-page modals/overlays */
+    --z-modal: 3100;
+    --z-toast: 4000;           /* toasts/notifications, always on top */
+
+    /* ============================================================
+       Legacy aliases — kept so every page that already references
+       these names (most of them) automatically picks up the unified
+       palette above without needing to be rewritten.
+       ============================================================ */
+    --white: var(--color-text-on-dark);
+    --black: var(--color-text-on-light);
+    --red: var(--color-danger);
+    --blue: var(--color-accent);
+    --green: var(--color-success);
+    --dark-red: #a63636;
+
+    --page-background-color: #6e7992;
+
+    --font-basic-color: var(--color-text-on-dark);
+    --font-cold-color: var(--color-text-on-dark-soft);
+    --font-light-color: var(--color-text-muted);
+    --font-dark-color: var(--color-text-on-light);
+    --font-error-color: var(--color-danger);
     --font-errordark-color: var(--dark-red);
 
-    --background-cold-color: #cccccc;
-    --background-light-color: #888888;
-    --background-normal-color: #666666;
-    --background-middle-color: #444444;
-    --background-dark-color: #333333;
-    --background-darkest-color: #2c2c2c;
+    --background-cold-color: var(--color-bg-pale);
+    --background-light-color: var(--color-bg-soft);
+    --background-normal-color: var(--color-bg-mid);
+    --background-middle-color: var(--color-bg-raised);
+    --background-dark-color: var(--color-bg-deep);
+    --background-darkest-color: var(--color-bg-deepest);
 
-    --border-cold-color: #cccccc;
-    --border-light-color: #888888;
-    --border-medium-color: #444444;
+    --border-cold-color: var(--color-bg-pale);
+    --border-light-color: var(--color-bg-soft);
+    --border-medium-color: var(--color-bg-raised);
     --border-dark-color: var(--black);
 }
 
@@ -53,22 +119,22 @@ body {
 
 a {
     text-decoration: none;
-    color: black;
+    color: var(--color-accent);
 }
 
 
 ::-webkit-scrollbar {
-    background-color: lightgrey;
+    background-color: var(--color-bg-pale);
     width: 1vw;
 }
 
 ::-webkit-scrollbar-thumb {
-    background: grey;
+    background: var(--color-bg-soft);
     border-radius: 10px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: #222222;
+    background: var(--color-bg-mid);
 }
 
 
@@ -87,7 +153,7 @@ a {
     top: 0;
     left: 0;
     width: 100%;
-    z-index: 1100; /* above all page content (sticky toolbars, sidebars) */
+    z-index: var(--z-chrome); /* nav/footer/modals are not page data, they always sit above it */
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
@@ -148,7 +214,7 @@ a {
     border-radius: 20px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     transition: opacity 0.5s ease, transform 0.5s ease;
-    z-index: 3;
+    z-index: var(--z-chrome-dropdown); /* nav flyout, not page data */
     margin-left: 50px; /* Move it slightly to the right of the center */
 
     @media (max-width: 800px) {
@@ -241,7 +307,7 @@ a {
     transition: opacity 0.5s ease, transform 0.5s ease;
     opacity: 0;
     transform: translateY(-20px);
-    z-index: 3;
+    z-index: var(--z-chrome-dropdown); /* nav flyout, not page data */
 }
 
 .dropdown_menu.show {
@@ -372,7 +438,7 @@ footer {
     padding: 10px 20px;
     text-align: center;
     border-top: 1px solid var(--border-dark-color);
-    z-index: 1050; /* Ensure it stays on top of other content */
+    z-index: var(--z-chrome); /* footer is not page data, sits above it */
 }
 
 .footer_in {
@@ -403,7 +469,7 @@ footer h5, footer h6 {
     display: none;
     position: fixed;
     color: var(--font-dark-color);
-    z-index: 1200;
+    z-index: var(--z-modal); /* global modal, always above nav/footer */
     padding-top: 100px;
     left: 0;
     top: 0;

@@ -1,7 +1,10 @@
 :root {
---bg: #e6e6e6; --page-bg: #fff; --toolbar-bg: #1f2430;
---toolbar-fg: #e7eaf0; --accent: #4c8bf5; --border: #cfd4dd;
---muted: #7a8291; --shadow: 0 2px 10px rgba(0,0,0,.18);
+/* Document viewer palette — now sourced from the site-wide theme
+   instead of its own one-off colors. --page-bg stays paper-white
+   on purpose: this view is emulating printed Word/Excel pages. */
+--bg: var(--color-bg-pale); --page-bg: #fff; --toolbar-bg: var(--color-bg-deep);
+--toolbar-fg: var(--color-text-on-dark); --accent: var(--color-accent); --border: var(--border-cold-color);
+--muted: var(--color-text-muted); --shadow: 0 2px 10px rgba(0,0,0,.18);
 }
 * { box-sizing: border-box; }
 html, body {
@@ -10,7 +13,7 @@ font-family: "Calibri","Segoe UI",system-ui,Arial,sans-serif;
 font-size: 11pt; line-height: 1.4; color: #1c1c1c;
 }
 #toolbar {
-position: sticky; top: 0; z-index: 1000;
+position: sticky; top: 0; z-index: var(--z-page-max); /* in-page sticky header, not global chrome */
 display: flex; justify-content: center;
 padding: 0 16px; background: var(--toolbar-bg); color: var(--toolbar-fg);
 font-family: system-ui,sans-serif; font-size: 13px;
@@ -26,44 +29,44 @@ padding: 10px 0; flex-wrap: wrap;
 #toolbar .spacer { flex: 1 1 auto; }
 #toolbar button, #toolbar label.btn {
 display: inline-flex; align-items: center; gap: 6px;
-background: #2c3444; color: var(--toolbar-fg);
-border: 1px solid #3a445a; border-radius: 6px;
+background: var(--color-bg-raised); color: var(--toolbar-fg);
+border: 1px solid var(--color-bg-mid); border-radius: 6px;
 padding: 6px 12px; cursor: pointer; font: inherit;
 transition: background .15s, border-color .15s;
 }
 #toolbar button:hover:not(:disabled),
-#toolbar label.btn:hover { background: #374158; border-color: var(--accent); }
+#toolbar label.btn:hover { background: var(--color-bg-mid); border-color: var(--accent); }
 #toolbar button:disabled { opacity: .45; cursor: not-allowed; }
 #toolbar input[type=file] { display: none; }
-#fileMeta { display: flex; align-items: center; gap: 8px; font-size: 12px; color: #c8cedb; min-width: 0; }
+#fileMeta { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--color-text-on-dark-soft); min-width: 0; }
 #fileMeta .badge {
 background: var(--accent); color: #fff; padding: 2px 7px;
 border-radius: 4px; font-weight: 600; text-transform: uppercase;
 font-size: 10px; letter-spacing: .5px;
 }
 #fileName { max-width: 260px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-#status { font-size: 12px; color: #a8b0c0; }
+#status { font-size: 12px; color: var(--color-text-muted); }
 
 #dropzone {
 max-width: 680px; margin: 60px auto; padding: 48px 24px;
-text-align: center; border: 2px dashed #b6bdc9; border-radius: 14px;
-background: rgba(255,255,255,.55); color: #555;
+text-align: center; border: 2px dashed var(--color-bg-soft); border-radius: 14px;
+background: rgba(255,255,255,.55); color: var(--color-text-on-light);
 font-family: system-ui,sans-serif;
 transition: background .15s, border-color .15s;
 }
-#dropzone.dragover { background: rgba(76,139,245,.12); border-color: var(--accent); }
-#dropzone h2 { margin: 0 0 8px; font-size: 18px; color: #333; }
-#dropzone p { margin: 4px 0; font-size: 13px; color: #6b7280; }
-#dropzone .formats { margin-top: 14px; font-size: 12px; color: #8b93a1; line-height: 1.7; }
+#dropzone.dragover { background: var(--color-accent-soft); border-color: var(--accent); }
+#dropzone h2 { margin: 0 0 8px; font-size: 18px; color: var(--color-text-on-light); }
+#dropzone p { margin: 4px 0; font-size: 13px; color: var(--color-text-muted); }
+#dropzone .formats { margin-top: 14px; font-size: 12px; color: var(--color-text-muted); line-height: 1.7; }
 #dropzone .formats code {
-background: #eef1f6; padding: 1px 5px; border-radius: 3px;
-font-family: ui-monospace, monospace; font-size: 11px; color: #444;
+background: var(--color-bg-pale); padding: 1px 5px; border-radius: 3px;
+font-family: ui-monospace, monospace; font-size: 11px; color: var(--color-text-on-light);
 }
 
 #error {
 display: none; max-width: 720px; margin: 24px auto;
-padding: 14px 18px; background: #fdecec; border: 1px solid #f5b5b5;
-color: #8a1f1f; border-radius: 8px;
+padding: 14px 18px; background: var(--color-danger-soft); border: 1px solid var(--color-danger);
+color: var(--color-danger-strong); border-radius: 8px;
 font-family: system-ui,sans-serif; font-size: 13px; white-space: pre-wrap;
 }
 #viewer { display: none; flex-direction: column; align-items: center; padding: 32px 16px 64px; gap: 24px; min-height: 100vh; }
@@ -93,19 +96,19 @@ width: min(1400px, 100%); background: var(--page-bg);
 box-shadow: var(--shadow); border-radius: 8px; overflow: hidden;
 font-family: "Segoe UI",system-ui,Arial,sans-serif; font-size: 12px;
 }
-#xlsx-tabs { display: flex; gap: 2px; background: #f3f4f7; border-bottom: 1px solid var(--border); padding: 6px 8px 0; overflow-x: auto; }
+#xlsx-tabs { display: flex; gap: 2px; background: var(--color-bg-pale); border-bottom: 1px solid var(--border); padding: 6px 8px 0; overflow-x: auto; }
 #xlsx-tabs button {
-border: 1px solid var(--border); border-bottom: none; background: #e9ebf1; color: #444;
+border: 1px solid var(--border); border-bottom: none; background: var(--border); color: var(--color-text-on-light);
 padding: 6px 14px; cursor: pointer; border-radius: 6px 6px 0 0; font: inherit; white-space: nowrap;
 transition: background .12s;
 }
-#xlsx-tabs button:hover { background: #dde1ea; }
-#xlsx-tabs button.active { background: #fff; color: #1c1c1c; font-weight: 600; box-shadow: 0 -1px 0 var(--accent) inset; }
+#xlsx-tabs button:hover { background: var(--color-bg-soft); }
+#xlsx-tabs button.active { background: #fff; color: var(--color-text-on-light); font-weight: 600; box-shadow: 0 -1px 0 var(--accent) inset; }
 #xlsx-sheet { overflow: auto; max-height: calc(100vh - 200px); }
 #xlsx-sheet table { border-collapse: collapse; font-size: 12px; min-width: 100%; }
-#xlsx-sheet th, #xlsx-sheet td { border: 1px solid #d8dce4; padding: 3px 8px; white-space: nowrap; max-width: 320px; overflow: hidden; text-overflow: ellipsis; vertical-align: top; }
-#xlsx-sheet th { background: #f3f4f7; position: sticky; top: 0; z-index: 2; font-weight: 600; color: #555; }
-#xlsx-sheet td.rowhead { background: #f3f4f7; position: sticky; left: 0; z-index: 1; font-weight: 600; color: #555; text-align: center; }
+#xlsx-sheet th, #xlsx-sheet td { border: 1px solid var(--border); padding: 3px 8px; white-space: nowrap; max-width: 320px; overflow: hidden; text-overflow: ellipsis; vertical-align: top; }
+#xlsx-sheet th { background: var(--color-bg-pale); position: sticky; top: 0; z-index: var(--z-page); font-weight: 600; color: var(--color-text-on-light); }
+#xlsx-sheet td.rowhead { background: var(--color-bg-pale); position: sticky; left: 0; z-index: var(--z-page); font-weight: 600; color: var(--color-text-on-light); text-align: center; }
 #xlsx-sheet td.num { text-align: right; font-variant-numeric: tabular-nums; }
 #xlsx-sheet td.bool { text-align: center; }
 
@@ -115,24 +118,24 @@ transition: background .12s;
 .plain-pre { background: #1e1e1e; color: #d4d4d4; padding: 24px; border-radius: 8px; font-family: ui-monospace,monospace; font-size: 13px; line-height: 1.5; overflow: auto; max-width: 100%; width: min(1100px, 100%); box-shadow: var(--shadow); }
 .csv-wrap { width: min(1400px, 100%); background: #fff; box-shadow: var(--shadow); border-radius: 8px; overflow: hidden; }
 .csv-wrap table { border-collapse: collapse; font-size: 12px; width: 100%; font-family: "Segoe UI",system-ui,sans-serif; }
-.csv-wrap th, .csv-wrap td { border: 1px solid #d8dce4; padding: 4px 10px; text-align: left; max-width: 400px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.csv-wrap th { background: #f3f4f7; font-weight: 600; color: #555; position: sticky; top: 0; }
+.csv-wrap th, .csv-wrap td { border: 1px solid var(--border); padding: 4px 10px; text-align: left; max-width: 400px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.csv-wrap th { background: var(--color-bg-pale); font-weight: 600; color: var(--color-text-on-light); position: sticky; top: 0; }
 .csv-wrap tr:nth-child(even) td { background: #fafbfd; }
 
 #odf-host { width: min(900px, 100%); background: #fff; box-shadow: var(--shadow); min-height: 400px; padding: 16px; }
 
 #loading-overlay {
 position: fixed; inset: 0; background: rgba(0,0,0,.35);
-display: none; align-items: center; justify-content: center; z-index: 1200;
+display: none; align-items: center; justify-content: center; z-index: var(--z-modal);
 font-family: system-ui,sans-serif; color: #fff;
 }
 #loading-overlay.show { display: flex; }
 #loading-overlay .box {
-background: #1f2430; padding: 24px 36px; border-radius: 10px;
+background: var(--toolbar-bg); padding: 24px 36px; border-radius: 10px;
 box-shadow: 0 10px 40px rgba(0,0,0,.4); text-align: center;
 }
 #loading-overlay .spinner {
-width: 28px; height: 28px; border: 3px solid #4c8bf5; border-top-color: transparent;
+width: 28px; height: 28px; border: 3px solid var(--accent); border-top-color: transparent;
 border-radius: 50%; animation: spin .8s linear infinite; margin: 0 auto 12px;
 }
 @keyframes spin { to { transform: rotate(360deg); } }

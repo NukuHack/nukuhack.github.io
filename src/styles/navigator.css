@@ -2,17 +2,19 @@
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
   :root {
-    --bg:       #0d0e11;
-    --surface:  #13151a;
-    --raised:   #1a1d24;
-    --border:   #262930;
-    --border2:  #32363f;
-    --text:     #e8eaf0;
-    --muted:    #6b7080;
-    --accent:   #7c6aff;
-    --accent2:  #4fd1c5;
-    --red:      #ff5a6e;
-    --green:    #3ddc97;
+    /* Navigator palette — now sourced from the site-wide theme
+       instead of its own purple/teal "hacker" one-off palette. */
+    --bg:       var(--color-bg-deepest);
+    --surface:  var(--color-bg-deep);
+    --raised:   var(--color-bg-raised);
+    --border:   var(--color-bg-raised);
+    --border2:  var(--color-bg-mid);
+    --text:     var(--color-text-on-dark);
+    --muted:    var(--color-text-muted);
+    --accent:   var(--color-accent);
+    --accent2:  var(--color-accent2);
+    --red:      var(--color-danger);
+    --green:    var(--color-success);
     --mono:     'DM Mono', monospace;
     --sans:     'Syne', sans-serif;
   }
@@ -318,7 +320,7 @@
     background: var(--green);
     flex-shrink: 0;
   }
-  .statusbar .dot.loading { background: #f59e0b; animation: pulse 1.2s infinite; }
+  .statusbar .dot.loading { background: var(--color-highlight); animation: pulse 1.2s infinite; }
   .statusbar .dot.error   { background: var(--red); }
   @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
   #sbMsg { flex: 1; }

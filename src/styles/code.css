@@ -320,7 +320,7 @@
     text-shadow : black 1px 1px 1px !important;
 }
 .line-numbers-rows{
-    color: #222222 !important;
+    color: var(--color-text-on-light) !important;
     border-right: 1px solid snow !important;
 }
 
