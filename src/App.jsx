@@ -1,6 +1,6 @@
 import { Route, Routes } from 'react-router-dom';
 import Layout from './components/Layout.jsx';
-import PageStub from './pages/PageStub.jsx';
+import NotFound from './pages/NotFound.jsx';
 import Home from './pages/Home.jsx';
 import Dice from './pages/Dice.jsx';
 import Weather from './pages/Weather.jsx';
@@ -34,7 +34,7 @@ export default function App() {
         <Route path="/animation" element={<Animation />} />
         <Route path="/urltable" element={<UrlTable />} />
         <Route path="/test3d" element={<Test3D />} />
-        <Route path="*" element={<PageStub name="Not Found" />} />
+        <Route path="*" element={<NotFound/>} />
       </Route>
     </Routes>
   );
