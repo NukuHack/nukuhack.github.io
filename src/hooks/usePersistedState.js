@@ -18,6 +18,14 @@ export function getFromLocalStorage(key) {
   }
 }
 
+export function removeFromLocalStorage(key) {
+  try {
+    localStorage.removeItem(key);
+  } catch (e) {
+    console.error('Error removing from localStorage:', e);
+  }
+}
+
 /** useState that is initialised from, and kept in sync with, localStorage. */
 export function usePersistedState(key, defaultValue) {
   const [state, setState] = useState(() => {

@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import '../styles/urltable.css';
 import { initWasmCompression } from '../lib/urltableWasm.js';
 import { parseUrlTableText, buildFileContent, applyFilterToData, highlightParts, GROUP_NAME_PATTERN } from '../lib/urltableParse.js';
+import { getFromLocalStorage, saveToLocalStorage, removeFromLocalStorage } from '../hooks/usePersistedState.js';
 
 const AUTO_LOAD_KEY = 'urlDataAutoLoad';
 
@@ -40,7 +41,7 @@ export default function UrlTable() {
   const [status, setStatus] = useState(null); // { message, type }
   const [newGroupInputValue, setNewGroupInputValue] = useState('');
   const [techOpen, setTechOpen] = useState(false);
-  const [autoLoadEnabled, setAutoLoadEnabled] = useState(() => localStorage.getItem(AUTO_LOAD_KEY) !== '0');
+  const [autoLoadEnabled, setAutoLoadEnabled] = useState(() => getFromLocalStorage(AUTO_LOAD_KEY) !== '0');
   const [autosaveToastVisible, setAutosaveToastVisible] = useState(false);
 
   const [editing, setEditing] = useState(null); // { id, extraData, url, isNew }
@@ -96,10 +97,10 @@ export default function UrlTable() {
       } catch (compressErr) {
         console.warn('Compression failed, storing plain text:', compressErr);
       }
-      localStorage.setItem('urlDataAutoSave', stored);
-      localStorage.setItem('urlDataAutoSaveCompressed', isCompressed ? '1' : '0');
-      localStorage.setItem('urlDataFileName', fileName || 'url-data.txt');
-      localStorage.setItem('urlDataLastModified', new Date().toISOString());
+      saveToLocalStorage('urlDataAutoSave', stored);
+      saveToLocalStorage('urlDataAutoSaveCompressed', isCompressed ? '1' : '0');
+      saveToLocalStorage('urlDataFileName', fileName || 'url-data.txt');
+      saveToLocalStorage('urlDataLastModified', new Date().toISOString());
     } catch (e) {
       console.warn('Auto-save failed:', e);
       return;
@@ -116,10 +117,10 @@ export default function UrlTable() {
 
     async function restoreAutoSave() {
       try {
-        const packed = localStorage.getItem('urlDataAutoSave');
+        const packed = getFromLocalStorage('urlDataAutoSave');
         if (!packed) return false;
 
-        const wasCompressed = localStorage.getItem('urlDataAutoSaveCompressed') !== '0';
+        const wasCompressed = getFromLocalStorage('urlDataAutoSaveCompressed') !== '0';
         let restored = packed;
         if (wasCompressed) {
           try {
@@ -130,8 +131,8 @@ export default function UrlTable() {
             restored = packed;
           }
         }
-        const savedFileName = localStorage.getItem('urlDataFileName') || 'url-data.txt';
-        const savedDate = localStorage.getItem('urlDataLastModified');
+        const savedFileName = getFromLocalStorage('urlDataFileName') || 'url-data.txt';
+        const savedDate = getFromLocalStorage('urlDataLastModified');
 
         const { items, groupsFound, validCount, skippedCount } = parseUrlTableText(restored);
         if (items.length === 0 || cancelled) return false;
@@ -153,7 +154,7 @@ export default function UrlTable() {
     }
 
     (async () => {
-      const autoLoadOn = localStorage.getItem(AUTO_LOAD_KEY) !== '0';
+      const autoLoadOn = getFromLocalStorage(AUTO_LOAD_KEY) !== '0';
       if (autoLoadOn && (await restoreAutoSave())) return;
       if (cancelled) return;
 
@@ -440,13 +441,9 @@ export default function UrlTable() {
     URL.revokeObjectURL(url);
 
     markSaved();
-    try {
-      localStorage.removeItem('urlDataAutoSave');
-      localStorage.removeItem('urlDataFileName');
-      localStorage.removeItem('urlDataLastModified');
-    } catch {
-      /* ignore */
-    }
+    removeFromLocalStorage('urlDataAutoSave');
+    removeFromLocalStorage('urlDataFileName');
+    removeFromLocalStorage('urlDataLastModified');
     showStatus('File saved successfully!', 'success');
   }
 
@@ -484,7 +481,7 @@ export default function UrlTable() {
   function handleAutoLoadToggle(e) {
     const checked = e.target.checked;
     setAutoLoadEnabled(checked);
-    localStorage.setItem(AUTO_LOAD_KEY, checked ? '1' : '0');
+    saveToLocalStorage(AUTO_LOAD_KEY, checked ? '1' : '0');
     showStatus(
       checked
         ? 'Auto-load enabled — saved data will be restored on next page load.'
@@ -494,16 +491,16 @@ export default function UrlTable() {
   }
 
   function handleClearCache() {
-    const hasCache = localStorage.getItem('urlDataAutoSave');
+    const hasCache = getFromLocalStorage('urlDataAutoSave');
     if (!hasCache) {
       showStatus('No cached data to clear.', 'empty');
       return;
     }
     if (!confirm('Clear the locally cached data? This cannot be undone.')) return;
-    localStorage.removeItem('urlDataAutoSave');
-    localStorage.removeItem('urlDataAutoSaveCompressed');
-    localStorage.removeItem('urlDataFileName');
-    localStorage.removeItem('urlDataLastModified');
+    removeFromLocalStorage('urlDataAutoSave');
+    removeFromLocalStorage('urlDataAutoSaveCompressed');
+    removeFromLocalStorage('urlDataFileName');
+    removeFromLocalStorage('urlDataLastModified');
     showStatus('Cache cleared.', 'success');
   }
 

@@ -1,31 +1,16 @@
 import { useCallback, useEffect, useState } from 'react';
+import { getFromLocalStorage, saveToLocalStorage } from '../hooks/usePersistedState.js';
 
 const STORAGE_KEY = 'PrefersDark';
 
-function readStoredPreference() {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    return raw !== null ? JSON.parse(raw) : undefined;
-  } catch (e) {
-    console.error('Error reading localStorage:', e);
-    return undefined;
-  }
-}
-
-function writeStoredPreference(value) {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(value));
-  } catch (e) {
-    console.error('Error saving to localStorage:', e);
-  }
-}
+const writeStoredPreference = (value) => saveToLocalStorage(STORAGE_KEY, value);
 
 /**
  * Relies on the global `DarkReader` object loaded from the CDN script in index.html.
  */
 export function useDarkMode() {
   const [prefersDark, setPrefersDark] = useState(() => {
-    const stored = readStoredPreference();
+    const stored = getFromLocalStorage(STORAGE_KEY);
     if (stored !== undefined) return stored;
     return window.matchMedia?.('(prefers-color-scheme: dark)').matches ?? true;
   });
