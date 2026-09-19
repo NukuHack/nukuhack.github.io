@@ -28,7 +28,9 @@ export function initWasmCompression() {
 
   // 3. WASM module + migration helpers.
   initPromise = (async () => {
-    const { default: getWasm } = await import(/* @vite-ignore */ '/wasm/wasm.js');
+    const wasmEntryPath = '/wasm/wasm.js';
+    const { default: getWasm } = await import(/* @vite-ignore */ wasmEntryPath);
+    
     const wasm = await getWasm('Compression').then(async (m) => {
       await m.default();
       return m;
