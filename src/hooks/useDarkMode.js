@@ -21,7 +21,6 @@ function writeStoredPreference(value) {
 }
 
 /**
- * Mirrors the original main.js dark mode behaviour, but as a React hook.
  * Relies on the global `DarkReader` object loaded from the CDN script in index.html.
  */
 export function useDarkMode() {

@@ -19,7 +19,7 @@
     height: 0;
     border-left: 20px solid transparent;
     border-right: 20px solid transparent;
-    border-bottom: 50px solid dodgerblue; /* Color of the triangle */
+    border-bottom: 50px solid dodgerblue;
     top: 25%;
     right: 23%;
 }
@@ -75,7 +75,7 @@
     transform-style: preserve-3d;
     transform: rotateX(-20deg) rotateY(20deg);
     margin: 100px auto;
-    transition: transform 5s; /* Smooth transition for manual animation toggling */
+    transition: transform 5s;
 }
 
 /* General Face Styles */
@@ -87,20 +87,13 @@
     border: none;
 }
 
-/* Front */
-.cube .front { transform: translateZ(60px); background: white/*#cccccc*/; }
-/* Back */
-.cube .back { transform: rotateY(180deg) translateZ(-60px); background: white/*#6c63ff*/; }
-/* Left */
-.cube .left { transform: rotateY(-90deg) translateX(-60px); transform-origin: left center; background: white/*#28c76f*/; }
-/* Right */
-.cube .right { transform: rotateY(90deg) translateX(60px); transform-origin: right center; background: white/*#ffc107*/; }
-/* Top */
-.cube .top { transform: rotateX(90deg) translateY(-60px); transform-origin: top center; background: white/*#00cfe8*/; }
-/* Bottom */
-.cube .bottom { transform: rotateX(-90deg) translateY(60px); transform-origin: bottom center; background: white/*#ea5455*/; }
+.cube .front { transform: translateZ(60px); background: white; }
+.cube .back { transform: rotateY(180deg) translateZ(-60px); background: white; }
+.cube .left { transform: rotateY(-90deg) translateX(-60px); transform-origin: left center; background: white; }
+.cube .right { transform: rotateY(90deg) translateX(60px); transform-origin: right center; background: white; }
+.cube .top { transform: rotateX(90deg) translateY(-60px); transform-origin: top center; background: white; }
+.cube .bottom { transform: rotateX(-90deg) translateY(60px); transform-origin: bottom center; background: white; }
 
-/* Rotation Animation */
 .cube.animate {
     animation: rotateCube 10s infinite linear;
 }
@@ -128,7 +121,7 @@
         transform: rotateY(360deg) rotateX(-360deg) translateZ(0px);
     }
     100% {
-        transform: rotateY(0deg) rotateX(0deg); /* Seamlessly jump back to 0 degrees */
+        transform: rotateY(0deg) rotateX(0deg);
     }
 }
 
@@ -137,8 +130,8 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding-top: 80px;      /* replaces the 12x <br> at the top */
-    padding-bottom: 60px;   /* replaces the 4x <br> after the cube */
+    padding-top: 80px;
+    padding-bottom: 60px;
 }
 
 .animate_button {

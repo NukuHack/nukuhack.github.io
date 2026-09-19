@@ -16,7 +16,7 @@ body {
 .app-layout {
     display: flex;
     flex: 1;
-    min-height: 85vh; /* critical: allows children to shrink below content size */
+    min-height: 85vh;
     width: 100%;
     overflow: hidden;
 }
@@ -328,7 +328,7 @@ body {
 /* ── Collapsible tech section ─────────────────────────── */
 .tech-section {
     border-bottom: none;
-    margin-top: auto; /* push to bottom */
+    margin-top: auto;
 }
 
 .collapsible-trigger {
@@ -852,7 +852,7 @@ body {
     font-family: 'IBM Plex Mono', monospace;
     font-size: 11px;
     border: 1px solid var(--border-cold-color);
-    z-index: var(--z-toast); /* toast, not page data */
+    z-index: var(--z-toast);
     opacity: 0.9;
     pointer-events: none;
     animation: toastIn 0.15s ease;
@@ -869,7 +869,7 @@ body {
     position: fixed;
     inset: 0;
     background: rgba(0,0,0,0.65);
-    z-index: var(--z-modal); /* global modal, always above nav/footer */
+    z-index: var(--z-modal);
     align-items: center;
     justify-content: center;
     backdrop-filter: blur(2px);

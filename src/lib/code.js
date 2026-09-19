@@ -1,10 +1,16 @@
 export const LANGUAGE_MAPPING = {
   csharp: 'C#',
   javascript: 'JavaScript',
+  java: 'Java',
   python: 'Python',
   css: 'CSS',
-  java: 'Java',
-  rust: 'Rust',
+  html: 'HTML',
+  //jsx: 'JSX',
+  //tsx: 'TSX',
+  //typescript: 'TypeScript',
+  c_lang: 'C',
+  cplusplus: 'C++',
+  haskell: 'Haskell',
 };
 
 export function capitalize(string) {

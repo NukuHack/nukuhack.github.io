@@ -6,7 +6,7 @@ canvas {
     align-self: center;
     border: 1px solid var(--border-cold-color);
 }
-/* Custom Context Menu Styling */
+
 #customContextMenu {
     display: none;
     position: absolute;
@@ -14,7 +14,7 @@ canvas {
     border: 1px solid var(--border-medium-color);
     box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
     padding: 10px;
-    z-index: var(--z-page-max); /* in-page context menu, stays within page-data range */
+    z-index: var(--z-page-max);
 }
 #customContextMenu ul {
     list-style-type: none;

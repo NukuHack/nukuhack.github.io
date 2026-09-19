@@ -1,7 +1,4 @@
 :root {
-/* Document viewer palette — now sourced from the site-wide theme
-   instead of its own one-off colors. --page-bg stays paper-white
-   on purpose: this view is emulating printed Word/Excel pages. */
 --bg: var(--color-bg-pale); --page-bg: #fff; --toolbar-bg: var(--color-bg-deep);
 --toolbar-fg: var(--color-text-on-dark); --accent: var(--color-accent); --border: var(--border-cold-color);
 --muted: var(--color-text-muted); --shadow: 0 2px 10px rgba(0,0,0,.18);
@@ -13,7 +10,7 @@ font-family: "Calibri","Segoe UI",system-ui,Arial,sans-serif;
 font-size: 11pt; line-height: 1.4; color: #1c1c1c;
 }
 #toolbar {
-position: sticky; top: 0; z-index: var(--z-page-max); /* in-page sticky header, not global chrome */
+position: sticky; top: 0; z-index: var(--z-page-max);
 display: flex; justify-content: center;
 padding: 0 16px; background: var(--toolbar-bg); color: var(--toolbar-fg);
 font-family: system-ui,sans-serif; font-size: 13px;

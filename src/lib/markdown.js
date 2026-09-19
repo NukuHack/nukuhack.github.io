@@ -1,4 +1,5 @@
 // ─── Hand-rolled markdown renderer (unchanged logic from the original markdown.js) ──
+// should be replaced with, '@y1feng200156/awsm-markdown-renderer'
 
 function esc(s) {
   return s

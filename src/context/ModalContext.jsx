@@ -16,7 +16,7 @@ export function ModalProvider({ children }) {
   return <ModalContext.Provider value={value}>{children}</ModalContext.Provider>;
 }
 
-/** Equivalent of calling ModalOpen(title, text, error) / ModalClose() from the old main.js */
+/** Equivalent of calling ModalOpen(title, text, error) / ModalClose() */
 export function useModal() {
   const ctx = useContext(ModalContext);
   if (!ctx) throw new Error('useModal must be used within a ModalProvider');
