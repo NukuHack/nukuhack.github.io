@@ -24,9 +24,11 @@ const EXAMPLES = {
   hostCount: '50',
 };
 
-function fillExampleOnFocus(exampleValue) {
-  return (e) => {
-    if (!e.target.value) e.target.value = exampleValue;
+// Must go through React state: writing to e.target.value directly leaves the
+// controlled input's state empty, so Calculate would read '' and always error.
+function fillExampleOnFocus(currentValue, setValue, exampleValue) {
+  return () => {
+    if (!currentValue) setValue(exampleValue);
   };
 }
 
@@ -163,11 +165,13 @@ export default function Subnet() {
         ))}
       </div>
 
-      {activeTab === 'subnet-calc' && (
-        <SubnetCalcTab onCalculate={calculateSubnet} onEnter={handleEnter} />
-      )}
-      {activeTab === 'host-calc' && (
-        <HostCalcTab
+      <SubnetCalcTab
+        active={activeTab === 'subnet-calc'}
+        onCalculate={calculateSubnet}
+        onEnter={handleEnter}
+      />
+      <HostCalcTab
+          active={activeTab === 'host-calc'}
           hostInputs={hostInputs}
           hostInputsVisible={hostInputsVisible}
           onToggleHostInputs={() => setHostInputsVisible((v) => !v)}
@@ -176,11 +180,12 @@ export default function Subnet() {
           onUpdateHostInput={updateHostInput}
           onCalculate={calculateForHosts}
           onEnter={handleEnter}
-        />
-      )}
-      {activeTab === 'power-calc' && (
-        <PowerCalcTab onCalculate={calculatePowerOfTwo} onEnter={handleEnter} />
-      )}
+      />
+      <PowerCalcTab
+        active={activeTab === 'power-calc'}
+        onCalculate={calculatePowerOfTwo}
+        onEnter={handleEnter}
+      />
 
       {error && <div className="error">{error}</div>}
 
@@ -218,13 +223,13 @@ export default function Subnet() {
 
 // ─── Tab bodies ─────────────────────────────────────────────────────────────
 
-function SubnetCalcTab({ onCalculate, onEnter }) {
+function SubnetCalcTab({ active, onCalculate, onEnter }) {
   const [ip, setIp] = useState('');
   const [subnet, setSubnet] = useState('');
   const submit = () => onCalculate(ip.trim(), subnet.trim());
 
   return (
-    <div id="subnet-calc" className="tab-content active">
+    <div id="subnet-calc" className={`tab-content${active ? ' active' : ''}`}>
       <div className="input-group">
         <label htmlFor="ip">IP Address:</label>
         <input
@@ -233,7 +238,7 @@ function SubnetCalcTab({ onCalculate, onEnter }) {
           placeholder="e.g., 192.168.1.1"
           value={ip}
           onChange={(e) => setIp(e.target.value)}
-          onFocus={fillExampleOnFocus(EXAMPLES.ip)}
+          onFocus={fillExampleOnFocus(ip, setIp, EXAMPLES.ip)}
           onKeyDown={(e) => onEnter(e, submit)}
         />
       </div>
@@ -245,7 +250,7 @@ function SubnetCalcTab({ onCalculate, onEnter }) {
           placeholder="e.g., 255.255.255.0 or /24"
           value={subnet}
           onChange={(e) => setSubnet(e.target.value)}
-          onFocus={fillExampleOnFocus(EXAMPLES.subnet)}
+          onFocus={fillExampleOnFocus(subnet, setSubnet, EXAMPLES.subnet)}
           onKeyDown={(e) => onEnter(e, submit)}
         />
       </div>
@@ -257,6 +262,7 @@ function SubnetCalcTab({ onCalculate, onEnter }) {
 }
 
 function HostCalcTab({
+  active,
   hostInputs,
   hostInputsVisible,
   onToggleHostInputs,
@@ -271,7 +277,7 @@ function HostCalcTab({
   const submit = () => onCalculate(hostIp.trim(), hostSubnet.trim());
 
   return (
-    <div id="host-calc" className="tab-content active">
+    <div id="host-calc" className={`tab-content${active ? ' active' : ''}`}>
       <div className="input-group">
         <label htmlFor="host-ip">Network IP Address:</label>
         <input
@@ -280,7 +286,7 @@ function HostCalcTab({
           placeholder="e.g., 192.168.1.0"
           value={hostIp}
           onChange={(e) => setHostIp(e.target.value)}
-          onFocus={fillExampleOnFocus(EXAMPLES.hostIp)}
+          onFocus={fillExampleOnFocus(hostIp, setHostIp, EXAMPLES.hostIp)}
           onKeyDown={(e) => onEnter(e, submit)}
         />
       </div>
@@ -292,7 +298,7 @@ function HostCalcTab({
           placeholder="e.g., 255.255.255.0 or /24"
           value={hostSubnet}
           onChange={(e) => setHostSubnet(e.target.value)}
-          onFocus={fillExampleOnFocus(EXAMPLES.hostSubnet)}
+          onFocus={fillExampleOnFocus(hostSubnet, setHostSubnet, EXAMPLES.hostSubnet)}
           onKeyDown={(e) => onEnter(e, submit)}
         />
       </div>
@@ -330,12 +336,12 @@ function HostCalcTab({
   );
 }
 
-function PowerCalcTab({ onCalculate, onEnter }) {
+function PowerCalcTab({ active, onCalculate, onEnter }) {
   const [hostCount, setHostCount] = useState('');
   const submit = () => onCalculate(hostCount.trim());
 
   return (
-    <div id="power-calc" className="tab-content active">
+    <div id="power-calc" className={`tab-content${active ? ' active' : ''}`}>
       <div className="input-group">
         <label htmlFor="host-count">Number of Hosts Needed:</label>
         <input
@@ -345,7 +351,7 @@ function PowerCalcTab({ onCalculate, onEnter }) {
           min="1"
           value={hostCount}
           onChange={(e) => setHostCount(e.target.value)}
-          onFocus={fillExampleOnFocus(EXAMPLES.hostCount)}
+          onFocus={fillExampleOnFocus(hostCount, setHostCount, EXAMPLES.hostCount)}
           onKeyDown={(e) => onEnter(e, submit)}
         />
       </div>
