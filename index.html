@@ -46,7 +46,7 @@
   Object.assign(window, MicroReact, MicroReact.createExtras());
 
   // ─── JSX LOADER ───
-  const [{ default: App }] = await Promise.all([loadJsx("./src/App.jsx")]);
+  const { default: App } = await loadJsx("./src/App.jsx");
 
   window.__root = await render(html`<${App} />`, document.getElementById('root'));
   </script>

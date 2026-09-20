@@ -1,42 +1,65 @@
+// wasm helers
+const REGISTRY = {
+  Compression: {
+    path: '/wasm/compressor/pkg/compressor.js',
+    dependencies: [] // For modules that depend on other WASM
+  },
+  React: {
+    path: '/wasm/micro-react/pkg/micro_react.js',
+    dependencies: []
+  },
+};
+
+const initialized = new Map();
+
+export async function getWasm(alias) {
+  if (initialized.has(alias)) {
+    return initialized.get(alias);
+  }
+
+  const config = REGISTRY[alias];
+  if (!config) {
+    throw new Error(`WASM module "${alias}" not registered`);
+  }
+
+  // Load dependencies first
+  await Promise.all(
+    config.dependencies.map(dep => getWasm(dep))
+  );
+
+  // Dynamic import with Vite/Rollup support
+  const module = await loadPublicModule(config.path);
+  await module.default(); // init
+  
+  initialized.set(alias, module);
+  return module;
+}
+
+const PUBLIC_PREFIX = '/public';
+export function resolve(src) {
+  return src.startsWith(PUBLIC_PREFIX) ? src : PUBLIC_PREFIX + src;
+}
 
 export function loadScript(src) {
-  return new Promise((resolve, reject) => {
-    const script = document.createElement('script');
-    script.src = src;
-    script.onload = () => resolve();
-    script.onerror = () => reject(new Error(`Failed to load script: ${src}`));
-    document.head.appendChild(script);
+  const url = resolve(src);
+  if (window.__root && window.loadJsx) {
+    Object.assign(window, window.loadJsx(url).then((m) => m));
+    return;
+  }
+  return new Promise((resolve_, reject) => {
+    const s = document.createElement('script');
+    s.src = url;
+    s.onload = () => resolve_();
+    s.onerror = () => reject(new Error(`Failed to load script: ${url}`));
+    document.head.appendChild(s);
   });
 }
 
-/**
- * Loads an ES module that lives in /public through a real <script type="module">
- * tag (allowed by Vite) and resolves with its default export.
- */
-export function loadPublicModule(src) {
-  return new Promise((resolve, reject) => {
-    const key = `__publicModule_${Math.random().toString(36).slice(2)}`;
-    const script = document.createElement('script');
-    script.type = 'module';
-    script.textContent =
-      `import * as m from ${JSON.stringify(src)};` +
-      `window.${key} = m;`;
-    script.onerror = () => reject(new Error(`Failed to load module: ${src}`));
-    document.head.appendChild(script);
-
-    // Inline module scripts don't fire onload, so poll for the handoff.
-    const started = Date.now();
-    const timer = setInterval(() => {
-      if (window[key]) {
-        clearInterval(timer);
-        const mod = window[key];
-        delete window[key];
-        script.remove();
-        resolve(mod.default);
-      } else if (Date.now() - started > 15000) {
-        clearInterval(timer);
-        reject(new Error(`Timed out loading module: ${src}`));
-      }
-    }, 20);
-  });
+export function loadPublicModule(src, { timeout = 15000 } = {}) {
+  const url = resolve(src);
+  if (window.__root && window.loadJsx) {
+    return window.loadJsx(url);
+  }
+  // Prefer a real external module script over an inline one (CSP-safe).
+  return import(/* @vite-ignore */ url);
 }

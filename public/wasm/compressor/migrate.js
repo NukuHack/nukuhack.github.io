@@ -1,5 +1,3 @@
-"use strict";
-
 // ─── V1 detection ─────────────────────────────────────────────────────────────
 // V1 headers look like:  "<number>_<n|t|d|a>_<c|d>_<sep>_"
 // V2 headers are 64 chars of ciphertext starting with the encrypted MAGIC "C2Fx".

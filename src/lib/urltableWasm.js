@@ -1,5 +1,5 @@
 import { decompress as decompressV1 } from './urltableCompressV1.js';
-import { loadPublicModule, loadScript } from '../lib/loader.js';
+import { loadScript, getWasm } from '../lib/loader.js';
 
 let initPromise = null;
 
@@ -29,11 +29,6 @@ export function initWasmCompression() {
 
   // 3. WASM module + migration helpers.
   initPromise = (async () => {
-    // /public files can't be import()ed from source in Vite (it rewrites the
-    // request and rejects it). A plain <script type="module"> is left alone
-    // and served as-is, so load the entry that way and hand it back via window.
-    const getWasm = await loadPublicModule('/wasm/wasm.js');
-
     const wasm = await getWasm('Compression').then(async (m) => {
       await m.default();
       return m;

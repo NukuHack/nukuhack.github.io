@@ -281,7 +281,7 @@ export default function Video() {
           className="fileSelect"
           id="fileSelectDemo"
           aria-label="Select a file to display"
-          onClick={() => displayVideo('/resources/demo.mp4')}
+          onClick={() => displayVideo('/public/resources/demo.mp4')}
         >
           Try the demo File
         </button>
