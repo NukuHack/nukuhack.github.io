@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/png" href="/assets/favicon.png" />
+    <link rel="icon" type="image/png" href="/public/assets/favicon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Stupid Webpage</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" rel="stylesheet">
@@ -17,6 +17,40 @@
   </head>
   <body>
     <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
+
+
+  <script>
+  /// this for 404's custom redirect
+  if (sessionStorage.redirect) {
+    history.replaceState(null, '', sessionStorage.redirect);
+    sessionStorage.removeItem('redirect');
+  }
+  </script>
+
+  <script type="module">
+  // Boot WASM
+  window.MicroReact = await import('./public/wasm/micro-react/pkg/micro_react.js')
+    .then(async (m) => { await m.default(); return m; });
+
+  // Everything below this line is the only project-specific bit left:
+  // src/**/*.jsx writes root-relative asset paths the way Vite serves
+  // `public/` at the site root. A plain static server doesn't do that
+  // rewrite, so tell micro-react which are the top-level public/ folders
+  MicroReact.setPublicPrefixes(["assets", "resources", "wasm"]);
+
+  // html is a wrapper: tagged templates call (strings, ...values), the
+  // wasm export needs (strings, valuesArray) — no way to avoid this one.
+  window.html = (txt, ...val) => MicroReact.htmlTemplate(txt, val);
+
+  // make everything Global from wasm
+  Object.assign(window, MicroReact, MicroReact.createExtras());
+
+  // ─── JSX LOADER ───
+  const [{ default: App }] = await Promise.all([loadJsx("./src/App.jsx")]);
+
+  window.__root = await render(html`<${App} />`, document.getElementById('root'));
+  </script>
+
+
   </body>
 </html>
