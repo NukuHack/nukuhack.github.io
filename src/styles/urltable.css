@@ -4,7 +4,7 @@
 /* ── No-scroll shell ──────────────────────────────────── */
 html, body {
     height: 100%;
-    overflow: hidden;
+    overflow: scroll;
 }
 
 body {
@@ -934,7 +934,6 @@ body {
 
 /* ── Responsive ────────────────────────────────────────── */
 @media (max-width: 768px) {
-    html, body { overflow: auto; }
     .app-layout { flex-direction: column; overflow: visible; }
     .main-content { overflow: visible; min-height: 60vh; }
     .table-wrap { overflow-x: auto; }

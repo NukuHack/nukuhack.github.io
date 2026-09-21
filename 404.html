@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Redirecting...</title>
+  <style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+    --bg: #0f0f13;
+    --surface: #18181f;
+    --surface2: #21212c;
+    --border: #2e2e3e;
+    --accent: #7c6bff;
+    --accent2: #ff6b9d;
+    --green: #4cde8a;
+    --yellow: #f5c542;
+    --red: #ff5c72;
+    --text: #e8e8f0;
+    --muted: #7a7a96;
+    --radius: 10px;
+    --font: 'Segoe UI', system-ui, sans-serif;
+}
+
+body {
+    font-family: var(--font);
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease-in;
+}
+  </style>
+  <link rel="stylesheet" type="text/css" href="src/styles/not-found.css">
+  <link rel="stylesheet" href="main.css">
+</head>
+<body class="not-found">
+  <div class="container">
+    <h1>404</h1>
+    
+    <div class="card">
+      <p>
+        This page doesn't exist in this website
+      </p>
+      <p>
+        Since this is a <strong>single-page application</strong>, all routes are 
+        handled client-side by the WASM router, so any direct URL access to
+        a non-root path triggers this 404.
+      </p>
+      <p>
+        In a production SPA, the server would be configured to always serve 
+        <span class="code">index.html</span> and let the client-side router handle 
+        the rest. This thing uses a workaround: storing the intended URL and 
+        redirecting you back to the app.
+      </p>
+    </div>
+
+    <p class="redirect-notice">
+      <span class="spinner"></span> Redirecting you back to the app...
+    </p>
+    
+    <div class="refresh-notice" id="refreshNotice">
+      <p>Still here? Try clearing your cache and reloading for the best experience.</p>
+      <button onclick="location.reload(true)" class="cacheClear">Clear Cache & Reload</button>
+    </div>
+  </div>
+
+  <script>
+    // Store the intended URL so the app can restore it after redirect
+    sessionStorage.redirect = location.href;
+    // Instant redirect
+    location.replace('/');
+    // If redirect hasn't happened instantly
+    setTimeout(() => {
+      document.body.classList.add('visible');
+    }, 1);
+    
+    // If user is still here after 3 seconds, show cache clear advice
+    setTimeout(() => {
+      document.getElementById('refreshNotice').classList.add('visible');
+    }, 3000);
+  </script>
+</body>
+</html>

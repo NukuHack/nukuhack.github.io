@@ -1,6 +1,4 @@
 
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
   :root {
     /* Navigator palette — now sourced from the site-wide theme
        instead of its own purple/teal "hacker" one-off palette. */
@@ -17,14 +15,6 @@
     --green:    var(--color-success);
     --mono:     'DM Mono', monospace;
     --sans:     'Syne', sans-serif;
-  }
-
-  html, body {
-    height: 100%;
-    background: var(--bg);
-    color: var(--text);
-    font-family: var(--sans);
-    overflow: hidden;
   }
 
   /* ── LAYOUT ── */
