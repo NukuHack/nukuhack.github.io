@@ -18,7 +18,6 @@
   <body>
     <div id="root"></div>
 
-
   <script>
   /// this for 404's custom redirect
   if (sessionStorage.redirect) {
@@ -28,8 +27,9 @@
   </script>
 
   <script type="module">
+  import { getWasm } from './src/lib/loader.js';
   // Boot WASM
-  window.MicroReact = await import('https://nukuhack.github.io/micro-react/micro_react.js')
+  window.MicroReact = await getWasm('React')
     .then(async (m) => { await m.default(); return m; });
 
   // Everything below this line is the only project-specific bit left:
