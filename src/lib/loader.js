@@ -5,7 +5,7 @@ const REGISTRY = {
     dependencies: [] // For modules that depend on other WASM
   },
   React: {
-    path: '/wasm/micro-react/pkg/micro_react.js',
+    path: 'https://nukuhack.github.io/micro-react/micro_react.js',
     dependencies: []
   },
 };
@@ -56,10 +56,14 @@ export function loadScript(src) {
 }
 
 export function loadPublicModule(src, { timeout = 15000 } = {}) {
-  const url = resolve(src);
+  // If it's already an absolute URL (http/https), use it directly, otherwise, resolve it.
+  const url = /^https?:\/\//i.test(src)
+    ? src : resolve(src);
+
   if (window.__root && window.loadJsx) {
     return window.loadJsx(url);
   }
+
   // Prefer a real external module script over an inline one (CSP-safe).
   return import(/* @vite-ignore */ url);
 }

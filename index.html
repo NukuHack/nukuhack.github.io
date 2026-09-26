@@ -29,7 +29,7 @@
 
   <script type="module">
   // Boot WASM
-  window.MicroReact = await import('./public/wasm/micro-react/pkg/micro_react.js')
+  window.MicroReact = await import('https://nukuhack.github.io/micro-react/micro_react.js')
     .then(async (m) => { await m.default(); return m; });
 
   // Everything below this line is the only project-specific bit left:
