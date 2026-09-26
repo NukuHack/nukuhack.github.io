@@ -37,7 +37,6 @@ export default function Document() {
   const [fileTypeLabel, setFileTypeLabel] = useState('');
   const [statusText, setStatusText] = useState('');
   const [errorText, setErrorText] = useState(null);
-  const [printDisabled, setPrintDisabled] = useState(true);
   const [saveDisabled, setSaveDisabled] = useState(true);
   const [overlay, setOverlay] = useState({ show: false, text: 'Loading…' });
 
@@ -86,7 +85,6 @@ export default function Document() {
     setViewerActive(false);
     setDropzoneVisible(true);
     setFileMetaVisible(false);
-    setPrintDisabled(true);
     setSaveDisabled(true);
     setStatusText('');
     setErrorText(null);
@@ -125,7 +123,6 @@ export default function Document() {
     setDropzoneVisible(false);
     if (hostRef.current) hostRef.current.innerHTML = '';
     setViewerActive(true);
-    setPrintDisabled(true);
     currentFileRef.current = file;
     setSaveDisabled(false);
     xlsxRendererRef.current = null;
@@ -142,7 +139,6 @@ export default function Document() {
       const result = (await handler.render(file, hostRef.current, ctx)) || {};
       document.title = result.title || file.name;
       setStatusText(result.status || 'Loaded');
-      setPrintDisabled(false);
     } catch (err) {
       console.error(err);
       setErrorText(err.message || String(err));
@@ -192,9 +188,6 @@ export default function Document() {
           <input type="file" id="filePicker" ref={filePickerRef} onChange={handleFilePickerChange} />
           <button id="saveBtn" disabled={saveDisabled} title="Save file to disk" onClick={saveFile}>
             💾 Save
-          </button>
-          <button id="printBtn" disabled={printDisabled} title="Print / Save as PDF" onClick={() => window.print()}>
-            🖨 Print
           </button>
           <button id="reloadBtn" title="Reset" onClick={resetViewer}>
             ↺ Reset
