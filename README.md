@@ -45,9 +45,8 @@ public/
 | `/extra`, `/links` | Simple content lists (share `DataList` component) |
 | `/subnet` | IPv4 subnet / VLSM calculator |
 | `/code` | Prism.js snippet browser with search |
-| `/markdown` | Hand-rolled markdown renderer + live preview |
 | `/video` | Custom `<video>` player UI |
-| `/document` | Universal document viewer (PDF/DOCX/XLSX/CSV/RTF/ODF/...) |
+| `/document` | Universal document viewer (PDF/DOCX/XLSX/CSV/RTF/ODF/Markdown/...), with a live edit/preview split for text-based formats |
 | `/navigator` | Mini-browser: iframe rendering, search aggregator |
 | `/animation` | Canvas physics sandbox (gravity, collisions, drag) |
 | `/urltable` | URL list manager with groups/search/WASM compression |

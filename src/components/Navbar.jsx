@@ -30,7 +30,6 @@ const NAV_STRUCTURE = [
     label: 'Small Apps',
     items: [
       { label: 'Video', to: '/video' },
-      { label: 'Markdown', to: '/markdown' },
       { label: 'Weather', to: '/weather' },
       { label: 'Subnet', to: '/subnet' },
     ],

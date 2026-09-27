@@ -15,6 +15,8 @@
 
 "use strict";
 
+import "../styles/markdown.css";
+
 /* ======================================================================
  *  0.  Tiny DOM + utility helpers
  * ====================================================================== */
@@ -77,6 +79,25 @@ function loadModule(url) {
   const p = import(/* @vite-ignore */ url);
   _loadedModules.set(url, p);
   return p;
+}
+
+/* -------- Markdown --------
+ * Used by the "md" format below and by the Document page's live edit
+ * preview (both call handler.render(), so this is the only place markdown
+ * gets rendered). Renders via `marked` (lazy-loaded like everything else
+ * here) rather than a hand-rolled parser — full GFM support (tables, nested
+ * lists, task lists, fenced code, ...) isn't worth reimplementing by hand
+ * for a feature that already has a small, well-tested library. */
+const MARKED_URL = "https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.2/marked.min.js";
+async function renderMarkdown(text) {
+  try {
+    if (!window.marked?.parse) await loadScript(MARKED_URL);
+    window.marked.setOptions({ gfm: true, breaks: true });
+    return window.marked.parse(text ?? "");
+  } catch (err) {
+    console.error(err);
+    return `<pre class="md-fallback-error">Couldn't load the markdown renderer, showing raw text instead.\n\n${escapeHtml(text ?? "")}</pre>`;
+  }
 }
 
 /* ======================================================================
@@ -885,6 +906,7 @@ const FORMAT_REGISTRY = [
     extensions: ["csv", "tsv", "tab"],
     mimeTypes: ["text/csv", "text/tab-separated-values"],
     libs: ["https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"],
+    textBased: true,
     async render(file, host) {
       await loadScript(this.libs[0]);
       const result = await new Promise((resolve, reject) => {
@@ -955,6 +977,7 @@ const FORMAT_REGISTRY = [
     id: "txt", label: "Plain Text",
     extensions: ["txt", "log", "ini", "cfg", "conf", "yaml", "yml"],
     mimeTypes: ["text/plain"],
+    textBased: true,
     async render(file, host) {
       const text = await file.text();
       host.innerHTML = `<pre class="plain-pre">${escapeHtml(text)}</pre>`;
@@ -967,6 +990,7 @@ const FORMAT_REGISTRY = [
     id: "json", label: "JSON",
     extensions: ["json", "geojson"],
     mimeTypes: ["application/json"],
+    textBased: true,
     async render(file, host) {
       const raw = await file.text();
       let pretty = raw;
@@ -981,12 +1005,11 @@ const FORMAT_REGISTRY = [
     id: "md", label: "Markdown",
     extensions: ["md", "markdown", "mdown"],
     mimeTypes: ["text/markdown"],
-    libs: ["https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.2/marked.min.js"],
+    textBased: true,
     async render(file, host) {
-      await loadScript(this.libs[0]);
       const text = await file.text();
-      const html = (window.marked && marked.parse) ? marked.parse(text) : `<pre>${escapeHtml(text)}</pre>`;
-      host.innerHTML = `<div class="page">${html}</div>`;
+      const html = await renderMarkdown(text);
+      host.innerHTML = `<div class="page md-render">${html}</div>`;
       return { title: file.name, status: "Loaded (Markdown)" };
     },
   },
@@ -1026,6 +1049,7 @@ const FORMAT_REGISTRY = [
     id: "html", label: "HTML Source",
     extensions: ["html", "htm", "xhtml"],
     mimeTypes: ["text/html"],
+    textBased: true,
     async render(file, host) {
       const text = await file.text();
       host.innerHTML = `<pre class="plain-pre">${escapeHtml(text)}</pre>`;

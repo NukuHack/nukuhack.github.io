@@ -1,5 +1,5 @@
 import { lazy, Suspense } from 'react';
-import { Route, Routes, BrowserRouter } from 'react-router-dom';
+import { Route, Routes, BrowserRouter, Navigate } from 'react-router-dom';
 import { ModalProvider } from './context/ModalContext.jsx';
 import Layout from './components/Layout.jsx';
 import Home from './pages/Home.jsx';
@@ -13,7 +13,6 @@ const Extra = lazy(() => import('./pages/Extra.jsx'));
 const Links = lazy(() => import('./pages/Links.jsx'));
 const Subnet = lazy(() => import('./pages/Subnet.jsx'));
 const Code = lazy(() => import('./pages/Code.jsx'));
-const Markdown = lazy(() => import('./pages/Markdown.jsx'));
 const Video = lazy(() => import('./pages/Video.jsx'));
 const DocumentPage = lazy(() => import('./pages/Document.jsx'));
 const Navigator = lazy(() => import('./pages/Navigator.jsx'));
@@ -43,7 +42,6 @@ function AppRoutes() {
           <Route path="/links" element={<Links />} />
           <Route path="/subnet" element={<Subnet />} />
           <Route path="/code" element={<Code />} />
-          <Route path="/markdown" element={<Markdown />} />
           <Route path="/video" element={<Video />} />
           <Route path="/document" element={<DocumentPage />} />
           <Route path="/navigator" element={<Navigator />} />

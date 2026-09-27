@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import '../styles/document.css';
 import { FORMAT_REGISTRY } from '../lib/documentViewer.js';
+import { useModal } from '../context/ModalContext.jsx';
 
 function detectHandler(file) {
   const name = (file.name || '').toLowerCase();
@@ -24,6 +25,7 @@ function detectHandler(file) {
 }
 
 export default function Document() {
+  const { openModal } = useModal();
   const hostRef = useRef(null);
   const filePickerRef = useRef(null);
   const currentFileRef = useRef(null);
@@ -39,6 +41,12 @@ export default function Document() {
   const [errorText, setErrorText] = useState(null);
   const [saveDisabled, setSaveDisabled] = useState(true);
   const [overlay, setOverlay] = useState({ show: false, text: 'Loading…' });
+
+  // Live edit/preview split (only ever enabled for handler.textBased formats,
+  // e.g. Markdown, plain text, JSON, CSV, HTML source).
+  const [activeHandler, setActiveHandler] = useState(null);
+  const [editMode, setEditMode] = useState(false);
+  const [editText, setEditText] = useState('');
 
   // Whole-page drag & drop, exactly like the original (listens on `document`,
   // not just the dropzone, so dropping anywhere on the page works).
@@ -90,6 +98,10 @@ export default function Document() {
     setErrorText(null);
     xlsxRendererRef.current = null;
     currentFileRef.current = null;
+    // Reset always closes the editor — there's nothing left to edit.
+    setEditMode(false);
+    setEditText('');
+    setActiveHandler(null);
     document.title = 'Universal Document Viewer';
   }
 
@@ -126,6 +138,22 @@ export default function Document() {
     currentFileRef.current = file;
     setSaveDisabled(false);
     xlsxRendererRef.current = null;
+    setActiveHandler(handler);
+
+    // Opening a new document: if it isn't text-based, the editor (if open)
+    // no longer applies to anything and closes. If it IS text-based and the
+    // editor was already open, keep it open and load the new file's text in
+    // so editing continues seamlessly on the new document.
+    if (!handler.textBased) {
+      setEditMode(false);
+      setEditText('');
+    } else if (editMode) {
+      try {
+        setEditText(await file.text());
+      } catch {
+        setEditText('');
+      }
+    }
 
     const ctx = {
       setStatus: (s) => setStatusText(s),
@@ -152,6 +180,86 @@ export default function Document() {
       setOverlay((prev) => ({ ...prev, show: false }));
     }
   }
+
+  // Reads the clipboard as text, opens it as a (virtual) .md file, and jumps
+  // straight into the editor — the paste-and-preview workflow the old
+  // standalone Markdown page offered, now built on the same viewer/editor
+  // as every other format instead of a separate page.
+  async function pasteFromClipboard() {
+    if (!navigator.clipboard?.readText) {
+      openModal('Clipboard unavailable', "This browser won't let the page read the clipboard. Try Ctrl/Cmd+V into a .md file and opening that instead.");
+      return;
+    }
+    let text;
+    try {
+      text = await navigator.clipboard.readText();
+    } catch (err) {
+      openModal('Clipboard permission denied', err?.message || 'Could not read the clipboard. Your browser may need permission granted first.');
+      return;
+    }
+    if (!text) {
+      openModal('Clipboard is empty', 'There was no text on the clipboard to paste.');
+      return;
+    }
+    const file = new File([text], 'clipboard.md', { type: 'text/markdown' });
+    await openFile(file);
+    // openFile only auto-opens the editor if it was already open; force it
+    // open here since the whole point of pasting is to edit immediately.
+    setEditText(text);
+    setEditMode(true);
+  }
+
+  // ─── Live edit/preview ────────────────────────────────────────────────
+  async function toggleEditMode() {
+    if (editMode) {
+      closeEditMode();
+      return;
+    }
+    if (!activeHandler?.textBased || !currentFileRef.current) return;
+    try {
+      const text = await currentFileRef.current.text();
+      setEditText(text);
+      setEditMode(true);
+    } catch (err) {
+      openModalError(err);
+    }
+  }
+
+  function closeEditMode() {
+    setEditMode(false);
+  }
+
+  function openModalError(err) {
+    console.error(err);
+    setErrorText(err?.message || String(err));
+  }
+
+  // Re-render the preview from the edited text whenever it changes (debounced
+  // so we don't re-parse on every keystroke), and keep the underlying file in
+  // sync so Save exports the edited content.
+  useEffect(() => {
+    if (!editMode || !activeHandler || !currentFileRef.current) return;
+    const t = setTimeout(async () => {
+      const baseFile = currentFileRef.current;
+      const updated = new File([editText], baseFile.name, { type: baseFile.type });
+      currentFileRef.current = updated;
+      setSaveDisabled(false);
+      if (!hostRef.current) return;
+      hostRef.current.innerHTML = '';
+      try {
+        const result = (await activeHandler.render(updated, hostRef.current, {
+          setStatus: setStatusText,
+          onXlsxReady: () => {},
+        })) || {};
+        setStatusText(result.status || 'Updated');
+        setErrorText(null);
+      } catch (err) {
+        setErrorText(err.message || String(err));
+      }
+    }, 200);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [editText, editMode, activeHandler]);
 
   // Tab-switching delegation for the *modern* XLSX renderer (the legacy .xls
   // handler wires its own listener directly on its own markup, same as the
@@ -186,11 +294,29 @@ export default function Document() {
             Open file
           </label>
           <input type="file" id="filePicker" ref={filePickerRef} onChange={handleFilePickerChange} />
+          <button id="pasteBtn" title="Paste clipboard text as a new document and start editing it" onClick={pasteFromClipboard}>
+            📋 Paste as text
+          </button>
           <button id="saveBtn" disabled={saveDisabled} title="Save file to disk" onClick={saveFile}>
             💾 Save
           </button>
           <button id="reloadBtn" title="Reset" onClick={resetViewer}>
             ↺ Reset
+          </button>
+          <button
+            id="editBtn"
+            className={editMode ? 'active' : ''}
+            disabled={!activeHandler?.textBased}
+            title={
+              activeHandler?.textBased
+                ? editMode
+                  ? 'Close the editor'
+                  : 'Edit this document'
+                : 'Editing is only available for text-based documents (Markdown, TXT, JSON, CSV, HTML)'
+            }
+            onClick={toggleEditMode}
+          >
+            {editMode ? '✕ Close edit' : '✏️ Edit'}
           </button>
           <div className="spacer" />
           <div id="fileMeta" style={{ display: fileMetaVisible ? 'flex' : 'none' }}>
@@ -221,7 +347,28 @@ export default function Document() {
       <div id="error" style={{ display: errorText ? 'block' : 'none' }}>
         {errorText}
       </div>
-      <div id="viewer" className={viewerActive ? 'active' : ''} ref={hostRef} onClick={handleHostClick} />
+
+      <div id="viewerArea" className={editMode ? 'edit-mode' : ''}>
+        {editMode && (
+          <div id="editorPane">
+            <div className="editor-head">
+              <span>✏️ Editing — {fileName}</span>
+              <button className="editor-close" onClick={closeEditMode} title="Close editor">
+                ✕ Close
+              </button>
+            </div>
+            <textarea
+              id="editorText"
+              value={editText}
+              onChange={(e) => setEditText(e.target.value)}
+              spellCheck="false"
+              autoCapitalize="off"
+              autoCorrect="off"
+            />
+          </div>
+        )}
+        <div id="viewer" className={viewerActive ? 'active' : ''} ref={hostRef} onClick={handleHostClick} />
+      </div>
 
       <div id="loading-overlay" className={overlay.show ? 'show' : ''}>
         <div className="box">
