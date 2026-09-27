@@ -1,9 +1,9 @@
 
 canvas {
     display: block;
-    width: 95%;
-    height: auto;
-    align-self: center;
+    width: 99%;
+    height: 100%;
+    margin: 0 auto;
     border: 1px solid var(--border-cold-color);
 }
 

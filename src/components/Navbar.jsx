@@ -94,18 +94,21 @@ export default function Navbar() {
     <>
       <nav className="navbar" id="navbar">
         <div className="navbar_in">
-          <Link className="navbar_head link" to="/">
-            {pageTitle(location.pathname)}
-          </Link>
-          <button
-            type="button"
-            className="navbar_toggle"
-            id="navbarToggle"
-            ref={toggleRef}
-            onClick={() => setNavOpen((v) => !v)}
-          >
-            <img id="menu_image" src="/assets/menu_bars.png" alt="Menu" />
-          </button>
+          <div className="navbar_spacer" aria-hidden="true" />
+          <div className="navbar_center">
+            <Link className="navbar_head link" to="/">
+              {pageTitle(location.pathname)}
+            </Link>
+            <button
+              type="button"
+              className="navbar_toggle"
+              id="navbarToggle"
+              ref={toggleRef}
+              onClick={() => setNavOpen((v) => !v)}
+            >
+              <img id="menu_image" src="/assets/menu_bars.png" alt="Menu" />
+            </button>
+          </div>
           <div
             className={`navbar_items${navOpen ? ' show' : ''}`}
             id="navbarDropdown"

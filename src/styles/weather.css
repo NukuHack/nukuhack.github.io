@@ -3,6 +3,7 @@
 .weather-container {
     position: relative;
     top: 10%;
+    margin: auto;
     background-color: var(--background-dark-color);
     padding: 30px;
     border-radius: 12px;
@@ -24,6 +25,13 @@
     border-radius: 15px;
     overflow: hidden;
     color: var(--font-dark-color);
+}
+
+/* Empty paragraphs (no error, no weather text yet) shouldn't render as
+   visible padded boxes that shove the rest of the container down. */
+.weather-container p:empty {
+    display: none;
+    margin: 0;
 }
 
 #city_input {

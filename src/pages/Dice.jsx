@@ -269,11 +269,11 @@ export default function Dice() {
   };
 
   return (
-    <>
+    <div className="dice-page">
       <canvas id="canvas" ref={canvasRef} />
       <button id="rollButton" onClick={rollDice}>
         Roll Dice
       </button>
-    </>
+    </div>
   );
 }

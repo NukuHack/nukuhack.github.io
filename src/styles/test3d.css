@@ -2,12 +2,15 @@
 canvas {
     display: block;
     background: var(--background-dark-color);
+    width: 99%;
+    height: 99%;
 }
 
 /* Style the container to use CSS Grid */
 #controls {
     position: absolute;
     bottom: 100px;
+    left: 50%;
     transform: translateX(-50%);
     gap: 5px;
     display: flex;

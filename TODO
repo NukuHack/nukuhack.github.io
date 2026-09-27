@@ -1,64 +1,42 @@
 
+test3d:
+    insainly bad positions, should be nicer, like a div with canvas and buttons in
+    buttons relative to div
 
-code page :
-
-    opening a snippet : popup too right, not centered
-
-animation page :
-
-    canvas is left aligned, should be centered
-    it is also not high enough to fill the entire screen, should be anount 99% fill, in both direction
-
-test3d :
-    controls are pushed to the left, not centered (like they should)
-
-extra page : 
-    not centered, too left
-
-links page :
-    might be on the right a bit, not sure
-
-urltable :
-    not wide enough with data in it, if it has data it should be atleast 70% width
-
-navigation :
-    not wide enough, buttons fall off from header, should make the buttons not overflow, so nicely scale on small screens
-    also make it atleast 70% width
-
-doc-viewer :
-    
-    in markdown : code is not left aligned (centered)
-        (would also be nice to display what the code is)
-        (maybe even a copy to clipboard button ?)
-
-    edit :
-        too thin, and tall, roughtly should be the size of the rendered thing
-            it would be even better if the user could resize easily by dragging (by sides or corners)
-
-    general :
-        would be really nice to have a 2 page display for page-y things (like pdf)
-        or just the user-defined dragging thing (by sides or corners) if it's not page-based
-        edit header directly touches toolbar, while rendered does not, looks bad, make it nicer in some way
-        if file name is too big (more than 7 char including extension) the status in toolbar flows to the next line
-            make nicer sizing, this should not happen 
-        in small screens the rendered thing overfrows from 'viewer' (mainly if edit is on)
-
-video :
-    stuff is too thin, and left aligned instead of center
-        file details, is left aligned, should be center
-        video container is not wide enough (would be centered with more width)
+editing makes 2 renderer (in micro-react version)
 
 weather :
     clicking on get weather makes the entire "weather-container" pushed down by a lot (no reason)
     also now the response is html formatted, so doN't display it as raw text (it used to be that)
 
 subent :
-    in host calculator
-        clicking on spasre should only resize the result, not the entire page content
+    stuff should be thinner, not 100% wide
+    tab switcher should be centered
 
 
+doc-viewer :
+    
+    in markdown : code is not left aligned (centered)
+        would also be nice to display what the code is (so ```js would display it)
+        maybe even a copy to clipboard button, nextto the code type
+            if the code type is undefined, display as ```txt, so "text"
+
+    edit :
+        too thin, and tall, roughtly should be the size of the rendered thing
+            it would be even better if the user could resize easily by dragging (by sides or corners)
+        edit header directly touches toolbar, while rendered does not, looks bad, make it nicer in some way
+        if file name is too big (more than 7 char including extension) the status in toolbar flows to the next line
+            make nicer sizing, this should not happen 
+
+    general :
+        would be really nice to have a 2 page display for page-y things (like pdf)
+        or just the user-defined dragging thing (by sides or corners) if it's not page-based
+        in small screens the rendered thing overfrows from 'viewer' (mainly if edit is on)
 
 
 originally this website was written without react, so any kind of header, context, fotter was hand rolled
     if there is any spacing inside the code just to make the footer or header not overlap to the content
     it should be removed (since react creates nice DOM, by itself)
+    NOTE: left this one alone for now - navbar/footer are `position: fixed`, so the #navbarHelp/#footerHelp
+    spacer divs are actually still needed to keep content from sliding under them; removing them would
+    hide content behind the nav/footer. Flagging instead of just deleting them.

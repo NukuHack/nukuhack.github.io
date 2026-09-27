@@ -23,14 +23,18 @@
     flex-direction: column;
     height: 100vh;
     width: 95%;
+    inset: 0;
+    margin: auto;
   }
 
   /* ── TOOLBAR ── */
   .toolbar {
     flex-shrink: 0;
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     gap: 10px;
+    row-gap: 8px;
     padding: 10px 14px;
     background: var(--surface);
     border-bottom: 1px solid var(--border);
@@ -55,7 +59,8 @@
 
   /* address bar */
   .bar-wrap {
-    flex: 1;
+    flex: 1 1 240px;
+    min-width: 0;
     display: flex;
     align-items: center;
     gap: 0;
@@ -315,6 +320,15 @@
   @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
   #sbMsg { flex: 1; }
   #sbTime { margin-left: auto; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 520px) {
+    .toolbar { gap: 6px; padding: 8px 10px; }
+    .nav-btn { width: 30px; height: 30px; font-size: 13px; }
+    .tab { padding: 5px 9px; font-size: 11px; }
+    .go-btn { width: 26px; height: 26px; }
+    #addressInput { font-size: 12px; padding: 7px 6px; }
+  }
 
   /* loading overlay */
   .overlay {

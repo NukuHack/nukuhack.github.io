@@ -30,15 +30,17 @@
 }
 
 #fileDetails {
-    margin: 20px;
+    margin: 20px auto;
+    text-align: center;
 }
 
 /* Video Container */
 #videoContainer {
     position: relative;
     width: 80%;
+    margin: 0 auto;
     height: auto;
-    max-width: 900px;
+    max-width: 1200px;
     background: var(--background-middle-color);
     border-radius: 10px;
     overflow: hidden;

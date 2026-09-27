@@ -30,8 +30,11 @@ export default function Weather() {
         throw new Error('Failed to fetch data');
       }
 
-      // Get the response data (we expect plain text)
-      const data = await response.text();
+      // wttr.in returns a full HTML page for non-curl user agents (like a
+      // browser's fetch), so strip any tags to get back the plain text we
+      // actually want to display instead of showing raw markup to the user.
+      const raw = await response.text();
+      const data = raw.replace(/<[^>]*>/g, '').trim();
 
       // Check if the data is the default response: "+14 sunny"
       if (data === '+14 sunny') {

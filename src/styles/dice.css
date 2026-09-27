@@ -1,13 +1,16 @@
+.dice-page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
 #canvas {
-    position: relative;
-    top: 10%;
     border: 2px solid var(--border-dark-color);
     background-color: var(--background-cold-color);
+    width: 55%;
 }
 
 #rollButton {
-    position: relative;
-    top: 10%;
     margin-top: 20px;
     padding: 10px 20px;
     font-size: 16px;
