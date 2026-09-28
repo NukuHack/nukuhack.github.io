@@ -47,6 +47,10 @@ export default function Document() {
   const [activeHandler, setActiveHandler] = useState(null);
   const [editMode, setEditMode] = useState(false);
   const [editText, setEditText] = useState('');
+  const [editorWidth, setEditorWidth] = useState(null); // null = use CSS default
+  const [resizing, setResizing] = useState(false);
+  const editorPaneRef = useRef(null);
+  const viewerAreaRef = useRef(null);
 
   // Whole-page drag & drop, exactly like the original (listens on `document`,
   // not just the dropzone, so dropping anywhere on the page works).
@@ -102,6 +106,7 @@ export default function Document() {
     setEditMode(false);
     setEditText('');
     setActiveHandler(null);
+    setEditorWidth(null);
     document.title = 'Universal Document Viewer';
   }
 
@@ -229,6 +234,39 @@ export default function Document() {
     setEditMode(false);
   }
 
+  // Drag-to-resize the editor pane by its right edge, clamped to something
+  // sane relative to the viewer's own width so it can't swallow the whole
+  // screen or shrink to nothing.
+  function startEditorResize(e) {
+    e.preventDefault();
+    const container = viewerAreaRef.current;
+    const pane = editorPaneRef.current;
+    if (!container || !pane) return;
+    setResizing(true);
+    const containerRect = container.getBoundingClientRect();
+    // The pane has its own left margin, so measure from the pane's edge (not
+    // the container's) or the handle would jump away from the cursor.
+    const paneLeft = pane.getBoundingClientRect().left;
+    const move = (moveEvent) => {
+      const clientX = moveEvent.touches ? moveEvent.touches[0].clientX : moveEvent.clientX;
+      const min = 260;
+      const max = Math.max(min, containerRect.right - paneLeft - 260);
+      const next = Math.min(max, Math.max(min, clientX - paneLeft));
+      setEditorWidth(next);
+    };
+    const stop = () => {
+      setResizing(false);
+      window.removeEventListener('mousemove', move);
+      window.removeEventListener('mouseup', stop);
+      window.removeEventListener('touchmove', move);
+      window.removeEventListener('touchend', stop);
+    };
+    window.addEventListener('mousemove', move);
+    window.addEventListener('mouseup', stop);
+    window.addEventListener('touchmove', move);
+    window.addEventListener('touchend', stop);
+  }
+
   function openModalError(err) {
     console.error(err);
     setErrorText(err?.message || String(err));
@@ -318,14 +356,19 @@ export default function Document() {
           >
             {editMode ? '✕ Close edit' : '✏️ Edit'}
           </button>
-          <div className="spacer" />
-          <div id="fileMeta" style={{ display: fileMetaVisible ? 'flex' : 'none' }}>
-            <span className="badge" id="fileType">
-              {fileTypeLabel || '—'}
-            </span>
-            <span id="fileName">{fileName}</span>
+          <div className="file-info">
+            <div id="fileMeta" style={{ display: fileMetaVisible ? 'flex' : 'none' }}>
+              <span className="badge" id="fileType">
+                {fileTypeLabel || '—'}
+              </span>
+              <span id="fileName" title={fileName}>
+                {fileName}
+              </span>
+            </div>
+            <div id="status" title={statusText}>
+              {statusText}
+            </div>
           </div>
-          <div id="status">{statusText}</div>
         </div>
       </div>
 
@@ -348,9 +391,17 @@ export default function Document() {
         {errorText}
       </div>
 
-      <div id="viewerArea" className={editMode ? 'edit-mode' : ''}>
+      <div
+        id="viewerArea"
+        ref={viewerAreaRef}
+        className={`${editMode ? 'edit-mode' : ''} ${resizing ? 'resizing' : ''}`.trim()}
+      >
         {editMode && (
-          <div id="editorPane">
+          <div
+            id="editorPane"
+            ref={editorPaneRef}
+            style={editorWidth ? { flex: `0 0 ${editorWidth}px`, maxWidth: editorWidth } : undefined}
+          >
             <div className="editor-head">
               <span>✏️ Editing — {fileName}</span>
               <button className="editor-close" onClick={closeEditMode} title="Close editor">
@@ -364,6 +415,12 @@ export default function Document() {
               spellCheck="false"
               autoCapitalize="off"
               autoCorrect="off"
+            />
+            <div
+              className={`editor-resize-handle${resizing ? ' dragging' : ''}`}
+              onMouseDown={startEditorResize}
+              onTouchStart={startEditorResize}
+              title="Drag to resize"
             />
           </div>
         )}

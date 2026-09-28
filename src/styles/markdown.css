@@ -83,6 +83,55 @@
   font-size: .85em;
   line-height: 1.5;
   white-space: pre;
+  text-align: left;
+  display: block;
+}
+
+/* Fenced code blocks: language label + copy button above the code, both
+   produced by markdownCodeRenderer() in documentViewer.js. */
+.md-render .md-code-block {
+  margin: .8em 0;
+  border: 1px solid rgba(128,128,128,.3);
+  border-radius: 8px;
+  overflow: hidden;
+}
+.md-render .md-code-block pre {
+  margin: 0;
+  border: none;
+  border-radius: 0;
+}
+.md-render .md-code-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 5px 10px;
+  background: rgba(128,128,128,.2);
+  border-bottom: 1px solid rgba(128,128,128,.3);
+  font-family: ui-monospace, 'Fira Code', Menlo, Consolas, monospace;
+  font-size: .72em;
+}
+.md-render .md-code-lang {
+  text-transform: lowercase;
+  letter-spacing: .4px;
+  opacity: .75;
+}
+.md-render .md-code-copy {
+  flex: none;
+  border: 1px solid rgba(128,128,128,.4);
+  background: rgba(128,128,128,.12);
+  color: inherit;
+  border-radius: 5px;
+  padding: 2px 9px;
+  font: inherit;
+  font-size: .95em;
+  cursor: pointer;
+  transition: background .15s, border-color .15s, color .15s;
+}
+.md-render .md-code-copy:hover { background: rgba(128,128,128,.28); }
+.md-render .md-code-copy.copied {
+  color: var(--color-accent, #7ab8f5);
+  border-color: var(--color-accent, #7ab8f5);
 }
 
 .md-render table {

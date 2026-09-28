@@ -14,26 +14,6 @@ subent :
     tab switcher should be centered
 
 
-doc-viewer :
-    
-    in markdown : code is not left aligned (centered)
-        would also be nice to display what the code is (so ```js would display it)
-        maybe even a copy to clipboard button, nextto the code type
-            if the code type is undefined, display as ```txt, so "text"
-
-    edit :
-        too thin, and tall, roughtly should be the size of the rendered thing
-            it would be even better if the user could resize easily by dragging (by sides or corners)
-        edit header directly touches toolbar, while rendered does not, looks bad, make it nicer in some way
-        if file name is too big (more than 7 char including extension) the status in toolbar flows to the next line
-            make nicer sizing, this should not happen 
-
-    general :
-        would be really nice to have a 2 page display for page-y things (like pdf)
-        or just the user-defined dragging thing (by sides or corners) if it's not page-based
-        in small screens the rendered thing overfrows from 'viewer' (mainly if edit is on)
-
-
 originally this website was written without react, so any kind of header, context, fotter was hand rolled
     if there is any spacing inside the code just to make the footer or header not overlap to the content
     it should be removed (since react creates nice DOM, by itself)

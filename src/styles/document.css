@@ -12,13 +12,12 @@ font-family: system-ui,sans-serif; font-size: 13px;
 box-shadow: 0 1px 6px rgba(0,0,0,.35);
 }
 #toolbar .toolbar-inner {
-width: 100%; max-width: 794px;
+width: 100%; max-width: 960px;
 display: flex; align-items: center; gap: 12px;
 padding: 10px 0; flex-wrap: wrap;
 }
 #toolbar .brand { font-weight: 600; letter-spacing: .3px; }
 #toolbar .brand span { color: var(--accent); }
-#toolbar .spacer { flex: 1 1 auto; }
 #toolbar button, #toolbar label.btn {
 display: inline-flex; align-items: center; gap: 6px;
 background: var(--color-bg-raised); color: var(--toolbar-fg);
@@ -32,15 +31,23 @@ transition: background .15s, border-color .15s;
 #toolbar input[type=file] { display: none; }
 #toolbar button#editBtn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
 #toolbar button#editBtn.active:hover { background: var(--accent); filter: brightness(1.1); }
-#fileMeta { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--color-text-on-dark-soft); min-width: 0; flex-shrink: 1; }
+/* The file info (badge + name + status) is one flex item that soaks up whatever
+   room is left on the row. The name is the only thing that shrinks (ellipsis),
+   so a long file name can never push the status onto its own line. If there
+   really isn't room for it (narrow screens), the whole group wraps together. */
+#toolbar .file-info {
+flex: 1 1 0%; min-width: 200px;
+display: flex; align-items: center; justify-content: flex-end; gap: 12px;
+}
+#fileMeta { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--color-text-on-dark-soft); min-width: 0; flex: 0 1 auto; overflow: hidden; }
 #fileMeta .badge {
 background: var(--accent); color: #fff; padding: 2px 7px;
 border-radius: 4px; font-weight: 600; text-transform: uppercase;
 font-size: 10px; letter-spacing: .5px;
 flex-shrink: 0;
 }
-#fileName { max-width: min(260px, 30vw); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-#status { font-size: 12px; color: var(--color-text-muted); flex-shrink: 0; white-space: nowrap; }
+#fileName { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+#status { font-size: 12px; color: var(--color-text-muted); flex: 0 0 auto; min-width: 0; max-width: 60%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
 #dropzone {
 max-width: 680px; margin: 60px auto; padding: 48px 24px;
@@ -70,29 +77,48 @@ font-family: system-ui,sans-serif; font-size: 13px; white-space: pre-wrap;
 /* ---- Live edit/preview split (Edit button) ----
    Normally #viewerArea has no layout effect of its own — #viewer centers
    itself as usual. In edit-mode it becomes a two-column row: the editor on
-   the left, the (still centered-within-its-column) preview pushed right. */
+   the left, the preview on the right. The columns share the width equally
+   (the editor is capped at the width of a rendered .page) and the editor is
+   stretched to the height of the preview instead of being forced to a full
+   screen tall, so the two panes are roughly the same size.
+   The editor's top/bottom margins mirror #viewer's own padding, so it sits
+   the same distance below the toolbar as the rendered page does. */
 #viewerArea.edit-mode {
   display: flex;
   align-items: stretch;
-  min-height: 100vh;
 }
 #viewerArea.edit-mode #editorPane {
-  flex: 0 0 42%;
-  max-width: 640px;
-  min-width: 300px;
+  flex: 1 1 0%;
+  max-width: 794px;
+  min-width: 260px;
+  margin: 32px 0 64px 24px;
   display: flex;
   flex-direction: column;
   background: var(--color-bg-deepest);
-  border-right: 1px solid var(--border-medium-color);
+  box-shadow: var(--shadow);
+  position: relative;
 }
 #editorPane .editor-head {
   display: flex; align-items: center; justify-content: space-between;
   padding: 10px 14px; gap: 10px;
-  margin-top: 1px;
   font: 12px system-ui, sans-serif; letter-spacing: .3px;
   color: var(--color-text-on-dark-soft); background: var(--toolbar-bg);
   border-bottom: 1px solid var(--border-medium-color);
 }
+#editorPane .editor-resize-handle {
+  position: absolute;
+  top: 0; right: -4px; bottom: 0;
+  width: 8px;
+  cursor: col-resize;
+  z-index: 2;
+  touch-action: none;
+}
+#editorPane .editor-resize-handle:hover,
+#editorPane .editor-resize-handle.dragging {
+  background: var(--accent);
+  opacity: .35;
+}
+#viewerArea.edit-mode.resizing { cursor: col-resize; user-select: none; }
 #editorPane .editor-head span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 #editorPane .editor-close {
   flex: none;
@@ -102,20 +128,29 @@ font-family: system-ui,sans-serif; font-size: 13px; white-space: pre-wrap;
 }
 #editorPane .editor-close:hover { background: var(--color-danger); border-color: var(--color-danger); }
 #editorText {
-  flex: 1; min-height: 60vh; resize: none; border: none; outline: none;
+  flex: 1; min-height: 240px; resize: none; border: none; outline: none;
   padding: 18px; background: var(--color-bg-raised); color: var(--color-text-on-dark);
   font-family: ui-monospace, 'Fira Code', Menlo, Consolas, monospace;
   font-size: 13px; line-height: 1.6; white-space: pre; overflow: auto;
 }
 #viewerArea.edit-mode #viewer {
-  flex: 1; min-width: 0; align-items: flex-start; padding: 32px 40px 64px;
+  flex: 1 1 0%; min-width: 0; min-height: 0; align-items: flex-start; padding: 32px 24px 64px;
 }
 
 @media (max-width: 860px) {
   #viewerArea.edit-mode { flex-direction: column; }
-  #viewerArea.edit-mode #editorPane { flex: none; max-width: none; min-width: 0; border-right: none; border-bottom: 1px solid var(--border-medium-color); }
+  #viewerArea.edit-mode #editorPane { flex: none !important; max-width: none !important; min-width: 0; margin: 24px 16px 0; }
+  #viewerArea.edit-mode #editorPane .editor-resize-handle { display: none; }
   #editorText { min-height: 40vh; }
   #viewerArea.edit-mode #viewer { padding: 24px 16px 48px; }
+}
+#viewer, #viewerArea.edit-mode #viewer {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+#viewer .page, #viewer .pdf-page, #viewer #xlsx-wrap, #viewer .legacy-doc-wrap, #viewer #odf-host, #viewer .plain-pre, #viewer .csv-wrap {
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .page {
@@ -189,7 +224,6 @@ border-radius: 50%; animation: spin .8s linear infinite; margin: 0 auto 12px;
 @media (max-width: 860px) {
 .page { padding: 40px 24px; }
 #toolbar .toolbar-inner { padding: 8px 0; gap: 8px; font-size: 12px; }
-#fileName { max-width: 140px; }
 }
 @media print {
 #toolbar, #dropzone, #error, #loading-overlay { display: none !important; }

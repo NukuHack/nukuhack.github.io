@@ -89,15 +89,62 @@ function loadModule(url) {
  * lists, task lists, fenced code, ...) isn't worth reimplementing by hand
  * for a feature that already has a small, well-tested library. */
 const MARKED_URL = "https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.2/marked.min.js";
+let _codeBlockSeq = 0;
+
+// Custom code-block rendering: shows the fenced language (defaulting to
+// "txt" when none was given) in a small header above the block, with a
+// copy-to-clipboard button next to it.
+function markdownCodeRenderer(code, infostring) {
+  const lang = (infostring || "").trim().split(/\s+/)[0] || "txt";
+  const id = `md-code-${Date.now().toString(36)}-${_codeBlockSeq++}`;
+  return (
+    `<div class="md-code-block">` +
+      `<div class="md-code-head">` +
+        `<span class="md-code-lang">${escapeHtml(lang)}</span>` +
+        `<button type="button" class="md-code-copy" data-code-target="${id}">Copy</button>` +
+      `</div>` +
+      `<pre><code id="${id}" class="language-${escapeHtml(lang)}">${escapeHtml(code)}</code></pre>` +
+    `</div>`
+  );
+}
+
 async function renderMarkdown(text) {
   try {
     if (!window.marked?.parse) await loadScript(MARKED_URL);
-    window.marked.setOptions({ gfm: true, breaks: true });
+    const renderer = new window.marked.Renderer();
+    renderer.code = markdownCodeRenderer;
+    window.marked.setOptions({ gfm: true, breaks: true, renderer });
     return window.marked.parse(text ?? "");
   } catch (err) {
     console.error(err);
     return `<pre class="md-fallback-error">Couldn't load the markdown renderer, showing raw text instead.\n\n${escapeHtml(text ?? "")}</pre>`;
   }
+}
+
+// Wires the "Copy" buttons produced by markdownCodeRenderer. Delegated on
+// `host` (called fresh after every render, initial or live-edit) so it
+// always applies to whatever code blocks are currently in the DOM.
+function wireCodeCopyButtons(host) {
+  $$(".md-code-copy", host).forEach((btn) => {
+    btn.onclick = async () => {
+      const target = host.querySelector("#" + btn.dataset.codeTarget);
+      if (!target) return;
+      const reset = (label) => {
+        btn.textContent = label;
+        setTimeout(() => {
+          btn.textContent = "Copy";
+          btn.classList.remove("copied");
+        }, 1400);
+      };
+      try {
+        await navigator.clipboard.writeText(target.textContent);
+        btn.classList.add("copied");
+        reset("Copied!");
+      } catch {
+        reset("Failed");
+      }
+    };
+  });
 }
 
 /* ======================================================================
@@ -1010,6 +1057,7 @@ const FORMAT_REGISTRY = [
       const text = await file.text();
       const html = await renderMarkdown(text);
       host.innerHTML = `<div class="page md-render">${html}</div>`;
+      wireCodeCopyButtons(host);
       return { title: file.name, status: "Loaded (Markdown)" };
     },
   },
