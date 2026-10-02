@@ -1,16 +1,16 @@
 
 .not-found {
-    min-height: 90%;
+    min-height: 70vh;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     font-family: var(--font, 'Segoe UI', system-ui, sans-serif);
-    background: var(--bg, #0f0f13);
     color: var(--text, #e8e8f0);
 }
 .not-found .container {
     max-width: 600px;
+    background: var(--surface, #18181f);
     text-align: center;
     padding: 2rem;
     transition: opacity 0.3s ease-in;
