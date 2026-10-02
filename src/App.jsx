@@ -19,6 +19,7 @@ const Navigator = lazy(() => import('./pages/Navigator.jsx'));
 const Animation = lazy(() => import('./pages/Animation.jsx'));
 const UrlTable = lazy(() => import('./pages/UrlTable.jsx'));
 const Test3D = lazy(() => import('./pages/Test3D.jsx'));
+const Convert = lazy(() => import('./pages/Convert.jsx'));
 
 export default function App() {
   return (
@@ -42,6 +43,7 @@ function AppRoutes() {
           <Route path="/links" element={<Links />} />
           <Route path="/subnet" element={<Subnet />} />
           <Route path="/code" element={<Code />} />
+          <Route path="/convert" element={<Convert />} />
           <Route path="/video" element={<Video />} />
           <Route path="/document" element={<DocumentPage />} />
           <Route path="/navigator" element={<Navigator />} />

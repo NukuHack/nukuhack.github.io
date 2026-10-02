@@ -20,15 +20,16 @@ const NAV_STRUCTURE = [
     items: [
       { label: 'Extra', to: '/extra' },
       { label: 'Links', to: '/links' },
-      { label: 'UrlTable', to: '/urltable' },
       { label: 'Navigator', to: '/navigator' },
       { label: 'DocViewer', to: '/document' },
+      { label: 'Convert', to: '/convert' },
     ],
   },
   {
     type: 'dropdown',
     label: 'Small Apps',
     items: [
+      { label: 'UrlTable', to: '/urltable' },
       { label: 'Video', to: '/video' },
       { label: 'Weather', to: '/weather' },
       { label: 'Subnet', to: '/subnet' },

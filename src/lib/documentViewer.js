@@ -1106,4 +1106,4 @@ const FORMAT_REGISTRY = [
   },
 ];
 
-export { FORMAT_REGISTRY };
+export { FORMAT_REGISTRY, DocxRenderer, XlsxRenderer, paginateDocxBlocks, renderDocxPages };

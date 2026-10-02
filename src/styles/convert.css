@@ -1,0 +1,256 @@
+.convert_page {
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 24px 20px 80px;
+  text-align: left;
+  color: var(--color-text-on-dark);
+}
+
+.convert_header h1 {
+  margin: 0 0 6px;
+  font-size: 1.8rem;
+}
+
+.convert_header p {
+  margin: 0 0 20px;
+  color: var(--color-text-on-dark-soft);
+  max-width: 780px;
+  line-height: 1.5;
+}
+
+.convert_toolbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding: 10px 12px;
+  margin-bottom: 14px;
+  background: var(--color-bg-deep);
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.22);
+}
+
+.convert_toolbar input[type="file"] {
+  display: none;
+}
+
+.convert_spacer {
+  flex: 1 1 0%;
+  min-width: 0;
+}
+
+.convert_btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  border-radius: 6px;
+  border: 1px solid var(--color-bg-mid);
+  background: var(--color-bg-raised);
+  color: var(--color-text-on-dark);
+  font: inherit;
+  font-size: 0.88rem;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, transform 0.05s;
+}
+.convert_btn:hover:not(:disabled) {
+  background: var(--color-bg-mid);
+  border-color: var(--color-accent);
+}
+.convert_btn:active:not(:disabled) {
+  transform: translateY(1px);
+}
+.convert_btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.convert_btn_primary {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  color: #fff;
+  font-weight: 600;
+}
+.convert_btn_primary:hover:not(:disabled) {
+  background: var(--color-accent-hover);
+  border-color: var(--color-accent-hover);
+}
+
+.convert_filename {
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid var(--color-bg-mid);
+  background: var(--color-bg-deepest);
+  color: var(--color-text-on-dark);
+  font: inherit;
+  font-size: 0.88rem;
+  min-width: 160px;
+  max-width: 260px;
+}
+.convert_filename:focus {
+  outline: none;
+  border-color: var(--color-accent);
+}
+
+.convert_ext {
+  color: var(--color-text-muted);
+  font-size: 0.88rem;
+  margin-left: -4px;
+}
+
+.convert_grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  align-items: stretch;
+}
+
+@media (max-width: 900px) {
+  .convert_grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.convert_pane {
+  display: flex;
+  flex-direction: column;
+  min-height: 560px;
+  background: var(--color-bg-deep);
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.28);
+}
+
+.convert_pane_head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 9px 14px;
+  font-size: 0.78rem;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  color: var(--color-text-on-dark-soft);
+  background: var(--color-bg-deepest);
+  border-bottom: 1px solid var(--color-bg-raised);
+}
+
+.convert_pane_meta {
+  color: var(--color-text-muted);
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.convert_textarea {
+  flex: 1;
+  border: none;
+  outline: none;
+  resize: none;
+  padding: 16px 18px;
+  background: var(--color-bg-raised);
+  color: var(--color-text-on-dark);
+  font-family: ui-monospace, 'Fira Code', Menlo, Consolas, monospace;
+  font-size: 13px;
+  line-height: 1.6;
+  white-space: pre;
+  overflow: auto;
+  tab-size: 2;
+}
+
+.convert_preview {
+  flex: 1;
+  overflow: auto;
+  padding: 20px;
+  background: var(--color-bg-deepest);
+}
+
+.convert_preview_inner {
+  /* .page already gives the paper look; this just makes it fit */
+  margin: 0 auto;
+  padding: 40px 48px;
+  min-height: 100%;
+}
+
+.convert_preview_hint,
+.convert_preview_error {
+  margin: 0;
+  padding: 12px;
+  font-size: 0.9rem;
+  color: var(--color-text-muted);
+}
+.convert_preview_error {
+  color: var(--color-danger);
+}
+
+.convert_note {
+  margin-top: 16px;
+  font-size: 0.82rem;
+  color: var(--color-text-muted);
+}
+
+/* ─── Prism theme ────────────────────────────────────────────────────────
+   Loaded on the preview *and* used by the hidden tokenizer in md2docx.js,
+   so whatever you see here is exactly what ends up in the DOCX. */
+.prism-theme pre {
+  background: #1e1e1e;
+  color: #d4d4d4;
+  border: none;
+  border-radius: 6px;
+  padding: 12px 14px;
+  margin: 0;
+  overflow-x: auto;
+  text-align: left;
+}
+.prism-theme code {
+  background: none;
+  color: inherit;
+  padding: 0;
+  border-radius: 0;
+  text-shadow: none;
+  font-family: ui-monospace, 'Fira Code', Menlo, Consolas, monospace;
+  font-size: 0.88em;
+  line-height: 1.5;
+  white-space: pre;
+  display: block;
+}
+.prism-theme .token.comment,
+.prism-theme .token.prolog,
+.prism-theme .token.doctype,
+.prism-theme .token.cdata { color: #6a9955; }
+.prism-theme .token.punctuation { color: #d4d4d4; }
+.prism-theme .token.property,
+.prism-theme .token.tag,
+.prism-theme .token.constant,
+.prism-theme .token.symbol,
+.prism-theme .token.deleted { color: #569cd6; }
+.prism-theme .token.boolean,
+.prism-theme .token.number { color: #b5cea8; }
+.prism-theme .token.selector,
+.prism-theme .token.attr-name,
+.prism-theme .token.string,
+.prism-theme .token.char,
+.prism-theme .token.builtin,
+.prism-theme .token.inserted { color: #ce9178; }
+.prism-theme .token.operator,
+.prism-theme .token.entity,
+.prism-theme .token.url { color: #d4d4d4; }
+.prism-theme .token.atrule,
+.prism-theme .token.attr-value,
+.prism-theme .token.keyword { color: #c586c0; }
+.prism-theme .token.function,
+.prism-theme .token.class-name { color: #dcdcaa; }
+.prism-theme .token.regex,
+.prism-theme .token.important,
+.prism-theme .token.variable { color: #d16969; }
+.prism-theme .token.important,
+.prism-theme .token.bold { font-weight: 700; }
+.prism-theme .token.italic { font-style: italic; }
+.prism-theme .token.entity { cursor: help; }
+.prism-theme .token.namespace { opacity: 0.7; }
+
+/* Keep the preview's code blocks from fighting the markdown.css defaults. */
+.convert_preview .md-render pre {
+  background: #1e1e1e;
+  border: none;
+  color: #d4d4d4;
+}
