@@ -31,9 +31,13 @@ export default function App() {
   );
 }
 
+function PageLoading() {
+  return <div className="page-loading">Loading…</div>;
+}
+
 function AppRoutes() {
   return (
-    <Suspense fallback={<div>Loading…</div>}>
+    <Suspense fallback={<Layout Child={PageLoading} />}>
       <Routes>
         <Route element={<Layout />}>
           <Route path="/" element={<Home />} />

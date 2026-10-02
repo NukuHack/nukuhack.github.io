@@ -3,11 +3,11 @@ import Navbar from './Navbar.jsx';
 import Footer from './Footer.jsx';
 import Modal from './Modal.jsx';
 
-export default function Layout() {
+export default function Layout({Child}) {
   return (
     <>
       <Navbar />
-      <Outlet />
+      {typeof Child === 'function' ? <Child /> : <Outlet />}
       <Modal />
       <Footer />
     </>
